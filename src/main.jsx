@@ -33,7 +33,7 @@ function App(){
   async function refresh(){try{setData(await api('/state'))}catch{setData(null)}finally{setLoading(false)}}
   useEffect(()=>{refresh()},[]);
   useEffect(()=>{if(!data)return;let alive=true;fetch('/api/fx').then(r=>r.json()).then(r=>{if(alive)setFx(r)}).catch(()=>{});const fxTimer=setInterval(()=>fetch('/api/fx').then(r=>r.json()).then(r=>{if(alive)setFx(r)}).catch(()=>{}),3600000);const timer=setInterval(()=>fetch('/api/state').then(r=>r.ok?r.json():null).then(s=>{if(alive)setData(previous=>JSON.stringify(previous)===JSON.stringify(s)?previous:s)}).catch(()=>{}),5000);return()=>{alive=false;clearInterval(timer);clearInterval(fxTimer)}},[data?.user?.id]);
-  useEffect(()=>{if(!data)return;const events=new EventSource('/api/events');events.addEventListener('update',refresh);return()=>events.close()},[data?.user?.id]);
+  useEffect(()=>{if(!data||data.realtime===false)return;const events=new EventSource('/api/events');events.addEventListener('update',refresh);return()=>events.close()},[data?.user?.id]);
   useEffect(()=>{localStorage.setItem('lb_currency',currency)},[currency]);
   useEffect(()=>{if(!toast)return;const timer=setTimeout(()=>setToast(null),6000);return()=>clearTimeout(timer)},[toast]);
   async function run(path,body,method='POST'){setBusy(true);try{const r=await api(path,body,method);if(path==='/logout')history.replaceState(null,'','/');await refresh();setToast({ok:true,text:t('success')});return r}catch(e){setToast({ok:false,text:`${t('error')} ${t(e.message==='Equipment dates overlap'?'calendarConflict':e.message==='Invalid rental dates'?'rentalDatesError':'checkDetails')}`});return null}finally{setBusy(false)}}

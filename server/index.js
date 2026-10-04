@@ -10,8 +10,11 @@ import {routeDetails} from '../shared/routes.js';
 import {visibleShipments,vendorOrders} from '../shared/workspaces.js';
 import {advancedRoutes,publicAdvancedRoutes,advancedState,integrationAuth,notice,shipmentNotice,matchRoutes} from './advanced.js';
 
+import {cloudEnabled,writeSession,readSession,deleteSession} from './cloud-store.js';
+export async function createApp(){
 await initialize();
-const app = express(), sessions = new Map();
+const app = express(); const sessions = new Map();
+if(process.env.LOGIBRIDGE_SERVERLESS==='true')app.set('trust proxy',1);
 const DEMO = process.env.DEMO_MODE !== 'false';
 let redis;
 if (process.env.REDIS_URL) { redis = createClient({ url: process.env.REDIS_URL }); redis.on('error', e => console.error('Redis:', e.message)); await redis.connect(); }
@@ -24,8 +27,8 @@ const txt = (v, max = 300) => { if (typeof v !== 'string' || !v.trim() || v.leng
 const role = (user, ...roles) => { if (!roles.includes(user.role)) { const e = new Error('Forbidden'); e.status = 403; throw e; } };
 const enabled = (state, key) => { if (!state.flags[key]) throw new Error('Feature disabled'); };
 function notify(state, shipment, event) { shipmentNotice(state,shipment,event); }
-app.get('/api/health', (req, res) => res.json({ ok: true, demo: DEMO, storage: process.env.DATABASE_URL ? 'postgresql' : 'json', redis: !!redis }));
-async function sessionFor(user,res){const token=randomBytes(32).toString('hex'),expiry=Date.now()+86400000;const value={userId:user.id,expiry};if(redis)await redis.set(`session:${token}`,JSON.stringify(value),{EX:86400});else sessions.set(token,value);res.cookie('lb_session',token,{httpOnly:true,sameSite:'strict',secure:process.env.COOKIE_SECURE==='true',maxAge:86400000});res.json({user:publicUser(user,true)})}
+app.get('/api/health', (req, res) => res.json({ ok: true, demo: DEMO, storage:cloudEnabled()?'netlify-blobs':process.env.DATABASE_URL ? 'postgresql' : 'json', redis: !!redis }));
+async function sessionFor(user,res){const token=randomBytes(32).toString('hex'),expiry=Date.now()+86400000;const value={userId:user.id,expiry};if(cloudEnabled())await writeSession(token,value);else if(redis)await redis.set(`session:${token}`,JSON.stringify(value),{EX:86400});else sessions.set(token,value);res.cookie('lb_session',token,{httpOnly:true,sameSite:'strict',secure:process.env.COOKIE_SECURE==='true',maxAge:86400000});res.json({user:publicUser(user,true)})}
 app.post('/api/auth/register',authLimit,async(req,res)=>{
   const b=req.body;
   if(!['merchant','carrier','supplier','individual'].includes(b.accountType))throw new Error('Invalid account type');
@@ -45,7 +48,7 @@ app.post('/api/login', async (req, res) => {
   const user = readState().users.find(u => u.id === req.body.userId && u.demo);
   if (!user) return res.status(400).json({ error: 'Unknown demo account' });
   const token = randomBytes(32).toString('hex'), expiry = Date.now() + 86400000;
-  if (redis) await redis.set(`session:${token}`, JSON.stringify({ userId: user.id, expiry }), { EX: 86400 });
+  if(cloudEnabled())await writeSession(token,{userId:user.id,expiry});else if (redis) await redis.set(`session:${token}`, JSON.stringify({ userId: user.id, expiry }), { EX: 86400 });
   else sessions.set(token, { userId: user.id, expiry });
   res.cookie('lb_session', token, { httpOnly: true, sameSite: 'strict', secure: process.env.COOKIE_SECURE === 'true', maxAge: 86400000 });
   res.json({ user:publicUser(user,true) });
@@ -54,19 +57,19 @@ publicAdvancedRoutes(app);
 app.use('/api', async (req, res, next) => {
   if(req.path==='/v1/shipments')return integrationAuth(req,res,next);
   const token = req.headers.cookie?.split(';').map(x => x.trim()).find(x => x.startsWith('lb_session='))?.slice(11);
-  let session = token && (redis ? JSON.parse(await redis.get(`session:${token}`) || 'null') : sessions.get(token));
+  let session = token && (cloudEnabled()?await readSession(token):redis ? JSON.parse(await redis.get(`session:${token}`) || 'null') : sessions.get(token));
   if (!session || session.expiry < Date.now()) return res.status(401).json({ error: 'Sign in required' });
   if (req.method !== 'GET' && req.headers.origin && req.headers.origin !== `${req.protocol}://${req.get('host')}`) return res.status(403).json({ error: 'Origin rejected' });
   req.user = readState().users.find(u => u.id === session.userId);
   if(!req.user||!DEMO&&req.user.demo)return res.status(401).json({error:'Sign in required'});
   next();
 });
-app.post('/api/logout', async (req, res) => { const token = req.headers.cookie?.match(/lb_session=([^;]+)/)?.[1]; if (redis && token) await redis.del(`session:${token}`); else sessions.delete(token); res.clearCookie('lb_session'); res.json({ ok: true }); });
+app.post('/api/logout', async (req, res) => { const token = req.headers.cookie?.match(/lb_session=([^;]+)/)?.[1]; if(cloudEnabled()&&token)await deleteSession(token);else if (redis && token) await redis.del(`session:${token}`); else sessions.delete(token); res.clearCookie('lb_session'); res.json({ ok: true }); });
 app.get('/api/state', (req, res) => {
   const s = readState(), admin = req.user.role === 'admin';
   const mayReview=x=>admin&&(!req.user.demo||s.users.find(u=>u.id===x.userId)?.demo);
   const visibleShipment=id=>s.shipments.some(sh=>sh.id===id&&(admin||[sh.ownerId,sh.carrierId].includes(req.user.id)));
-  res.json({ ...s, ...advancedState(s,req.user), shipments:visibleShipments(s,req.user).map(sh=>{const {privateDetails,...publicShipment}=sh;return admin||[sh.ownerId,sh.carrierId].includes(req.user.id)?sh:publicShipment}),shipmentDocuments:s.shipmentDocuments.filter(d=>visibleShipment(d.shipmentId)&&(!req.user.demo||s.users.find(u=>u.id===d.userId)?.demo)).map(({encryptedContent,...doc})=>doc),trackingEvents:s.trackingEvents.filter(e=>visibleShipment(e.shipmentId)), users:s.users.map(u=>publicUser(u)), user: publicUser(req.user,true), demo: DEMO, kyb: s.kyb.filter(x => mayReview(x) || x.userId === req.user.id).map(({ content, encryptedContent, ...x }) => x), bids: s.bids.filter(b => admin || b.carrierId === req.user.id || s.shipments.some(sh => sh.id === b.shipmentId && sh.ownerId === req.user.id)), messages: s.messages.filter(m => m.senderId === req.user.id || m.recipientId === req.user.id), escrows: s.escrows.filter(e => admin || s.shipments.some(sh => sh.id === e.shipmentId && [sh.ownerId, sh.carrierId].includes(req.user.id))), reservations:s.reservations.filter(x=>admin||x.userId===req.user.id||req.user.role==='carrier'&&s.groups.some(g=>g.id===x.groupId&&g.carrierId===req.user.id)), orders:vendorOrders(s,req.user), contracts: s.contracts.filter(x => admin || s.shipments.some(sh => sh.id === x.shipmentId && [sh.ownerId, sh.carrierId].includes(req.user.id))), notifications: s.notifications.filter(x => x.userId === req.user.id), checklists: s.checklists[req.user.id] || {} });
+  res.json({ ...s, realtime:!cloudEnabled(), ...advancedState(s,req.user), shipments:visibleShipments(s,req.user).map(sh=>{const {privateDetails,...publicShipment}=sh;return admin||[sh.ownerId,sh.carrierId].includes(req.user.id)?sh:publicShipment}),shipmentDocuments:s.shipmentDocuments.filter(d=>visibleShipment(d.shipmentId)&&(!req.user.demo||s.users.find(u=>u.id===d.userId)?.demo)).map(({encryptedContent,...doc})=>doc),trackingEvents:s.trackingEvents.filter(e=>visibleShipment(e.shipmentId)), users:s.users.map(u=>publicUser(u)), user: publicUser(req.user,true), demo: DEMO, kyb: s.kyb.filter(x => mayReview(x) || x.userId === req.user.id).map(({ content, encryptedContent, ...x }) => x), bids: s.bids.filter(b => admin || b.carrierId === req.user.id || s.shipments.some(sh => sh.id === b.shipmentId && sh.ownerId === req.user.id)), messages: s.messages.filter(m => m.senderId === req.user.id || m.recipientId === req.user.id), escrows: s.escrows.filter(e => admin || s.shipments.some(sh => sh.id === e.shipmentId && [sh.ownerId, sh.carrierId].includes(req.user.id))), reservations:s.reservations.filter(x=>admin||x.userId===req.user.id||req.user.role==='carrier'&&s.groups.some(g=>g.id===x.groupId&&g.carrierId===req.user.id)), orders:vendorOrders(s,req.user), contracts: s.contracts.filter(x => admin || s.shipments.some(sh => sh.id === x.shipmentId && [sh.ownerId, sh.carrierId].includes(req.user.id))), notifications: s.notifications.filter(x => x.userId === req.user.id), checklists: s.checklists[req.user.id] || {} });
 });
 operationRoutes(app);
 advancedRoutes(app);
@@ -136,8 +139,11 @@ app.post('/api/customs', async (req, res) => {
 app.post('/api/ratings', async (req, res) => { await mutate(s => { enabled(s,'ratings'); const sh = s.shipments.find(x => x.id === req.body.shipmentId && x.status === 'delivered'); if (!sh || ![sh.ownerId,sh.carrierId].includes(req.user.id)) throw new Error('Delivered shipment required'); const score = Number(req.body.score); if (!Number.isInteger(score) || score<1 || score>5 || s.ratings.some(x => x.shipmentId === sh.id && x.userId === req.user.id)) throw new Error('Invalid or duplicate rating'); s.ratings.push({ id:id(), shipmentId:sh.id, userId:req.user.id, targetId:req.user.id === sh.ownerId ? sh.carrierId : sh.ownerId, score, comment:txt(req.body.comment) }); }); res.json({ok:true}); });
 app.post('/api/orders', async (req,res) => { role(req.user,'merchant','carrier');const result = await mutate(s => { enabled(s,'marketplace'); const p=s.products.find(x=>x.id===req.body.productId); if(!p) throw new Error('Unknown product'); if(p.type==='rental')throw new Error('Use dated equipment booking'); const quantity=positive(req.body.quantity,'quantity'); if(!Number.isInteger(quantity) || quantity>1000) throw new Error('Invalid quantity'); const order={id:id(),userId:req.user.id,productId:p.id,quantity,total:quantity*p.price,status:'demo_reserved'}; s.orders.push(order); return order; }); res.json(result); });
 app.post('/api/contracts', async(req,res) => { await mutate(s=> { enabled(s,'contracts'); const sh=s.shipments.find(x=>x.id===req.body.shipmentId && x.status!=='open'); if(!sh || ![sh.ownerId,sh.carrierId].includes(req.user.id)) throw new Error('Assigned shipment required'); if(s.contracts.some(x=>x.shipmentId===sh.id && x.userId===req.user.id)) throw new Error('Already acknowledged'); s.contracts.push({id:id(),shipmentId:sh.id,userId:req.user.id,name:txt(req.body.name),createdAt:new Date().toISOString(),type:'demo_acknowledgement'}); }); res.json({ok:true}); });
-if (process.argv.includes('--production')) { const root=new URL('../dist/',import.meta.url).pathname.replace(/^\/(\w:)/,'$1');app.use(express.static(root));app.get(['/accounts','/login/:account','/register/:account','/workspace/:section','/driver'],(req,res)=>res.sendFile(root+'index.html')); }
-else { const { createServer } = await import('vite'); const vite = await createServer({server:{middlewareMode:true},appType:'spa'}); app.use(vite.middlewares); }
+if(process.env.LOGIBRIDGE_SERVERLESS==='true'){}
+else if (process.argv.includes('--production')) { const root=process.cwd().replace(/\\/g,'/')+'/dist/';app.use(express.static(root));app.get(['/accounts','/login/:account','/register/:account','/workspace/:section','/driver'],(req,res)=>res.sendFile(root+'index.html')); }
+else { const { createServer } = await import('vite'+String('')); const vite = await createServer({server:{middlewareMode:true},appType:'spa'}); app.use(vite.middlewares); }
 app.use((err,req,res,next)=> { console.error(err.message); res.status(err.status || 400).json({error:err.message}); });
+return app;
+}
 const port=Number(process.env.PORT || 3000);
-app.listen(port, process.env.HOST || '127.0.0.1', ()=>console.log(`LogiBridge: http://localhost:${port} (demo=${DEMO})`));
+if(process.env.LOGIBRIDGE_SERVERLESS!=='true')createApp().then(app=>app.listen(port, process.env.HOST || '127.0.0.1', ()=>console.log(`LogiBridge: http://localhost:${port} (demo=${process.env.DEMO_MODE!=='false'})`))).catch(error=>{console.error(error.message);process.exitCode=1});

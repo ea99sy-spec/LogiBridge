@@ -5,7 +5,8 @@ import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 import { initializeVault, encryptDocument, hashPassword } from './identity.js';
-const directory = process.env.DATA_DIR ? pathToFileURL(resolve(process.env.DATA_DIR) + '/') : new URL('../data/', import.meta.url);
+import {cloudEnabled,readCloudState,writeCloudState} from './cloud-store.js';
+const directory = process.env.DATA_DIR ? pathToFileURL(resolve(process.env.DATA_DIR) + '/') : pathToFileURL(resolve('data')+'/');
 const file = new URL('state.json', directory);
 export const id = () => randomUUID();
 const initial = () => ({
@@ -25,13 +26,15 @@ const initial = () => ({
   products: [{ id: 'p1', title: 'Lashing kit', price: 65, type: 'sale' }, { id: 'p2', title: 'GPS tracker', price: 90, type: 'sale' }, { id: 'p3', title: 'Container / day', price: 45, type: 'rental' }],
   flags: { tracking: true, ratings: true, marketplace: true, contracts: false }
 });
-let state, pool;
+let state, pool,cloudEtag;
 const listeners=new Set();
 export function subscribeState(listener){listeners.add(listener);return()=>listeners.delete(listener)}
 export async function initialize() {
   await mkdir(directory,{recursive:true});
   await initializeVault(directory);
-  if (process.env.DATABASE_URL) {
+  if(cloudEnabled()){
+    const entry=await readCloudState();state=entry?.data||initial();cloudEtag=entry?.etag;
+  } else if (process.env.DATABASE_URL) {
     pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
     await pool.query('CREATE TABLE IF NOT EXISTS logibridge_state (id INTEGER PRIMARY KEY, payload JSONB NOT NULL)');
     const result = await pool.query('SELECT payload FROM logibridge_state WHERE id=1');
@@ -60,9 +63,11 @@ export async function initialize() {
     state.escrows.push({id:'demo-tracking-escrow',shipmentId:'demo-tracking',amount:450,commission:13.5,carrierNet:436.5,status:'held',simulated:true,currency:'USD'});
     state.trackingEvents.push({id:'demo-tracking-event',shipmentId:'demo-tracking',actorId:'carrier',event:'location_update',location:'Gaziantep',note:'Sample update only',source:'demo',createdAt:now});
   }
-  await persist(state);
+  if(!await persist(state)&&cloudEnabled())await refreshState();
 }
+export async function refreshState(){if(cloudEnabled()){const entry=await readCloudState();if(!entry)throw new Error('Cloud state unavailable');state=entry.data;cloudEtag=entry.etag}}
 async function persist(next) {
+  if(cloudEnabled()){const result=await writeCloudState(next,cloudEtag);if(result.modified)cloudEtag=result.etag;return result.modified}
   if (pool) await pool.query('INSERT INTO logibridge_state VALUES (1,$1) ON CONFLICT (id) DO UPDATE SET payload=$1', [JSON.stringify(next)]);
   else {
     const temp = new URL('state.tmp', directory);
@@ -73,10 +78,11 @@ async function persist(next) {
       catch (error) { if (attempt>=5 || !['EPERM','EACCES','EBUSY'].includes(error.code)) throw error; await delay(30*(attempt+1)); }
     }
   }
+  return true;
 }
 let queue = Promise.resolve();
 export function readState() { return structuredClone(state); }
 export function mutate(fn) {
-  const operation = queue.then(async () => { const next = structuredClone(state); const value = await fn(next); await persist(next); state = next; for(const listener of listeners){try{listener()}catch{}} return value; });
+  const operation = queue.then(async () => { for(let attempt=0;attempt<8;attempt++){if(cloudEnabled())await refreshState();const next = structuredClone(state); const value = await fn(next); if(!await persist(next)){await delay(20+Math.random()*80);continue} state = next; for(const listener of listeners){try{listener()}catch{}} return value;}throw Object.assign(new Error('Concurrent update. Please retry.'),{status:409}); });
   queue = operation.catch(() => {}); return operation;
 }

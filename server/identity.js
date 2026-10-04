@@ -1,9 +1,11 @@
 import { scrypt, randomBytes, timingSafeEqual, createCipheriv, createDecipheriv } from 'node:crypto';
 import { promisify } from 'node:util';
 import { readFile, writeFile } from 'node:fs/promises';
+import {cloudEnabled,cloudVaultKey} from './cloud-store.js';
 const derive = promisify(scrypt);
 let documentKey;
 export async function initializeVault(directory) {
+  if(cloudEnabled()){documentKey=await cloudVaultKey();if(documentKey.length!==32)throw new Error('Invalid cloud verification key');return}
   const file = new URL('.verification.key', directory);
   try { documentKey = await readFile(file); }
   catch(error) {
