@@ -1,0 +1,44 @@
+services:
+  web:
+    build: .
+    ports: ["127.0.0.1:3000:3000"]
+    environment:
+      DATABASE_URL: postgresql://logibridge:local-password@db:5432/logibridge
+      REDIS_URL: redis://redis:6379
+      DEMO_MODE: "true"
+      AI_SERVICE_URL: http://ai:8000
+      AI_SERVICE_KEY: ${AI_SERVICE_KEY:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    volumes: ["verificationdata:/app/data"]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: logibridge
+      POSTGRES_USER: logibridge
+      POSTGRES_PASSWORD: local-password
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U logibridge"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  ai:
+    build: ./ai
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4.1-mini}
+      AI_SERVICE_KEY: ${AI_SERVICE_KEY:-}
+volumes:
+  pgdata:
+  verificationdata:
