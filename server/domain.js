@@ -30,8 +30,8 @@ export function transitionShipment(state, shipment, action, actor) {
   if (action === 'fund' && actor.id === shipment.ownerId && escrow?.status === 'awaiting_funding') escrow.status = 'held';
   else if (action === 'dispatch' && actor.id === shipment.carrierId && shipment.status === 'assigned' && escrow?.status === 'held') shipment.status = 'transit';
   else if (action === 'arrive' && actor.id === shipment.carrierId && shipment.status === 'transit') shipment.status = 'arrived';
-  else if (action === 'confirm' && actor.id === shipment.ownerId && shipment.status === 'arrived' && escrow?.status === 'held') { shipment.status = 'delivered'; escrow.status = 'released'; }
+  else if (action === 'confirm' && actor.id === shipment.ownerId && shipment.status === 'arrived' && escrow?.status === 'held') { shipment.status = 'delivered'; escrow.status = escrow.simulated===false?'payout_pending':'released'; }
   else if (action === 'dispute' && actor.id === shipment.ownerId && ['assigned', 'transit', 'arrived'].includes(shipment.status) && escrow?.status === 'held') { shipment.status = 'disputed'; escrow.status = 'disputed'; }
-  else if (action === 'refund' && actor.role === 'admin' && shipment.status === 'disputed') { shipment.status = 'cancelled'; escrow.status = 'refunded'; }
+  else if (action === 'refund' && actor.role === 'admin' && shipment.status === 'disputed') { if(actor.demo&&escrow.simulated===false)throw Error('Registered administrator required');shipment.status = 'cancelled'; escrow.status = escrow.simulated===false?'refund_pending':'refunded'; }
   else throw new Error('Invalid transition or actor');
 }

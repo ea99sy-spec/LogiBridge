@@ -11,6 +11,7 @@ import {visibleShipments,vendorOrders} from '../shared/workspaces.js';
 import {advancedRoutes,publicAdvancedRoutes,advancedState,integrationAuth,notice,shipmentNotice,matchRoutes} from './advanced.js';
 
 import {cloudEnabled,writeSession,readSession,deleteSession} from './cloud-store.js';
+import {paymentRoutes,paymentState} from './payments.js';
 export async function createApp(){
 await initialize();
 const app = express(); const sessions = new Map();
@@ -34,8 +35,10 @@ app.post('/api/auth/register',authLimit,async(req,res)=>{
   if(!['merchant','carrier','supplier','individual'].includes(b.accountType))throw new Error('Invalid account type');
   const email=txt(b.email,254).toLowerCase();if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw new Error('Invalid email');
   const credential=await hashPassword(b.password);
-  const user={id:id(),role:b.accountType==='individual'?'merchant':b.accountType,accountType:b.accountType,name:txt(b.name,120),email,credential,verified:false,verificationStatus:'not_submitted',verificationLevel:'none',plan:'free',demo:false};
-  await mutate(s=>{if(s.users.some(u=>u.email===email))throw new Error('Email already registered');s.users.push(user)});
+  const taxId=b.accountType==='individual'?null:txt(b.taxId,40);
+  if(taxId&&!/^[A-Za-z0-9][A-Za-z0-9 .\/-]{2,39}$/.test(taxId))throw new Error('Invalid company tax number');
+  const user={id:id(),role:b.accountType==='individual'?'merchant':b.accountType,accountType:b.accountType,name:txt(b.name,120),taxId,email,credential,verified:false,verificationStatus:'not_submitted',verificationLevel:'none',plan:'free',demo:false};
+  await mutate(s=>{if(s.users.some(u=>u.email===email))throw new Error('Email already registered');s.users.push(user);for(const a of s.users.filter(u=>u.role==='admin'&&!u.demo))notice(s,a.id,'account_registered')});
   await sessionFor(user,res);
 });
 app.post('/api/auth/login',authLimit,async(req,res)=>{
@@ -69,14 +72,15 @@ app.get('/api/state', (req, res) => {
   const s = readState(), admin = req.user.role === 'admin';
   const mayReview=x=>admin&&(!req.user.demo||s.users.find(u=>u.id===x.userId)?.demo);
   const visibleShipment=id=>s.shipments.some(sh=>sh.id===id&&(admin||[sh.ownerId,sh.carrierId].includes(req.user.id)));
-  res.json({ ...s, realtime:!cloudEnabled(), ...advancedState(s,req.user), shipments:visibleShipments(s,req.user).map(sh=>{const {privateDetails,...publicShipment}=sh;return admin||[sh.ownerId,sh.carrierId].includes(req.user.id)?sh:publicShipment}),shipmentDocuments:s.shipmentDocuments.filter(d=>visibleShipment(d.shipmentId)&&(!req.user.demo||s.users.find(u=>u.id===d.userId)?.demo)).map(({encryptedContent,...doc})=>doc),trackingEvents:s.trackingEvents.filter(e=>visibleShipment(e.shipmentId)), users:s.users.map(u=>publicUser(u)), user: publicUser(req.user,true), demo: DEMO, kyb: s.kyb.filter(x => mayReview(x) || x.userId === req.user.id).map(({ content, encryptedContent, ...x }) => x), bids: s.bids.filter(b => admin || b.carrierId === req.user.id || s.shipments.some(sh => sh.id === b.shipmentId && sh.ownerId === req.user.id)), messages: s.messages.filter(m => m.senderId === req.user.id || m.recipientId === req.user.id), escrows: s.escrows.filter(e => admin || s.shipments.some(sh => sh.id === e.shipmentId && [sh.ownerId, sh.carrierId].includes(req.user.id))), reservations:s.reservations.filter(x=>admin||x.userId===req.user.id||req.user.role==='carrier'&&s.groups.some(g=>g.id===x.groupId&&g.carrierId===req.user.id)), orders:vendorOrders(s,req.user), contracts: s.contracts.filter(x => admin || s.shipments.some(sh => sh.id === x.shipmentId && [sh.ownerId, sh.carrierId].includes(req.user.id))), notifications: s.notifications.filter(x => x.userId === req.user.id), checklists: s.checklists[req.user.id] || {} });
+  res.json({ ...s, realtime:!cloudEnabled(), ...advancedState(s,req.user), ...paymentState(s,req.user), shipments:visibleShipments(s,req.user).map(sh=>{const {privateDetails,...publicShipment}=sh;return admin||[sh.ownerId,sh.carrierId].includes(req.user.id)?sh:publicShipment}),shipmentDocuments:s.shipmentDocuments.filter(d=>visibleShipment(d.shipmentId)&&(!req.user.demo||s.users.find(u=>u.id===d.userId)?.demo)).map(({encryptedContent,...doc})=>doc),trackingEvents:s.trackingEvents.filter(e=>visibleShipment(e.shipmentId)), users:s.users.map(u=>publicUser(u)), user: publicUser(req.user,true), demo: DEMO, kyb: s.kyb.filter(x => mayReview(x) || x.userId === req.user.id).map(({ content, encryptedContent, ...x }) => x), bids: s.bids.filter(b => admin || b.carrierId === req.user.id || s.shipments.some(sh => sh.id === b.shipmentId && sh.ownerId === req.user.id)), messages: s.messages.filter(m => m.senderId === req.user.id || m.recipientId === req.user.id), escrows: s.escrows.filter(e => admin || s.shipments.some(sh => sh.id === e.shipmentId && [sh.ownerId, sh.carrierId].includes(req.user.id))), reservations:s.reservations.filter(x=>admin||x.userId===req.user.id||req.user.role==='carrier'&&s.groups.some(g=>g.id===x.groupId&&g.carrierId===req.user.id)), orders:vendorOrders(s,req.user), contracts: s.contracts.filter(x => admin || s.shipments.some(sh => sh.id === x.shipmentId && [sh.ownerId, sh.carrierId].includes(req.user.id))), notifications: s.notifications.filter(x => x.userId === req.user.id), checklists: s.checklists[req.user.id] || {} });
 });
 operationRoutes(app);
+paymentRoutes(app);
 advancedRoutes(app);
 app.post(['/api/shipments','/api/v1/shipments'], async (req, res) => {
   role(req.user, 'merchant'); const b = req.body; const route=routeDetails(b);
   const hsCode = b.hsCode == null ? '' : String(b.hsCode).trim();
-  if(hsCode && !/^[0-9]{6,12}$/.test(hsCode)) throw new Error('HS Code must contain 6 to 12 digits');
+  if(!/^[0-9]{6,12}$/.test(hsCode)) throw new Error('HS Code is required and must contain 6 to 12 digits');
   if (!['textiles','food','machinery','packaging','other'].includes(b.category) || !/^\d{4}-\d{2}-\d{2}$/.test(b.date) || !Number.isFinite(Date.parse(b.date)) || b.date < new Date().toISOString().slice(0,10)) throw new Error('Invalid shipment details');
   if((b.originCountry&&!validCountry(b.originCountry))||(b.destinationCountry&&!validCountry(b.destinationCountry)))throw new Error('Invalid route country');
   const privateDetails=b.senderName?{senderName:txt(b.senderName,120),recipientName:txt(b.recipientName,120),phone:txt(b.phone,40),destinationAddress:txt(b.destinationAddress,300)}:null;
@@ -90,6 +94,7 @@ app.post('/api/bids', async (req, res) => {
 });
 app.post('/api/shipments/:id/accept', async (req, res) => { role(req.user, 'merchant'); const sh = await mutate(s => {const sh=acceptBid(s, req.params.id, req.body.bidId, req.user.id);s.trackingEvents.push({id:id(),shipmentId:sh.id,actorId:req.user.id,event:'assigned',source:'platform',createdAt:new Date().toISOString()});shipmentNotice(s,sh,'assigned');return sh}); res.json(sh); });
 app.post('/api/shipments/:id/action', async (req, res) => {
+  if(req.body.action==='fund'&&!req.user.demo)return res.status(400).json({error:'Submit a bank payment receipt; administrator confirmation is required'});
   await mutate(s => { const sh = s.shipments.find(x => x.id === req.params.id); if (!sh) throw new Error('Unknown shipment'); transitionShipment(s, sh, req.body.action, req.user);s.trackingEvents.push({id:id(),shipmentId:sh.id,actorId:req.user.id,event:req.body.action,source:'platform',createdAt:new Date().toISOString()}); notify(s, sh, req.body.action); }); res.json({ ok: true });
 });
 app.post('/api/groups/:id/reserve', async (req, res) => {
@@ -107,6 +112,7 @@ app.post('/api/kyb', async (req, res) => {
   if(!validCountry(b.country)&&!(req.user.demo&&!b.country))throw new Error('Valid country required');
   if(person&&!validFutureDate(b.expiry))throw new Error('Valid passport expiry required');
   const details=person?{fullName:txt(b.fullName,120),passportLast4:txt(b.passportNumber,40).slice(-4),expiry:b.expiry}:{company:txt(b.company),registration:txt(b.registration,80),registry:txt(b.registry|| (req.user.demo?'Demo registry':''),120)};
+  if(!person){details.taxId=txt(b.taxId||req.user.taxId||(req.user.demo?'DEMO-TAX':''),40);if(!/^[A-Za-z0-9][A-Za-z0-9 .\/-]{2,39}$/.test(details.taxId))throw new Error('Invalid company tax number')}
   await mutate(s=>{if(s.kyb.some(x=>x.userId===req.user.id&&x.status==='pending'))throw new Error('Application pending');s.kyb.push({id:id(),userId:req.user.id,kind:person?'person':'company',country:b.country||'TR',...details,filename:txt(b.filename),mime:b.mime,encryptedContent:encryptDocument(b.content),status:'pending',createdAt:new Date().toISOString()});const u=s.users.find(u=>u.id===req.user.id);u.verified=false;u.verificationStatus='pending';u.verificationLevel='none'});res.json({ok:true});
 });
 app.get('/api/kyb/:id/document', (req, res) => { role(req.user,'admin'); const doc = readState().kyb.find(x => x.id === req.params.id); if (!doc) return res.sendStatus(404); if(req.user.demo&&!readState().users.find(u=>u.id===doc.userId)?.demo)return res.sendStatus(403); res.set('Content-Type',doc.mime); res.set('Content-Disposition','attachment; filename="verification-document"'); res.send(decryptDocument(doc.encryptedContent)); });

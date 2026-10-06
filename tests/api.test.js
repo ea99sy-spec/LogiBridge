@@ -29,11 +29,13 @@ test('HTTP workflows, permissions, validation, feature flags and persistence',as
   assert.equal((await call('merchant','/shipments',{title:'bad',volume:-1})).status,400);
   const shipment=(await call('merchant','/shipments',{title:'Integration cargo',origin:'Gaziantep',destination:'Aleppo',originCountry:'TR',destinationCountry:'SY',description:'Cargo test',hsCode:'010121',senderName:'Test Sender',recipientName:'Test Recipient',phone:'TEST-ONLY-PHONE',destinationAddress:'Test delivery address',category:'textiles',crossing:'bab',volume:7,weight:500,date:'2099-01-01'})).body;
   assert.ok(shipment.id);
-  for(const [country,type] of [['TR','domesticTR'],['SY','domesticSY']]){const domestic=await call('merchant','/shipments',{title:'Domestic cargo',origin:'City A',destination:'City B',originCountry:country,destinationCountry:country,transportType:type,category:'other',volume:1,weight:100,date:'2099-01-01'});assert.equal(domestic.status,201);assert.equal(domestic.body.crossing,null);assert.equal(domestic.body.transportType,type)}
+  for(const [country,type] of [['TR','domesticTR'],['SY','domesticSY']]){const domestic=await call('merchant','/shipments',{title:'Domestic cargo',origin:'City A',destination:'City B',originCountry:country,destinationCountry:country,transportType:type,hsCode:'010121',category:'other',volume:1,weight:100,date:'2099-01-01'});assert.equal(domestic.status,201);assert.equal(domestic.body.crossing,null);assert.equal(domestic.body.transportType,type)}
   assert.equal((await call('merchant','/shipments',{...shipment,crossing:null})).status,400);
   assert.equal(shipment.hsCode,'010121');
   assert.equal((await call('merchant','/state')).body.shipments.find(s=>s.id===shipment.id).hsCode,'010121');
   assert.equal((await call('merchant','/shipments',{...shipment,hsCode:'12ABC3'})).status,400);
+  assert.equal((await call('merchant','/shipments',{...shipment,hsCode:''})).status,400);
+  assert.equal((await call('merchant','/shipments',{...shipment,hsCode:undefined})).status,400);
   assert.equal((await call('carrier','/state')).body.shipments.find(s=>s.id===shipment.id).privateDetails,undefined);
   assert.equal((await call('carrier','/bids',{shipmentId:shipment.id,price:400,days:2,note:'Test offer'})).status,201);
   assert.equal((await call('carrier','/bids',{shipmentId:shipment.id,price:500,days:2,note:'Duplicate'})).status,400);
@@ -94,9 +96,11 @@ test('HTTP workflows, permissions, validation, feature flags and persistence',as
   assert.equal((await call('merchant','/contracts',{shipmentId:shipment.id,name:'Demo Merchant'})).status,200);
   assert.equal((await call('merchant','/plan',{plan:'pro'})).status,200);
   const password='Test-only-account-password-2026';
-  async function register(accountType,key){const r=await fetch(base+'/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accountType,email:key+'@test.local',password,name:'Test '+key})});const body=await r.json();assert.equal(r.status,200,JSON.stringify(body));cookies[key]=r.headers.get('set-cookie').split(';')[0];return body.user}
+  async function register(accountType,key){const r=await fetch(base+'/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({accountType,email:key+'@test.local',password,taxId:accountType==='individual'?undefined:'TEST-TAX-123',name:'Test '+key})});const body=await r.json();assert.equal(r.status,200,JSON.stringify(body));cookies[key]=r.headers.get('set-cookie').split(';')[0];return body.user}
   async function signIn(email,accountType,key,pass=password){const r=await fetch(base+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass,accountType})});if(r.ok)cookies[key]=r.headers.get('set-cookie').split(';')[0];return r}
   const business=await register('merchant','business'),person=await register('individual','person');
+  assert.equal(business.taxId,'TEST-TAX-123');
+  assert.equal((await call('none','/auth/register',{accountType:'merchant',email:'taxless@test.local',password,name:'No tax'})).status,400);
   assert.equal(business.verified,false);assert.equal(person.accountType,'individual');
   assert.equal((await call('none','/auth/register',{accountType:'admin',email:'bad@test.local',password,name:'Bad'})).status,400);
   assert.equal((await call('none','/login',{userId:business.id})).status,400);
@@ -104,9 +108,40 @@ test('HTTP workflows, permissions, validation, feature flags and persistence',as
   assert.equal((await signIn('business@test.local','merchant','wrong','incorrect')).status,401);
   assert.equal((await signIn('business@test.local','merchant','business')).status,200);
   assert.equal((await signIn('admin@test.local','admin','realAdmin','Test-only-admin-password-2026')).status,200);
-  const companyDoc={...document,country:'TR',registry:'Test trade registry'};
+  assert.equal((await call('business',`/admin/accounts/${business.id}`)).status,403);
+  assert.equal((await call('admin',`/admin/accounts/${business.id}`)).status,403);
+  const detail=(await call('realAdmin',`/admin/accounts/${business.id}`)).body;assert.equal(detail.account.taxId,'TEST-TAX-123');assert.equal(detail.account.credential,undefined);
+  await register('carrier','realCarrier');
+  const bank={enabled:true,beneficiary:'Test beneficiary',bank:'Test bank',accountNumber:'TEST-ACCOUNT-ONLY',swift:'TESTSWIFT',currency:'USD'};
+  assert.equal((await call('admin','/payments/bank-account',bank,'PUT')).status,403);
+  assert.equal((await call('realAdmin','/payments/bank-account',bank,'PUT')).status,200);
+  const paidShipment=(await call('business','/shipments',{...shipment,title:'Bank transfer cargo'})).body;
+  assert.equal((await call('realCarrier','/bids',{shipmentId:paidShipment.id,price:77,days:2,note:'Real account test'})).status,201);
+  const paidBid=(await call('business','/state')).body.bids.find(b=>b.shipmentId===paidShipment.id);
+  await call('business',`/shipments/${paidShipment.id}/accept`,{bidId:paidBid.id});
+  assert.equal((await call('business',`/shipments/${paidShipment.id}/action`,{action:'fund'})).status,400);
+  const proof={...document,shipmentId:paidShipment.id,reference:'TEST-BANK-TRANSFER',amount:1};
+  assert.equal((await call('person','/payments/receipts',proof)).status,400);
+  assert.equal((await call('business','/payments/receipts',proof)).status,201);
+  assert.equal((await call('business','/payments/receipts',proof)).status,400);
+  const payment=(await call('business','/state')).body.payments[0];assert.equal(payment.amount,77);assert.equal(payment.encryptedContent,undefined);
+  assert.equal((await call('person','/state')).body.payments.length,0);assert.equal((await call('admin','/state')).body.payments.length,0);
+  assert.equal((await fetch(base+`/payments/${payment.id}/document`,{headers:{cookie:cookies.person}})).status,403);
+  assert.equal((await fetch(base+`/payments/${payment.id}/document`,{headers:{cookie:cookies.realAdmin}})).status,200);
+  assert.equal((await call('realAdmin',`/payments/${payment.id}/review`,{status:'approved',note:'Test bank statement reference'})).status,400);
+  assert.equal((await call('realAdmin',`/payments/${payment.id}/review`,{status:'approved',bankReceived:true,note:'Test bank statement reference'})).status,200);
+  assert.equal((await call('realAdmin',`/payments/${payment.id}/review`,{status:'approved',bankReceived:true,note:'Duplicate'})).status,400);
+  for(const [who,action] of [['realCarrier','dispatch'],['realCarrier','arrive'],['business','confirm']])assert.equal((await call(who,`/shipments/${paidShipment.id}/action`,{action})).status,200);
+  const paidEscrow=(await call('business','/state')).body.escrows.find(e=>e.shipmentId===paidShipment.id);assert.equal(paidEscrow.simulated,false);assert.equal(paidEscrow.status,'payout_pending');
+  assert.equal((await call('realAdmin',`/payments/${payment.id}/transfer`,{...document,reference:'TEST-PAYOUT',sent:false})).status,400);
+  assert.equal((await call('realAdmin',`/payments/${payment.id}/transfer`,{...document,reference:'TEST-PAYOUT',sent:true})).status,200);
+  const finalPayment=(await call('business','/state')).body.payments[0];assert.equal(finalPayment.transfer.amount,74.69);assert.equal(finalPayment.transferContent,undefined);
+  assert.equal((await call('realAdmin',`/payments/${payment.id}/transfer`,{...document,reference:'TEST-PAYOUT',sent:true})).status,400);
+  assert.equal((await call('business','/state')).body.escrows.find(e=>e.shipmentId===paidShipment.id).status,'released');
+  const companyDoc={...document,country:'TR',taxId:'TEST-TAX-123',registry:'Test trade registry'};
   assert.equal((await call('business','/kyb',companyDoc)).status,200);
   const realDoc=(await call('business','/state')).body.kyb[0];
+  assert.equal((await call('realAdmin',`/admin/accounts/${business.id}`)).body.applications[0].encryptedContent,undefined);
   assert.equal(realDoc.encryptedContent,undefined);
   assert.equal((await call('admin','/state')).body.kyb.some(d=>d.id===realDoc.id),false);
   assert.equal((await call('admin',`/kyb/${realDoc.id}/review`,{status:'approved'})).status,403);

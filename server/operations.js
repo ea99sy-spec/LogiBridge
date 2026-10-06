@@ -11,6 +11,13 @@ export function operationRoutes(app){
     if(req.user.role!=='admin')return res.status(403).json({error:'Forbidden'});
     const s=readState();res.json(s.users.filter(u=>u.role!=='admin').map(u=>({...publicUser(u),...(!req.user.demo||u.demo?{email:u.email}:{}),shipmentCount:s.shipments.filter(sh=>sh.ownerId===u.id||sh.carrierId===u.id).length,applicationCount:s.kyb.filter(d=>d.userId===u.id&&(!req.user.demo||u.demo)).length})));
   });
+  app.get('/api/admin/accounts/:id',(req,res)=>{
+    if(req.user.role!=='admin')return res.status(403).json({error:'Forbidden'});
+    const s=readState(),account=s.users.find(u=>u.id===req.params.id&&u.role!=='admin');
+    if(!account)return res.sendStatus(404);
+    if(req.user.demo&&!account.demo)return res.status(403).json({error:'A registered administrator is required'});
+    res.json({account:publicUser(account,true),applications:s.kyb.filter(d=>d.userId===account.id).map(({encryptedContent,content,...d})=>d),shipments:s.shipments.filter(sh=>[sh.ownerId,sh.carrierId].includes(account.id)).map(({privateDetails,...sh})=>sh)});
+  });
   app.post('/api/shipment-documents',async(req,res)=>{
     const b=req.body;validateDocument(b);
     if(!['invoice','packing','origin','transport','customs','other'].includes(b.kind))throw new Error('Invalid document kind');
