@@ -1,3 +1,4 @@
+import {requiresApproval} from '../shared/access.js';
 import {randomBytes,createHash} from 'node:crypto';
 import {readState,mutate,id,subscribeState} from './store.js';
 import {transitionShipment,positive} from './domain.js';
@@ -38,4 +39,4 @@ export function advancedRoutes(app){
   app.delete('/api/integrations/keys/:id',async(req,res)=>{await mutate(s=>{const k=s.apiKeys.find(k=>k.id===req.params.id&&k.userId===req.user.id);if(!k)throw new Error('Unknown key');k.revoked=true});res.json({ok:true})});
 }
 const apiCounts=new Map();
-export function integrationAuth(req,res,next){const token=req.get('Authorization')?.replace(/^Bearer /,'')||'',s=readState(),key=s.apiKeys.find(k=>k.tokenHash===hash(token)&&!k.revoked&&Date.parse(k.expiresAt)>Date.now()),user=s.users.find(u=>u.id===key?.userId&&u.role==='merchant'&&u.accountType!=='individual');if(!user||process.env.DEMO_MODE==='false'&&user.demo)return res.status(401).json({error:'Invalid API key'});const now=Date.now(),count=apiCounts.get(key.id)||{until:now+60000,n:0};if(count.until<now){count.until=now+60000;count.n=0}if(++count.n>60)return res.status(429).json({error:'API rate limit'});apiCounts.set(key.id,count);req.user=user;next()}
+export function integrationAuth(req,res,next){const token=req.get('Authorization')?.replace(/^Bearer /,'')||'',s=readState(),key=s.apiKeys.find(k=>k.tokenHash===hash(token)&&!k.revoked&&Date.parse(k.expiresAt)>Date.now()),user=s.users.find(u=>u.id===key?.userId&&u.role==='merchant'&&u.accountType!=='individual');if(!user||process.env.DEMO_MODE==='false'&&user.demo)return res.status(401).json({error:'Invalid API key'});if(requiresApproval(user))return res.status(403).json({error:'Account approval required'});const now=Date.now(),count=apiCounts.get(key.id)||{until:now+60000,n:0};if(count.until<now){count.until=now+60000;count.n=0}if(++count.n>60)return res.status(429).json({error:'API rate limit'});apiCounts.set(key.id,count);req.user=user;next()}

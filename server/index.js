@@ -12,6 +12,9 @@ import {advancedRoutes,publicAdvancedRoutes,advancedState,integrationAuth,notice
 
 import {cloudEnabled,writeSession,readSession,deleteSession} from './cloud-store.js';
 import {paymentRoutes,paymentState} from './payments.js';
+import {requiresApproval} from '../shared/access.js';
+import {queueEmail,mailConfigured} from './email.js';
+import {profileRoutes,announceCompany} from './profiles.js';
 export async function createApp(){
 await initialize();
 const app = express(); const sessions = new Map();
@@ -28,7 +31,7 @@ const txt = (v, max = 300) => { if (typeof v !== 'string' || !v.trim() || v.leng
 const role = (user, ...roles) => { if (!roles.includes(user.role)) { const e = new Error('Forbidden'); e.status = 403; throw e; } };
 const enabled = (state, key) => { if (!state.flags[key]) throw new Error('Feature disabled'); };
 function notify(state, shipment, event) { shipmentNotice(state,shipment,event); }
-app.get('/api/health', (req, res) => res.json({ ok: true, demo: DEMO, storage:cloudEnabled()?'netlify-blobs':process.env.DATABASE_URL ? 'postgresql' : 'json', redis: !!redis }));
+app.get('/api/health', (req, res) => res.json({ ok: true, demo: DEMO, supportEmail:readState().supportEmail||process.env.MAIL_REPLY_TO||'',emailConfigured:mailConfigured(),storage:cloudEnabled()?'netlify-blobs':process.env.DATABASE_URL ? 'postgresql' : 'json', redis: !!redis }));
 async function sessionFor(user,res){const token=randomBytes(32).toString('hex'),expiry=Date.now()+86400000;const value={userId:user.id,expiry};if(cloudEnabled())await writeSession(token,value);else if(redis)await redis.set(`session:${token}`,JSON.stringify(value),{EX:86400});else sessions.set(token,value);res.cookie('lb_session',token,{httpOnly:true,sameSite:'strict',secure:process.env.COOKIE_SECURE==='true',maxAge:86400000});res.json({user:publicUser(user,true)})}
 app.post('/api/auth/register',authLimit,async(req,res)=>{
   const b=req.body;
@@ -38,12 +41,13 @@ app.post('/api/auth/register',authLimit,async(req,res)=>{
   const taxId=b.accountType==='individual'?null:txt(b.taxId,40);
   if(taxId&&!/^[A-Za-z0-9][A-Za-z0-9 .\/-]{2,39}$/.test(taxId))throw new Error('Invalid company tax number');
   const user={id:id(),role:b.accountType==='individual'?'merchant':b.accountType,accountType:b.accountType,name:txt(b.name,120),taxId,email,credential,verified:false,verificationStatus:'not_submitted',verificationLevel:'none',plan:'free',demo:false};
-  await mutate(s=>{if(s.users.some(u=>u.email===email))throw new Error('Email already registered');s.users.push(user);for(const a of s.users.filter(u=>u.role==='admin'&&!u.demo))notice(s,a.id,'account_registered')});
+  await mutate(s=>{if(s.users.some(u=>u.email===email))throw new Error('Email already registered');s.users.push(user);queueEmail(s,user.id,'registered');for(const a of s.users.filter(u=>u.role==='admin'&&!u.demo))notice(s,a.id,'account_registered')});
   await sessionFor(user,res);
 });
 app.post('/api/auth/login',authLimit,async(req,res)=>{
   const user=readState().users.find(u=>u.email===String(req.body.email||'').trim().toLowerCase()&&!u.demo);
   if(!user||user.accountType!==req.body.accountType||!await checkPassword(req.body.password,user.credential))return res.status(401).json({error:'Invalid credentials or account type'});
+  await mutate(s=>queueEmail(s,user.id,'login',{time:new Date().toISOString()}));
   await sessionFor(user,res);
 });
 app.post('/api/login', async (req, res) => {
@@ -65,15 +69,18 @@ app.use('/api', async (req, res, next) => {
   if (req.method !== 'GET' && req.headers.origin && req.headers.origin !== `${req.protocol}://${req.get('host')}`) return res.status(403).json({ error: 'Origin rejected' });
   req.user = readState().users.find(u => u.id === session.userId);
   if(!req.user||!DEMO&&req.user.demo)return res.status(401).json({error:'Sign in required'});
+  if(requiresApproval(req.user)&&!['/state','/logout','/kyb','/profile'].includes(req.path))return res.status(403).json({error:'Account approval required'});
   next();
 });
 app.post('/api/logout', async (req, res) => { const token = req.headers.cookie?.match(/lb_session=([^;]+)/)?.[1]; if(cloudEnabled()&&token)await deleteSession(token);else if (redis && token) await redis.del(`session:${token}`); else sessions.delete(token); res.clearCookie('lb_session'); res.json({ ok: true }); });
 app.get('/api/state', (req, res) => {
   const s = readState(), admin = req.user.role === 'admin';
+  if(requiresApproval(req.user))return res.json({user:publicUser(req.user,true),users:[publicUser(req.user)],approvalRequired:true,realtime:false,emailConfigured:mailConfigured(),supportEmail:s.supportEmail||'',demo:DEMO,flags:s.flags,kyb:s.kyb.filter(d=>d.userId===req.user.id).map(({content,encryptedContent,...d})=>d),notifications:s.notifications.filter(n=>n.userId===req.user.id),shipments:[],bids:[],groups:[],products:[],orders:[],payments:[],escrows:[],messages:[],reservations:[],ratings:[],contracts:[],fleets:[],shipmentDocuments:[],trackingEvents:[],driverLinks:[],equipmentBookings:[],settlements:[],apiKeys:[],checklists:{}});
   const mayReview=x=>admin&&(!req.user.demo||s.users.find(u=>u.id===x.userId)?.demo);
   const visibleShipment=id=>s.shipments.some(sh=>sh.id===id&&(admin||[sh.ownerId,sh.carrierId].includes(req.user.id)));
-  res.json({ ...s, realtime:!cloudEnabled(), ...advancedState(s,req.user), ...paymentState(s,req.user), shipments:visibleShipments(s,req.user).map(sh=>{const {privateDetails,...publicShipment}=sh;return admin||[sh.ownerId,sh.carrierId].includes(req.user.id)?sh:publicShipment}),shipmentDocuments:s.shipmentDocuments.filter(d=>visibleShipment(d.shipmentId)&&(!req.user.demo||s.users.find(u=>u.id===d.userId)?.demo)).map(({encryptedContent,...doc})=>doc),trackingEvents:s.trackingEvents.filter(e=>visibleShipment(e.shipmentId)), users:s.users.map(u=>publicUser(u)), user: publicUser(req.user,true), demo: DEMO, kyb: s.kyb.filter(x => mayReview(x) || x.userId === req.user.id).map(({ content, encryptedContent, ...x }) => x), bids: s.bids.filter(b => admin || b.carrierId === req.user.id || s.shipments.some(sh => sh.id === b.shipmentId && sh.ownerId === req.user.id)), messages: s.messages.filter(m => m.senderId === req.user.id || m.recipientId === req.user.id), escrows: s.escrows.filter(e => admin || s.shipments.some(sh => sh.id === e.shipmentId && [sh.ownerId, sh.carrierId].includes(req.user.id))), reservations:s.reservations.filter(x=>admin||x.userId===req.user.id||req.user.role==='carrier'&&s.groups.some(g=>g.id===x.groupId&&g.carrierId===req.user.id)), orders:vendorOrders(s,req.user), contracts: s.contracts.filter(x => admin || s.shipments.some(sh => sh.id === x.shipmentId && [sh.ownerId, sh.carrierId].includes(req.user.id))), notifications: s.notifications.filter(x => x.userId === req.user.id), checklists: s.checklists[req.user.id] || {} });
+  res.json({ ...s,emailOutbox:undefined,emailConfigured:mailConfigured(), realtime:!cloudEnabled(), ...advancedState(s,req.user), ...paymentState(s,req.user), shipments:visibleShipments(s,req.user).map(sh=>{const {privateDetails,...publicShipment}=sh;return admin||[sh.ownerId,sh.carrierId].includes(req.user.id)?sh:publicShipment}),shipmentDocuments:s.shipmentDocuments.filter(d=>visibleShipment(d.shipmentId)&&(!req.user.demo||s.users.find(u=>u.id===d.userId)?.demo)).map(({encryptedContent,...doc})=>doc),trackingEvents:s.trackingEvents.filter(e=>visibleShipment(e.shipmentId)), users:s.users.map(u=>publicUser(u)), user: publicUser(req.user,true), demo: DEMO, kyb: s.kyb.filter(x => mayReview(x) || x.userId === req.user.id).map(({ content, encryptedContent, ...x }) => x), bids: s.bids.filter(b => admin || b.carrierId === req.user.id || s.shipments.some(sh => sh.id === b.shipmentId && sh.ownerId === req.user.id)), messages: s.messages.filter(m => m.senderId === req.user.id || m.recipientId === req.user.id), escrows: s.escrows.filter(e => admin || s.shipments.some(sh => sh.id === e.shipmentId && [sh.ownerId, sh.carrierId].includes(req.user.id))), reservations:s.reservations.filter(x=>admin||x.userId===req.user.id||req.user.role==='carrier'&&s.groups.some(g=>g.id===x.groupId&&g.carrierId===req.user.id)), orders:vendorOrders(s,req.user), contracts: s.contracts.filter(x => admin || s.shipments.some(sh => sh.id === x.shipmentId && [sh.ownerId, sh.carrierId].includes(req.user.id))), notifications: s.notifications.filter(x => x.userId === req.user.id), checklists: s.checklists[req.user.id] || {} });
 });
+profileRoutes(app);
 operationRoutes(app);
 paymentRoutes(app);
 advancedRoutes(app);
@@ -89,7 +96,7 @@ app.post(['/api/shipments','/api/v1/shipments'], async (req, res) => {
 });
 app.post('/api/bids', async (req, res) => {
   role(req.user, 'carrier'); const b = req.body;
-  await mutate(s => { if (!s.shipments.some(x => x.id === b.shipmentId && x.status === 'open')) throw new Error('Shipment closed'); if (s.bids.some(x => x.shipmentId === b.shipmentId && x.carrierId === req.user.id)) throw new Error('You already submitted an offer'); notice(s,s.shipments.find(x=>x.id===b.shipmentId).ownerId,'bid_received',b.shipmentId);s.bids.push({ id: id(), shipmentId: b.shipmentId, carrierId: req.user.id, price: positive(b.price, 'price'), days: positive(b.days, 'days'), note: txt(b.note), createdAt: new Date().toISOString() }); });
+  await mutate(s => { if (!s.shipments.some(x => x.id === b.shipmentId && x.status === 'open')) throw new Error('Shipment closed'); if (s.bids.some(x => x.shipmentId === b.shipmentId && x.carrierId === req.user.id)) throw new Error('You already submitted an offer'); notice(s,s.shipments.find(x=>x.id===b.shipmentId).ownerId,'bid_received',b.shipmentId);queueEmail(s,s.shipments.find(x=>x.id===b.shipmentId).ownerId,'bid_received',{shipment:s.shipments.find(x=>x.id===b.shipmentId).title,carrier:req.user.name},`bid/${b.shipmentId}/${req.user.id}`);s.bids.push({ id: id(), shipmentId: b.shipmentId, carrierId: req.user.id, price: positive(b.price, 'price'), days: positive(b.days, 'days'), note: txt(b.note), createdAt: new Date().toISOString() }); });
   res.status(201).json({ ok: true });
 });
 app.post('/api/shipments/:id/accept', async (req, res) => { role(req.user, 'merchant'); const sh = await mutate(s => {const sh=acceptBid(s, req.params.id, req.body.bidId, req.user.id);s.trackingEvents.push({id:id(),shipmentId:sh.id,actorId:req.user.id,event:'assigned',source:'platform',createdAt:new Date().toISOString()});shipmentNotice(s,sh,'assigned');return sh}); res.json(sh); });
@@ -113,7 +120,7 @@ app.post('/api/kyb', async (req, res) => {
   if(person&&!validFutureDate(b.expiry))throw new Error('Valid passport expiry required');
   const details=person?{fullName:txt(b.fullName,120),passportLast4:txt(b.passportNumber,40).slice(-4),expiry:b.expiry}:{company:txt(b.company),registration:txt(b.registration,80),registry:txt(b.registry|| (req.user.demo?'Demo registry':''),120)};
   if(!person){details.taxId=txt(b.taxId||req.user.taxId||(req.user.demo?'DEMO-TAX':''),40);if(!/^[A-Za-z0-9][A-Za-z0-9 .\/-]{2,39}$/.test(details.taxId))throw new Error('Invalid company tax number')}
-  await mutate(s=>{if(s.kyb.some(x=>x.userId===req.user.id&&x.status==='pending'))throw new Error('Application pending');s.kyb.push({id:id(),userId:req.user.id,kind:person?'person':'company',country:b.country||'TR',...details,filename:txt(b.filename),mime:b.mime,encryptedContent:encryptDocument(b.content),status:'pending',createdAt:new Date().toISOString()});const u=s.users.find(u=>u.id===req.user.id);u.verified=false;u.verificationStatus='pending';u.verificationLevel='none'});res.json({ok:true});
+  await mutate(s=>{if(s.kyb.some(x=>x.userId===req.user.id&&x.status==='pending'))throw new Error('Application pending');s.kyb.push({id:id(),userId:req.user.id,kind:person?'person':'company',country:b.country||'TR',...details,filename:txt(b.filename),mime:b.mime,encryptedContent:encryptDocument(b.content),status:'pending',createdAt:new Date().toISOString()});const u=s.users.find(u=>u.id===req.user.id);u.verified=false;u.verificationStatus='pending';u.verificationLevel='none';if(!person)u.taxId=details.taxId;queueEmail(s,u.id,'application',{name:details.fullName||details.company});for(const a of s.users.filter(u=>u.role==='admin'&&!u.demo))notice(s,a.id,'account_registered')});res.json({ok:true,completed:true});
 });
 app.get('/api/kyb/:id/document', (req, res) => { role(req.user,'admin'); const doc = readState().kyb.find(x => x.id === req.params.id); if (!doc) return res.sendStatus(404); if(req.user.demo&&!readState().users.find(u=>u.id===doc.userId)?.demo)return res.sendStatus(403); res.set('Content-Type',doc.mime); res.set('Content-Disposition','attachment; filename="verification-document"'); res.send(decryptDocument(doc.encryptedContent)); });
 app.post('/api/kyb/:id/review', async (req, res) => { role(req.user, 'admin'); if (!['approved','rejected'].includes(req.body.status)) throw new Error('Invalid review'); await mutate(s => {
@@ -123,12 +130,12 @@ app.post('/api/kyb/:id/review', async (req, res) => { role(req.user, 'admin'); i
   if(b.status==='approved'&&!owner.demo){if(b.documentMatches!==true)throw new Error('Document review required');if(doc.kind==='company'&&(b.registryMatches!==true||b.businessActive!==true||!b.reference))throw new Error('Official registry review and reference required');if(doc.kind==='person'&&(!validFutureDate(doc.expiry)||b.passportMatches!==true))throw new Error('Passport review required')}
   if(b.status==='rejected'&&!owner.demo&&!b.reason)throw new Error('Rejection reason required');
   doc.status=b.status;doc.review={reviewerId:req.user.id,reviewedAt:new Date().toISOString(),reference:b.reference?txt(b.reference,500):null,reason:b.reason?txt(b.reason,500):null,documentMatches:b.documentMatches===true,registryMatches:b.registryMatches===true,businessActive:b.businessActive===true,passportMatches:b.passportMatches===true};
-  notice(s,owner.id,'verification_'+b.status);owner.verified=b.status==='approved';owner.verificationStatus=b.status;owner.verificationLevel=owner.verified?(owner.demo?'demo':'manual_review'):'none';
+  notice(s,owner.id,'verification_'+b.status);owner.verified=b.status==='approved';owner.verificationStatus=b.status;owner.verificationLevel=owner.verified?(owner.demo?'demo':'manual_review'):'none';queueEmail(s,owner.id,b.status==='approved'?'approved':'rejected',{reason:doc.review.reason||''},`review/${doc.id}`);if(owner.verified)announceCompany(s,owner);
 });res.json({ok:true}); });
 app.post('/api/messages', async (req, res) => {
-  const b = req.body; const message = txt(b.text,2000); if (!readState().users.some(u => u.id === b.recipientId && u.id !== req.user.id)) throw new Error('Invalid recipient');
+  const b = req.body; const message = txt(b.text,2000); if (!readState().users.some(u => u.id === b.recipientId && u.id !== req.user.id&&!requiresApproval(u))) throw new Error('Invalid recipient');
   const result = await translate(message, b.targetLanguage);
-  await mutate(s => s.messages.push({ id: id(), senderId: req.user.id, recipientId: b.recipientId, text: message, translated: result.text, translationMode: result.mode, targetLanguage: b.targetLanguage, createdAt: new Date().toISOString() })); res.json({ ok: true });
+  await mutate(s => {queueEmail(s,b.recipientId,'message_received',{sender:req.user.name});s.messages.push({ id: id(), senderId: req.user.id, recipientId: b.recipientId, text: message, translated: result.text, translationMode: result.mode, targetLanguage: b.targetLanguage, createdAt: new Date().toISOString() })}); res.json({ ok: true });
 });
 async function translate(text, lang) {
   if (!['ar','en','tr'].includes(lang)) throw new Error('Invalid language');

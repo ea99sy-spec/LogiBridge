@@ -38,7 +38,7 @@ export async function checkPassword(password,credential) {
 export function publicUser(user,own=false) {
   if(!user)return null;
   const {id,role,name,verified,plan,accountType,verificationStatus,verificationLevel,demo}=user;
-  return {id,role,name,verified,plan,accountType,verificationStatus,verificationLevel,demo,...(own?{email:user.email,taxId:user.taxId||null}: {})};
+  return {id,role,name,verified,plan,accountType,verificationStatus,verificationLevel,demo,...(own?{email:user.email,taxId:user.taxId||null,profile:user.profile||{}}: {})};
 }
 export function validateDocument(body) {
   if(!/^[A-Za-z0-9+/]+={0,2}$/.test(body.content||''))throw new Error('Invalid document');

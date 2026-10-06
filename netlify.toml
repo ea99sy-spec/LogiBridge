@@ -10,6 +10,9 @@
   node_bundler = "esbuild"
   external_node_modules = ["express", "exceljs", "pg", "redis", "@netlify/blobs"]
 
+[functions.emails]
+  schedule = "* * * * *"
+
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/api/:splat"

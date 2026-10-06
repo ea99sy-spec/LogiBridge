@@ -1,3 +1,4 @@
+import {queueEmail} from './email.js';
 import {publicUser,validateDocument,encryptDocument,decryptDocument} from './identity.js';
 import {readState,mutate,id} from './store.js';
 const text=(value,max=300)=>{if(typeof value!=='string'||!value.trim()||value.length>max)throw new Error('Invalid text');return value.trim()};
@@ -18,6 +19,7 @@ export function operationRoutes(app){
     if(req.user.demo&&!account.demo)return res.status(403).json({error:'A registered administrator is required'});
     res.json({account:publicUser(account,true),applications:s.kyb.filter(d=>d.userId===account.id).map(({encryptedContent,content,...d})=>d),shipments:s.shipments.filter(sh=>[sh.ownerId,sh.carrierId].includes(account.id)).map(({privateDetails,...sh})=>sh)});
   });
+  app.post('/api/shipments/:id/submit',async(req,res)=>{await mutate(s=>{const sh=s.shipments.find(x=>x.id===req.params.id&&x.ownerId===req.user.id);if(!sh)throw Error('Shipment unavailable');if(sh.submittedAt)return;if(!s.shipmentDocuments.some(d=>d.shipmentId===sh.id))throw Error('Upload shipment documents first');sh.submittedAt=new Date().toISOString();queueEmail(s,req.user.id,'shipment_submitted',{shipment:sh.title},`shipment/${sh.id}`)});res.json({ok:true,completed:true})});
   app.post('/api/shipment-documents',async(req,res)=>{
     const b=req.body;validateDocument(b);
     if(!['invoice','packing','origin','transport','customs','other'].includes(b.kind))throw new Error('Invalid document kind');
