@@ -1,5 +1,62 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { LegalLinks } from "./Legal";
+// "Try it" area: opens a demo account of each type without registering.
+function TryPlatform({ t }) {
+  const [demo, setDemo] = useState(false),
+    [busy, setBusy] = useState(""),
+    [error, setError] = useState("");
+  useEffect(() => {
+    fetch("/api/health")
+      .then((r) => r.json())
+      .then((r) => setDemo(!!r.demo))
+      .catch(() => {});
+  }, []);
+  if (!demo) return null;
+  const kinds = [
+    ["merchant", "▤"],
+    ["carrier", "⇄"],
+    ["supplier", "▧"],
+    ["individual", "◉"],
+    ["admin", "◇"],
+  ];
+  async function open(kind) {
+    setBusy(kind);
+    setError("");
+    try {
+      const r = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: kind }),
+      });
+      if (!r.ok) throw new Error();
+      window.location.href = "/workspace/dashboard";
+    } catch {
+      setError(t("error"));
+      setBusy("");
+    }
+  }
+  return (
+    <section id="try" className="landing-section try-platform">
+      <span className="eyebrow">TRY IT · NO SIGN-UP</span>
+      <h2>{t("tryPlatformTitle")}</h2>
+      <p>{t("tryPlatformIntro")}</p>
+      <div className="landing-account-cards">
+        {kinds.map(([kind, symbol]) => (
+          <article key={kind}>
+            <span className="access-symbol">{symbol}</span>
+            <h3>{t(kind === "admin" ? "administrator" : kind)}</h3>
+            <p>{t("tryAs_" + kind)}</p>
+            <button className="button yellow-button" disabled={!!busy} onClick={() => open(kind)}>
+              {busy === kind ? t("loading") : t("tryDemo")} ↗
+            </button>
+          </article>
+        ))}
+      </div>
+      {error && <p role="alert">{error}</p>}
+      <p className="muted small">{t("tryPlatformNote")}</p>
+    </section>
+  );
+}
 export default function Landing({ t, langSelect, user }) {
   const types = ["merchant", "carrier", "supplier", "individual"];
   const symbols = { merchant: "▤", carrier: "⇄", supplier: "▧", individual: "◉" };
@@ -10,6 +67,7 @@ export default function Landing({ t, langSelect, user }) {
           <span className="brand-icon">⇄</span>LogiBridge
         </a>
         <nav aria-label={t("mainNavigation")}>
+          <a href="#try">{t("tryNav")}</a>
           <a href="#services">{t("ourServices")}</a>
           <a href="#verification">{t("identityReview")}</a>
           <a href="/accounts">{t("chooseAccount")}</a>
@@ -76,6 +134,7 @@ export default function Landing({ t, langSelect, user }) {
             <div className="global-art-caption">LOGIBRIDGE NETWORK</div>
           </div>
         </section>
+        <TryPlatform t={t} />
         <section id="services" className="landing-section">
           <span className="eyebrow">ONE PLATFORM. YOUR WORKSPACE.</span>
           <h2>{t("accountForEveryone")}</h2>

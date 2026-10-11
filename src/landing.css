@@ -554,3 +554,12 @@
     display: none;
   }
 }
+
+/* Try-it area */
+.try-platform {
+  background: linear-gradient(180deg, #fff8dc 0%, transparent 100%);
+  border-radius: 20px;
+}
+.try-platform .landing-account-cards {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}

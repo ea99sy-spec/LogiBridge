@@ -755,6 +755,9 @@ export async function createApp() {
     const b = req.body;
     validateDocument(b);
     const person = req.user.accountType === "individual";
+    // Companies complete their profile first, so the administrator reviews it with the documents.
+    if (!person && !req.user.demo && (!req.user.profile?.about || !req.user.profile?.contactEmail))
+      throw new Error("Complete your company profile first");
     if (!validCountry(b.country) && !(req.user.demo && !b.country)) throw new Error("Valid country required");
     if (person && !validFutureDate(b.expiry)) throw new Error("Valid passport expiry required");
     const details = person

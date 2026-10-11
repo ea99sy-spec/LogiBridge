@@ -1,5 +1,5 @@
 import { requiresApproval } from "../shared/access";
-import { PendingAccount, Profile, Directory, AccountSecurity } from "./Profiles";
+import { PendingAccount, Profile, Directory, AccountSecurity, CompanyProfile } from "./Profiles";
 import { ShipmentPayment } from "./Payments";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -77,7 +77,7 @@ function Select({ label, name, options, ...props }) {
   );
 }
 function ShipmentCard({ s, compact = false }) {
-  const { data, user, t, run, busy, money, num, lang } = useWorkspace();
+  const { data, user, t, run, busy, money, num, lang, openProfile } = useWorkspace();
   const admin = user.role === "admin",
     merchant = user.role === "merchant",
     carrier = user.role === "carrier";
@@ -138,7 +138,21 @@ function ShipmentCard({ s, compact = false }) {
             {bids.map((b) => (
               <div className={`offer ${s.bidId === b.id ? "accepted-offer" : ""}`} key={b.id}>
                 <div>
-                  <b>{b.carrierId === user.id ? t("yourOffer") : name(b.carrierId)}</b>
+                  <b>
+                    {b.carrierId === user.id ? (
+                      t("yourOffer")
+                    ) : (
+                      <a
+                        href={`/workspace/company?id=${encodeURIComponent(b.carrierId)}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          openProfile?.(b.carrierId);
+                        }}
+                      >
+                        {name(b.carrierId)}
+                      </a>
+                    )}
+                  </b>
                   {data.users.find((u) => u.id === b.carrierId)?.verified && (
                     <span className="verified"> ✓</span>
                   )}
@@ -352,9 +366,11 @@ function App() {
     [modal, setModal] = useState(false),
     [search, setSearch] = useState(""),
     [filter, setFilter] = useState("all");
-  function setTab(next) {
-    history.pushState(null, "", `/workspace/${next}`);
+  // `id` is used by the company profile page: /workspace/company?id=...
+  function setTab(next, id) {
+    history.pushState(null, "", `/workspace/${next}${id ? "?id=" + encodeURIComponent(id) : ""}`);
     setCurrentTab(next);
+    window.scrollTo({ top: 0 });
   }
   function enteredAccount(register, account) {
     const next =
@@ -528,7 +544,8 @@ function App() {
     merchant = user.role === "merchant",
     carrier = user.role === "carrier";
   const modules = workspaceModules(user, data.flags);
-  const activeTab = modules.includes(tab) ? tab : "dashboard";
+  const activeTab =
+    modules.includes(tab) || (tab === "company" && modules.includes("directory")) ? tab : "dashboard";
   const ownShipments = data.shipments.filter(
     (s) => admin || s.ownerId === user.id || s.carrierId === user.id,
   );
@@ -551,7 +568,17 @@ function App() {
   const eligibleContracts = ownShipments.filter(
     (s) => s.status !== "open" && [s.ownerId, s.carrierId].includes(user.id),
   );
-  const workspace = { data, user, t, run, busy, money, num, lang };
+  const workspace = {
+    data,
+    user,
+    t,
+    run,
+    busy,
+    money,
+    num,
+    lang,
+    openProfile: (id) => setTab("company", id),
+  };
   return (
     <Workspace.Provider value={workspace}>
       <div className="app-shell">
@@ -618,7 +645,9 @@ function App() {
                 {t(
                   activeTab === "kyb" && user.accountType === "individual"
                     ? "passportVerification"
-                    : activeTab,
+                    : activeTab === "company"
+                      ? "companyPage"
+                      : activeTab,
                 )}
               </b>
             </div>
@@ -687,9 +716,18 @@ function App() {
             {activeTab === "dashboard" && data.approvalRequired && (
               <PendingAccount data={data} t={t} navigate={setTab} />
             )}
-            {activeTab === "profile" && <Profile data={data} t={t} run={run} busy={busy} />}
+            {activeTab === "profile" && <Profile data={data} t={t} run={run} busy={busy} navigate={setTab} />}
+            {activeTab === "company" && (
+              <CompanyProfile
+                id={new URLSearchParams(window.location.search).get("id")}
+                t={t}
+                data={data}
+                navigate={setTab}
+                money={money}
+              />
+            )}
             {activeTab === "security" && <AccountSecurity data={data} t={t} run={run} busy={busy} />}
-            {activeTab === "directory" && <Directory data={data} t={t} />}
+            {activeTab === "directory" && <Directory data={data} t={t} navigate={setTab} />}
             {activeTab === "dashboard" && !data.approvalRequired && (
               <RoleDashboard data={data} t={t} navigate={setTab} money={money} ShipmentCard={ShipmentCard} />
             )}
@@ -1320,7 +1358,14 @@ function Customs({ t, lang, money, busy, run, Field }) {
   );
 }
 function Chat({ data, t, user, run, busy, name, lang }) {
-  const [recipient, setRecipient] = useState(data.users.find((u) => u.id !== user.id)?.id),
+  const [recipient, setRecipient] = useState(() => {
+      let wanted = null;
+      try {
+        wanted = localStorage.getItem("lb_chat_to");
+        localStorage.removeItem("lb_chat_to");
+      } catch {}
+      return data.users.some((u) => u.id === wanted) ? wanted : data.users.find((u) => u.id !== user.id)?.id;
+    }),
     [text, setText] = useState(""),
     [target, setTarget] = useState(lang);
   const messages = data.messages.filter((m) => [m.senderId, m.recipientId].includes(recipient));

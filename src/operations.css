@@ -476,3 +476,60 @@ td .small-button + .small-button {
   border-color: #f79009;
   background: #fffaeb;
 }
+
+/* Company logos and profile pages */
+.company-logo {
+  border-radius: 14px;
+  object-fit: cover;
+  background: #fff;
+  border: 1px solid #e4e7ec;
+  flex-shrink: 0;
+}
+.company-logo.placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #102a56;
+  color: #f5c542;
+  font-weight: 700;
+}
+.profile-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.profile-head h2,
+.profile-head h3 {
+  margin: 4px 0;
+}
+.company-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+.company-hero h1 {
+  margin: 6px 0;
+}
+.company-hero .verified {
+  font-size: 14px;
+  color: #2f9e6f;
+}
+.company-actions {
+  margin-inline-start: auto;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.account-details-list {
+  display: grid;
+  grid-template-columns: minmax(120px, max-content) 1fr;
+  gap: 6px 16px;
+}
+.account-details-list dt {
+  color: #667085;
+}
+.account-details-list dd {
+  margin: 0;
+  font-weight: 600;
+}

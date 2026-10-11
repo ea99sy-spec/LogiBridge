@@ -174,6 +174,8 @@ export async function initialize() {
         services: "Fabric export, raw cotton import, consolidated LCL orders",
         location: "Gaziantep, Türkiye",
         website: "",
+        contactEmail: "trade@anatolia.example",
+        contactPhone: "+90 342 000 10 01",
         companyEmails: true,
       },
     },
@@ -193,6 +195,8 @@ export async function initialize() {
         services: "FTL and LCL road freight, customs brokerage, door-to-door delivery",
         location: "Gaziantep, Türkiye",
         website: "",
+        contactEmail: "ops@bridge-transport.example",
+        contactPhone: "+90 342 000 10 02",
         companyEmails: true,
       },
     },
@@ -211,6 +215,8 @@ export async function initialize() {
         services: "Container rental, cargo securing kits, GPS trackers",
         location: "Mersin, Türkiye",
         website: "",
+        contactEmail: "sales@route-equipment.example",
+        contactPhone: "+90 324 000 10 03",
         companyEmails: true,
       },
     },
@@ -233,7 +239,7 @@ export async function initialize() {
     u.email ||= info.email;
     if (info.taxId) u.taxId ||= info.taxId;
     u.details = { ...info.details, ...(u.details || {}) };
-    if (!u.profile?.about && info.profile.about) u.profile = info.profile;
+    if (info.profile.about && (!u.profile?.about || !u.profile.contactEmail)) u.profile = info.profile;
   }
   for (const doc of state.kyb) {
     doc.kind ||= "company";

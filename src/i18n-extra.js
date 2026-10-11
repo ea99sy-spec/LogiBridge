@@ -1,5 +1,112 @@
 // Additional interface texts: [Arabic, English, Turkish].
 export const extraRows = {
+  // Company profile pages
+  companyContact: ["التواصل", "Contact", "İletişim"],
+  companyPage: ["صفحة الشركة", "Company page", "Şirket sayfası"],
+  viewProfile: ["عرض صفحة الشركة", "View profile", "Profili görüntüle"],
+  viewMyPage: ["كيف تظهر صفحتي للأعضاء", "See my page as members see it", "Sayfamı üyeler gibi gör"],
+  companyLogo: ["شعار الشركة (PNG أو JPEG)", "Company logo (PNG or JPEG)", "Şirket logosu (PNG veya JPEG)"],
+  removeLogo: ["حذف الشعار", "Remove logo", "Logoyu kaldır"],
+  logoInvalid: [
+    "اختر صورة PNG أو JPEG أصغر من 5 ميغابايت.",
+    "Choose a PNG or JPEG image under 5 MB.",
+    "5 MB altı PNG veya JPEG seçin.",
+  ],
+  contactEmailRequired: [
+    "إيميل التواصل (يظهر للأعضاء)",
+    "Contact email (shown to members)",
+    "İletişim e-postası (üyelere görünür)",
+  ],
+  contactEmailOptional: [
+    "إيميل التواصل (اختياري)",
+    "Contact email (optional)",
+    "İletişim e-postası (isteğe bağlı)",
+  ],
+  contactPhoneOptional: [
+    "هاتف التواصل (اختياري)",
+    "Contact phone (optional)",
+    "İletişim telefonu (isteğe bağlı)",
+  ],
+  verifiedAccount: ["حساب موثّق", "Verified", "Doğrulanmış"],
+  memberSince: ["عضو منذ", "Member since", "Üyelik tarihi"],
+  sendMessage: ["مراسلة", "Send a message", "Mesaj gönder"],
+  requestQuote: ["اطلب عرض سعر", "Request a quote", "Teklif iste"],
+  upcomingTrips: ["رحلات مشتركة قادمة", "Upcoming shared trips", "Yaklaşan ortak seferler"],
+  customerReviews: ["تقييمات العملاء", "Customer reviews", "Müşteri değerlendirmeleri"],
+  noContactYet: [
+    "لم تُضف بيانات تواصل بعد. استخدم زر المراسلة.",
+    "No contact details yet. Use the message button.",
+    "Henüz iletişim bilgisi yok. Mesaj düğmesini kullanın.",
+  ],
+  profileUnavailable: [
+    "هذه الصفحة غير متاحة.",
+    "This profile is not available.",
+    "Bu profil kullanılamıyor.",
+  ],
+  completeProfileFirst: [
+    "الخطوة الأولى: أكمل صفحة التعريف (النبذة والخدمات وإيميل التواصل). بعدها ارفع وثائق التوثيق ليراجعها المسؤول مع صفحتك.",
+    "Step one: complete your profile (introduction, services and contact email). Then upload your verification documents so the administrator reviews them together.",
+    "İlk adım: profilinizi tamamlayın (tanıtım, hizmetler ve iletişim e-postası). Ardından doğrulama belgelerinizi yükleyin; yönetici birlikte inceler.",
+  ],
+  "err_Complete your company profile first": [
+    "أكمل صفحة التعريف أولًا (النبذة والخدمات وإيميل التواصل).",
+    "Complete your company profile first (introduction, services and contact email).",
+    "Önce şirket profilinizi tamamlayın (tanıtım, hizmetler ve iletişim e-postası).",
+  ],
+  "err_Contact email required": [
+    "أدخل إيميل التواصل للشركة.",
+    "Enter the company contact email.",
+    "Şirket iletişim e-postasını girin.",
+  ],
+  "err_Logo must be a PNG or JPEG under 150 KB": [
+    "الشعار يجب أن يكون صورة PNG أو JPEG صغيرة.",
+    "The logo must be a small PNG or JPEG.",
+    "Logo küçük bir PNG veya JPEG olmalıdır.",
+  ],
+
+  // Try-it area on the home page
+  tryNav: ["جرّب المنصة", "Try it", "Deneyin"],
+  tryPlatformTitle: [
+    "جرّب المنصة قبل التسجيل",
+    "Try the platform before signing up",
+    "Kaydolmadan önce platformu deneyin",
+  ],
+  tryPlatformIntro: [
+    "ادخل بحساب تجريبي جاهز وشاهد كيف تعمل المنصة لكل نوع حساب: نشر شحنة، تقديم عرض، الدفع، التتبع وإغلاق العملية.",
+    "Open a ready demo account and see how the platform works for each account type: posting a shipment, offering, paying, tracking and closing the operation.",
+    "Hazır bir demo hesapla girin ve her hesap türü için platformun nasıl çalıştığını görün: sevkiyat yayınlama, teklif, ödeme, takip ve işlemi kapatma.",
+  ],
+  tryAs_merchant: [
+    "انشر شحنة وقارن عروض الناقلين.",
+    "Post a shipment and compare carrier offers.",
+    "Sevkiyat yayınlayın ve teklifleri karşılaştırın.",
+  ],
+  tryAs_carrier: [
+    "شاهد فرص النقل وقدّم عرضك.",
+    "Browse jobs and send your offer.",
+    "İşlere göz atın ve teklif verin.",
+  ],
+  tryAs_supplier: [
+    "اعرض معداتك للبيع أو الإيجار.",
+    "List equipment for sale or rent.",
+    "Ekipmanınızı satışa veya kiraya sunun.",
+  ],
+  tryAs_individual: [
+    "أرسل طردًا شخصيًا بسهولة.",
+    "Send a personal parcel easily.",
+    "Kişisel kolinizi kolayca gönderin.",
+  ],
+  tryAs_admin: [
+    "راجع الحسابات وراقب العمليات.",
+    "Review accounts and monitor operations.",
+    "Hesapları inceleyin ve işlemleri izleyin.",
+  ],
+  tryPlatformNote: [
+    "الحسابات التجريبية تستخدم بيانات توضيحية منفصلة تمامًا عن الحسابات الحقيقية، ولا تتضمن مدفوعات حقيقية.",
+    "Demo accounts use sample data kept completely apart from real accounts, with no real payments.",
+    "Demo hesaplar gerçek hesaplardan tamamen ayrı örnek veriler kullanır; gerçek ödeme yoktur.",
+  ],
+
   // Country-specific tax field
   taxField_TR: ["الرقم الضريبي (VKN أو TCKN)", "Tax number (VKN or TCKN)", "Vergi numarası (VKN veya TCKN)"],
   taxField_VAT15: ["الرقم الضريبي (15 رقمًا)", "VAT number (15 digits)", "KDV numarası (15 hane)"],

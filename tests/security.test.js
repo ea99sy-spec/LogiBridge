@@ -476,3 +476,80 @@ test("two-step sign-in, GCC tax rules, GPS sharing and email confirmation", asyn
   const dir = (await call("p", "/directory")).body;
   assert.ok(Array.isArray(dir));
 });
+
+test("company profile pages are for approved members and show contact details", async (t) => {
+  const server = await startServer(3217, { DEMO_MODE: "" });
+  t.after(server.stop);
+  const { call } = server;
+  const company = {
+    accountType: "supplier",
+    name: "Profile Supplier",
+    email: "sup@test.local",
+    password,
+    ...personFields,
+    taxId: "1234567890",
+    equipment: "Containers",
+  };
+  await call("sup", "/auth/register", company);
+  // Documents need a complete profile with a contact email first.
+  const doc = await call("sup", "/kyb", {
+    content: "JVBERi0xLjQK",
+    mime: "application/pdf",
+    filename: "r.pdf",
+  });
+  assert.equal(doc.body.error, "Complete your company profile first");
+  assert.equal(
+    (
+      await call(
+        "sup",
+        "/profile",
+        { about: "We rent containers", services: "Rental", companyEmails: true },
+        "PUT",
+      )
+    ).body.error,
+    "Contact email required",
+  );
+  assert.equal(
+    (
+      await call(
+        "sup",
+        "/profile",
+        {
+          about: "We rent containers",
+          services: "Rental",
+          contactEmail: "info@supplier.test",
+          contactPhone: "+90 324 111 22 33",
+          companyEmails: true,
+          logo: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aXmUAAAAASUVORK5CYII=",
+        },
+        "PUT",
+      )
+    ).status,
+    200,
+  );
+  const sid = (await call("sup", "/state")).body.user.id;
+  // A second member, not yet approved, cannot open profile pages.
+  await call("buyer", "/auth/register", {
+    accountType: "individual",
+    name: "Buyer",
+    email: "buyer@test.local",
+    password,
+    ...personFields,
+  });
+  assert.equal((await call("buyer", `/companies/${sid}`)).status, 403);
+  await call("owner", "/auth/login", { email: "owner@test.local", password: "Owner-test-password-2026" });
+  const bid = (await call("buyer", "/state")).body.user.id;
+  await call("owner", `/admin/accounts/${bid}/review`, { status: "approved" });
+  assert.equal((await call("buyer", `/companies/${sid}`)).status, 404, "unapproved companies are hidden");
+  await call("owner", `/admin/accounts/${sid}/review`, { status: "approved" });
+  const page = await call("buyer", `/companies/${sid}`);
+  assert.equal(page.status, 200);
+  assert.equal(page.body.profile.contactEmail, "info@supplier.test");
+  assert.match(page.body.logo, /^data:image\/png/);
+  assert.equal(page.body.details.equipment, "Containers");
+  assert.equal(JSON.stringify(page.body).includes("1234567890"), false, "tax number stays private");
+  assert.equal(JSON.stringify(page.body).includes("sup@test.local"), false, "login email stays private");
+  assert.ok((await call("buyer", "/directory")).body.some((u) => u.id === sid));
+  // Anonymous visitors cannot see profiles.
+  assert.equal((await call("anon", `/companies/${sid}`)).status, 401);
+});

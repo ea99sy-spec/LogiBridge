@@ -401,6 +401,7 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
           services: "Cargo transport",
           website: "https://example.com",
           location: "TR",
+          contactEmail: "contact@example.com",
           companyEmails: true,
         },
         "PUT",
@@ -502,6 +503,22 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
     200,
   );
   await register("carrier", "realCarrier");
+  assert.equal(
+    (
+      await call(
+        "realCarrier",
+        "/profile",
+        {
+          about: "Carrier intro",
+          services: "Road freight",
+          contactEmail: "ops@carrier.test",
+          companyEmails: true,
+        },
+        "PUT",
+      )
+    ).status,
+    200,
+  );
   assert.equal(
     (
       await call("realCarrier", "/kyb", {

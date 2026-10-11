@@ -13,10 +13,19 @@ export function PendingAccount({ data, t, navigate }) {
         </p>
       )}
       <p>{t(status === "rejected" ? "rejectedAccountNext" : "reviewEmailNote")}</p>
+      {data.user.accountType !== "individual" && !data.user.profile?.contactEmail && (
+        <p className="notice">{t("completeProfileFirst")}</p>
+      )}
       <div className="actions">
-        <button className="button" onClick={() => navigate("kyb")}>
-          {t("completeApplication")}
-        </button>
+        {data.user.accountType !== "individual" && !data.user.profile?.contactEmail ? (
+          <button className="button" onClick={() => navigate("profile")}>
+            1 · {t("profile")}
+          </button>
+        ) : (
+          <button className="button" onClick={() => navigate("kyb")}>
+            {t("completeApplication")}
+          </button>
+        )}
         <button className="button ghost" onClick={() => navigate("profile")}>
           {t("profile")}
         </button>
@@ -24,8 +33,45 @@ export function PendingAccount({ data, t, navigate }) {
     </section>
   );
 }
-export function Profile({ data, t, run, busy }) {
+// Shrinks a chosen logo to at most 256×256 so profiles stay light.
+async function resizeLogo(file) {
+  if (!file || !["image/png", "image/jpeg"].includes(file.type) || file.size > 5000000) throw new Error();
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = reject;
+      i.src = url;
+    });
+    const scale = Math.min(1, 256 / Math.max(img.width, img.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL(file.type === "image/png" ? "image/png" : "image/jpeg", 0.85);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+export function Logo({ src, name, size = 56 }) {
+  return src ? (
+    <img className="company-logo" src={src} alt="" width={size} height={size} />
+  ) : (
+    <span className="company-logo placeholder" style={{ width: size, height: size }}>
+      {(name || "?")
+        .split(" ")
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)}
+    </span>
+  );
+}
+export function Profile({ data, t, run, busy, navigate }) {
   const p = data.user.profile || {};
+  const company = data.user.accountType !== "individual";
+  const [logo, setLogo] = useState(p.logo || null),
+    [logoError, setLogoError] = useState("");
   return (
     <>
       <h1>{t("profile")}</h1>
@@ -35,11 +81,52 @@ export function Profile({ data, t, run, busy }) {
         onSubmit={(e) => {
           e.preventDefault();
           const f = new FormData(e.currentTarget);
-          run("/profile", { ...Object.fromEntries(f), companyEmails: f.has("companyEmails") }, "PUT");
+          f.delete("logoFile");
+          run(
+            "/profile",
+            { ...Object.fromEntries(f), companyEmails: f.has("companyEmails"), logo: logo || null },
+            "PUT",
+          );
         }}
       >
-        <h3>{data.user.name}</h3>
-        <p dir="ltr">{data.user.email}</p>
+        <div className="profile-head">
+          <Logo src={logo} name={data.user.name} size={72} />
+          <div>
+            <h3>{data.user.name}</h3>
+            <p dir="ltr" className="muted small">
+              {data.user.email}
+            </p>
+            {!data.user.demo && !data.approvalRequired && navigate && (
+              <button type="button" className="text-button" onClick={() => navigate("company", data.user.id)}>
+                {t("viewMyPage")} ↗
+              </button>
+            )}
+          </div>
+        </div>
+        {company && (
+          <label className="field">
+            <span>{t("companyLogo")}</span>
+            <input
+              type="file"
+              name="logoFile"
+              accept="image/png,image/jpeg"
+              onChange={async (e) => {
+                setLogoError("");
+                try {
+                  if (e.target.files[0]) setLogo(await resizeLogo(e.target.files[0]));
+                } catch {
+                  setLogoError(t("logoInvalid"));
+                }
+              }}
+            />
+            {logo && (
+              <button type="button" className="text-button" onClick={() => setLogo(null)}>
+                {t("removeLogo")}
+              </button>
+            )}
+            {logoError && <small className="form-error">{logoError}</small>}
+          </label>
+        )}
         <AccountDetails account={data.user} t={t} />
         <label className="field">
           <span>{t("aboutUs")}</span>
@@ -66,6 +153,30 @@ export function Profile({ data, t, run, busy }) {
             />
           </label>
         </div>
+        <div className="form-grid">
+          <label className="field">
+            <span>{t(company ? "contactEmailRequired" : "contactEmailOptional")}</span>
+            <input
+              name="contactEmail"
+              type="email"
+              required={company}
+              maxLength="254"
+              dir="ltr"
+              defaultValue={p.contactEmail || ""}
+              placeholder="info@company.com"
+            />
+          </label>
+          <label className="field">
+            <span>{t("contactPhoneOptional")}</span>
+            <input
+              name="contactPhone"
+              type="tel"
+              maxLength="30"
+              dir="ltr"
+              defaultValue={p.contactPhone || ""}
+            />
+          </label>
+        </div>
         <label className="consent">
           <input type="checkbox" name="companyEmails" defaultChecked={p.companyEmails !== false} />
           <span>{t("companyEmailPreference")}</span>
@@ -78,7 +189,7 @@ export function Profile({ data, t, run, busy }) {
     </>
   );
 }
-export function Directory({ t, data }) {
+export function Directory({ t, data, navigate }) {
   const [items, setItems] = useState([]),
     [query, setQuery] = useState(""),
     [error, setError] = useState("");
@@ -116,10 +227,15 @@ export function Directory({ t, data }) {
           )
           .map((u) => (
             <article className="panel public-profile" key={u.id}>
-              <span className="tag">{t(u.accountType)}</span>
-              <h2>
-                {u.name} {u.verified ? "✓" : ""}
-              </h2>
+              <div className="profile-head">
+                <Logo src={u.logo} name={u.name} />
+                <div>
+                  <span className="tag">{t(u.accountType)}</span>
+                  <h2>
+                    {u.name} {u.verified ? <span className="verified">✓</span> : ""}
+                  </h2>
+                </div>
+              </div>
               <p>{u.profile.location}</p>
               <p className="reputation">
                 {u.rating ? (
@@ -150,6 +266,9 @@ export function Directory({ t, data }) {
                   {"★".repeat(r.score)} {r.comment}
                 </blockquote>
               ))}
+              <button className="button" onClick={() => navigate?.("company", u.id)}>
+                {t("viewProfile")} ↗
+              </button>{" "}
               {u.profile.website && (
                 <a
                   className="button ghost"
@@ -566,6 +685,190 @@ export function TwoFactorSettings({ data, t, run, busy }) {
           </button>
         </form>
       )}
+    </div>
+  );
+}
+
+// Full profile page of a company or person (members only).
+export function CompanyProfile({ id, t, data, navigate, money }) {
+  const [c, setC] = useState(null),
+    [error, setError] = useState("");
+  useEffect(() => {
+    let active = true;
+    setC(null);
+    setError("");
+    fetch("/api/companies/" + encodeURIComponent(id || ""))
+      .then(async (r) => {
+        const v = await r.json();
+        if (!r.ok) throw Error(v.error);
+        return v;
+      })
+      .then((v) => active && setC(v))
+      .catch(() => active && setError(t("profileUnavailable")));
+    return () => {
+      active = false;
+    };
+  }, [id]);
+  if (error)
+    return (
+      <section className="panel">
+        <p className="notice">{error}</p>
+        <button className="button ghost" onClick={() => navigate("directory")}>
+          ← {t("directory")}
+        </button>
+      </section>
+    );
+  if (!c) return <p className="muted">{t("loading")}</p>;
+  const d = c.details;
+  const facts = [
+    ["countryLabel", [d.city, d.country].filter(Boolean).join(", ")],
+    ["tradeActivity", d.activity && t("activity_" + d.activity)],
+    ["mainProducts", d.products],
+    ["serviceRoutes", d.routes],
+    ["fleetSize", d.fleetSize],
+    ["equipmentTypes", d.equipment],
+    ["warehouseLocation", d.warehouse],
+    [
+      "memberSince",
+      c.memberSince && new Date(c.memberSince).toLocaleDateString(document.documentElement.lang),
+    ],
+  ].filter(([, v]) => v);
+  const own = c.id === data.user.id;
+  return (
+    <div className="company-page">
+      <button className="text-button" onClick={() => navigate("directory")}>
+        ← {t("directory")}
+      </button>
+      <header className="panel company-hero">
+        <Logo src={c.logo} name={c.name} size={96} />
+        <div>
+          <span className="tag">{t(c.accountType)}</span>
+          <h1>
+            {c.name} {c.verified && <span className="verified">✓ {t("verifiedAccount")}</span>}
+          </h1>
+          {c.profile.location && <p className="muted">{c.profile.location}</p>}
+          <p className="reputation">
+            {c.rating ? (
+              <>
+                <span className="stars">
+                  {"★".repeat(Math.round(c.rating))}
+                  {"☆".repeat(5 - Math.round(c.rating))}
+                </span>{" "}
+                <b>{c.rating}</b> ({c.reviewCount} {t("reviewsCount")})
+              </>
+            ) : (
+              <span className="muted">{t("noReviewsYet")}</span>
+            )}{" "}
+            · {c.completed} {t("completedOperations")}
+          </p>
+        </div>
+        {!own && (
+          <div className="company-actions">
+            <button
+              className="button"
+              onClick={() => {
+                try {
+                  localStorage.setItem("lb_chat_to", c.id);
+                } catch {}
+                navigate("hub");
+              }}
+            >
+              ✉ {t("sendMessage")}
+            </button>
+            {c.accountType === "carrier" && data.user.role === "merchant" && (
+              <button className="button ghost" onClick={() => navigate("newShipment")}>
+                ＋ {t("requestQuote")}
+              </button>
+            )}
+          </div>
+        )}
+      </header>
+      <div className="two-cols">
+        <section className="panel">
+          <h2>{t("aboutUs")}</h2>
+          <p className="profile-text">{c.profile.about || "—"}</p>
+          <h2>{t("ourServices")}</h2>
+          <p className="profile-text">{c.profile.services || "—"}</p>
+          {facts.length > 0 && (
+            <dl className="account-details-list">
+              {facts.map(([k, v]) => (
+                <React.Fragment key={k}>
+                  <dt>{t(k)}</dt>
+                  <dd>{v}</dd>
+                </React.Fragment>
+              ))}
+            </dl>
+          )}
+        </section>
+        <section className="panel">
+          <h2>{t("companyContact")}</h2>
+          {c.profile.contactEmail && (
+            <p>
+              ✉{" "}
+              <a href={`mailto:${c.profile.contactEmail}`} dir="ltr">
+                {c.profile.contactEmail}
+              </a>
+            </p>
+          )}
+          {c.profile.contactPhone && (
+            <p>
+              ☎{" "}
+              <a href={`tel:${c.profile.contactPhone.replace(/[^+0-9]/g, "")}`} dir="ltr">
+                {c.profile.contactPhone}
+              </a>
+            </p>
+          )}
+          {c.profile.website && (
+            <p>
+              ↗{" "}
+              <a href={c.profile.website} target="_blank" rel="noopener noreferrer" dir="ltr">
+                {c.profile.website}
+              </a>
+            </p>
+          )}
+          {!c.profile.contactEmail && !c.profile.contactPhone && <p className="muted">{t("noContactYet")}</p>}
+          {c.groups.length > 0 && (
+            <>
+              <h2>{t("upcomingTrips")}</h2>
+              {c.groups.map((g) => (
+                <p key={g.id} className="small">
+                  {g.origin} → {g.destination} · {g.date} · {g.capacity - g.booked} m³ ·{" "}
+                  {money ? money(g.pricePerM3) : g.pricePerM3 + " USD"} {t("perM3")}
+                </p>
+              ))}
+            </>
+          )}
+          {c.products.length > 0 && (
+            <>
+              <h2>{t("marketplace")}</h2>
+              {c.products.map((p) => (
+                <p key={p.id} className="small">
+                  {p.title} · {t(p.type)} · {money ? money(p.price) : p.price + " USD"}
+                </p>
+              ))}
+            </>
+          )}
+        </section>
+      </div>
+      <section className="panel">
+        <h2>
+          {t("customerReviews")} ({c.reviewCount})
+        </h2>
+        {c.reviews.length ? (
+          c.reviews.map((r, i) => (
+            <blockquote className="review-quote" key={i}>
+              <span className="stars">{"★".repeat(r.score)}</span> {r.comment || ""}
+              <small className="muted">
+                {" "}
+                — {r.by}
+                {r.at ? " · " + new Date(r.at).toLocaleDateString(document.documentElement.lang) : ""}
+              </small>
+            </blockquote>
+          ))
+        ) : (
+          <p className="muted">{t("noReviewsYet")}</p>
+        )}
+      </section>
     </div>
   );
 }
