@@ -4,6 +4,7 @@ import { announceCompany } from "./profiles.js";
 import { demoActive } from "./world.js";
 import { notice } from "./advanced.js";
 import { publicUser, validateDocument, encryptDocument, decryptDocument } from "./identity.js";
+import { readPosition } from "./position.js";
 import { readState, mutate, id } from "./store.js";
 const text = (value, max = 300) => {
   if (typeof value !== "string" || !value.trim() || value.length > max) throw new Error("Invalid text");
@@ -75,6 +76,7 @@ export function operationRoutes(app) {
     const s = readState();
     res.json({
       demoLogin: demoActive(s),
+      requireEmailVerification: s.settings?.requireEmailVerification === true,
       activityEmails: s.settings?.activityEmails !== false,
       notifyEmail: s.settings?.notifyEmail || "",
       recipient: adminRecipient(s),
@@ -84,7 +86,7 @@ export function operationRoutes(app) {
   app.put("/api/admin/settings", async (req, res) => {
     if (!realAdmin(req, res)) return;
     const b = req.body;
-    for (const k of ["demoLogin", "activityEmails"])
+    for (const k of ["demoLogin", "activityEmails", "requireEmailVerification"])
       if (k in b && typeof b[k] !== "boolean") throw new Error("Invalid request");
     let notifyEmail;
     if ("notifyEmail" in b) {
@@ -98,6 +100,7 @@ export function operationRoutes(app) {
       s.settings ||= {};
       if ("demoLogin" in b) s.settings.demoLogin = b.demoLogin;
       if ("activityEmails" in b) s.settings.activityEmails = b.activityEmails;
+      if ("requireEmailVerification" in b) s.settings.requireEmailVerification = b.requireEmailVerification;
       if (notifyEmail !== undefined) s.settings.notifyEmail = notifyEmail;
     });
     res.json({ ok: true });
@@ -199,8 +202,13 @@ export function operationRoutes(app) {
       const sh = s.shipments.find((x) => x.id === req.params.id);
       if (!sh || req.user.id !== sh.carrierId || !["assigned", "transit", "arrived"].includes(sh.status))
         throw new Error("Assigned carrier required");
-      const location = text(req.body.location, 120),
-        note = text(req.body.note, 500);
+      const position = readPosition(req.body);
+      const location =
+          position && !String(req.body.location || "").trim()
+            ? `GPS ${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`
+            : text(req.body.location, 120),
+        note = req.body.note ? text(req.body.note, 500) : "";
+      if (position) sh.lastPosition = { ...position, at: new Date().toISOString() };
       s.trackingEvents.push({
         id: id(),
         shipmentId: sh.id,
@@ -208,7 +216,8 @@ export function operationRoutes(app) {
         event: "location_update",
         location,
         note,
-        source: "carrier_manual",
+        source: position ? "carrier_gps" : "carrier_manual",
+        ...(position ? { position } : {}),
         createdAt: new Date().toISOString(),
       });
       sh.lastLocation = location;

@@ -1,5 +1,6 @@
 import { requiresApproval } from "../shared/access.js";
 import { randomBytes, createHash } from "node:crypto";
+import { readPosition } from "./position.js";
 import { readState, mutate, id, subscribeState } from "./store.js";
 import { transitionShipment, positive } from "./domain.js";
 import { sameWorld, demoActive } from "./world.js";
@@ -178,6 +179,7 @@ export function publicAdvancedRoutes(app) {
         destination: sh.destination,
         status: sh.status,
         lastLocation: sh.lastLocation,
+        lastPosition: sh.lastPosition || null,
       },
     });
   });
@@ -190,8 +192,13 @@ export function publicAdvancedRoutes(app) {
       if (current.revoked || Date.parse(current.expiresAt) <= Date.now()) throw new Error("Link expired");
       const sh = s.shipments.find((x) => x.id === link.shipmentId && x.carrierId === link.carrierId);
       if (!sh) throw new Error("Assignment changed");
-      const location = text(req.body.location, 120),
-        note = text(req.body.note, 500);
+      const position = readPosition(req.body);
+      const location =
+          position && !String(req.body.location || "").trim()
+            ? `GPS ${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`
+            : text(req.body.location, 120),
+        note = req.body.note ? text(req.body.note, 500) : "";
+      if (position) sh.lastPosition = { ...position, at: new Date().toISOString() };
       if (req.body.action)
         transitionShipment(s, sh, req.body.action, { id: link.carrierId, role: "carrier" });
       sh.lastLocation = location;
@@ -202,7 +209,8 @@ export function publicAdvancedRoutes(app) {
         event: req.body.action || "location_update",
         location,
         note,
-        source: "driver_manual",
+        source: position ? "driver_gps" : "driver_manual",
+        ...(position ? { position } : {}),
         createdAt: new Date().toISOString(),
       });
       shipmentNotice(s, sh, "driver_update");

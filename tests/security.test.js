@@ -66,7 +66,7 @@ async function startServer(port, env) {
 }
 
 const password = "Security-test-password-2026";
-const personFields = { phone: "+90 555 000 0000", country: "TR", city: "Istanbul" };
+const personFields = { phone: "+90 555 000 0000", country: "TR", city: "Istanbul", acceptTerms: true };
 const shipment = {
   title: "Security test cargo",
   origin: "Gaziantep",
@@ -364,4 +364,115 @@ test("tax numbers are checked and the administrator controls demo sign-in", asyn
   assert.equal(demoUser.details.license.length > 0, true, "demo carrier has carrier details");
   assert.equal((await call("owner", "/admin/settings", { demoLogin: false }, "PUT")).status, 200);
   assert.equal((await call("demo", "/state")).status, 401, "hiding demo ends demo sessions");
+});
+
+test("two-step sign-in, GCC tax rules, GPS sharing and email confirmation", async (t) => {
+  const { totp, base32Encode } = await import("../server/totp.js");
+  const secret = base32Encode(Buffer.from("12345678901234567890"));
+  assert.equal(secret, "GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ");
+  assert.equal(totp(secret, 59000), "287082", "RFC 6238 test vector");
+  const { checkTaxFormat, taxField } = await import("../shared/tax.js");
+  assert.equal(checkTaxFormat("SA", "300000000000003").status, "format_ok");
+  assert.equal(checkTaxFormat("SA", "100000000000003").status, "invalid");
+  assert.equal(checkTaxFormat("AE", "100123456700003").status, "format_ok");
+  assert.equal(checkTaxFormat("AE", "12345").status, "invalid");
+  assert.equal(taxField("QA").label, "taxField_CR");
+
+  const server = await startServer(3216, {
+    DEMO_MODE: "",
+    RESEND_API_KEY: "test-key-not-real",
+    MAIL_FROM: "LogiBridge <test@example.invalid>",
+  });
+  t.after(server.stop);
+  const { call } = server;
+  await call("owner", "/auth/login", { email: "owner@test.local", password: "Owner-test-password-2026" });
+  // Two-step sign-in for the administrator.
+  const setup = await call("owner", "/account/2fa/setup", { password: "Owner-test-password-2026" });
+  assert.equal(setup.status, 200);
+  assert.match(setup.body.qr, /^data:image\/png;base64,/);
+  assert.equal((await call("owner", "/account/2fa/enable", { code: "000000" })).status, 400);
+  const enabled = await call("owner", "/account/2fa/enable", { code: totp(setup.body.secret) });
+  assert.equal(enabled.status, 200);
+  assert.equal(enabled.body.backupCodes.length, 8);
+  const noCode = await call("o2", "/auth/login", {
+    email: "owner@test.local",
+    password: "Owner-test-password-2026",
+  });
+  assert.equal(noCode.status, 401);
+  assert.equal(noCode.body.twoFactor, true);
+  assert.equal(
+    (
+      await call("o2", "/auth/login", {
+        email: "owner@test.local",
+        password: "Owner-test-password-2026",
+        code: "123456",
+      })
+    ).status,
+    401,
+  );
+  const backup = enabled.body.backupCodes[0];
+  const login = { email: "owner@test.local", password: "Owner-test-password-2026", code: backup };
+  assert.equal((await call("o2", "/auth/login", login)).status, 200, "backup code works once");
+  assert.equal((await call("o3", "/auth/login", login)).status, 401, "and not twice");
+  assert.equal((await call("o2", "/state")).body.user.backupCodesLeft, 7);
+
+  // Email confirmation is optional until the administrator requires it.
+  await call("p", "/auth/register", {
+    accountType: "individual",
+    name: "Mail Person",
+    email: "mail@test.local",
+    password,
+    ...personFields,
+  });
+  const me = (await call("p", "/state")).body.user;
+  assert.equal(me.emailVerified, false);
+  await call("o2", `/admin/accounts/${me.id}/review`, { status: "approved" });
+  assert.equal((await call("p", "/shipments", shipment)).status, 201);
+  assert.equal((await call("o2", "/admin/settings", { requireEmailVerification: true }, "PUT")).status, 200);
+  const blocked = await call("p", "/shipments", shipment);
+  assert.equal(blocked.status, 403);
+  assert.equal(blocked.body.error, "Email verification required");
+  await delay(200);
+  const stateFile = JSON.parse(await readFile(resolve(server.directory, "state.json"), "utf8"));
+  const mail = stateFile.emailOutbox.filter((m) => m.event === "verify_email").at(-1);
+  const token = mail.text.match(/verify-email#([a-f0-9]{64})/)[1];
+  assert.equal((await call("anon", "/auth/verify-email", { token })).status, 200);
+  assert.equal((await call("p", "/state")).body.user.emailVerified, true);
+  const created = await call("p", "/shipments", shipment);
+  assert.equal(created.status, 201);
+
+  // GPS positions are validated and stored on the shipment for the owner only.
+  const carrier = {
+    accountType: "carrier",
+    name: "GPS Carrier",
+    email: "gps@test.local",
+    password,
+    ...personFields,
+    taxId: "1234567890",
+    license: "L",
+    fleetSize: 1,
+    routes: "R",
+  };
+  await call("c", "/auth/register", carrier);
+  const cid = (await call("c", "/state")).body.user.id;
+  await call("o2", `/admin/accounts/${cid}/review`, { status: "approved" });
+  await call("o2", "/admin/settings", { requireEmailVerification: false }, "PUT");
+  await call("c", "/bids", { shipmentId: created.body.id, price: 10, days: 1 });
+  const bid = (await call("p", "/state")).body.bids.find((b) => b.shipmentId === created.body.id);
+  await call("p", `/shipments/${created.body.id}/accept`, { bidId: bid.id });
+  assert.equal(
+    (await call("c", `/shipments/${created.body.id}/location`, { lat: 200, lng: 10 })).status,
+    400,
+  );
+  assert.equal(
+    (await call("c", `/shipments/${created.body.id}/location`, { lat: 36.2021, lng: 37.1343, accuracy: 12 }))
+      .status,
+    200,
+  );
+  const tracked = (await call("p", "/state")).body.shipments.find((s) => s.id === created.body.id);
+  assert.equal(tracked.lastPosition.lat, 36.2021);
+  assert.match(tracked.lastLocation, /^GPS /);
+  // Directory shows reputation numbers.
+  const dir = (await call("p", "/directory")).body;
+  assert.ok(Array.isArray(dir));
 });

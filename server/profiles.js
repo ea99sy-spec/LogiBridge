@@ -26,9 +26,27 @@ export function profileRoutes(app) {
     res.json({ ok: true });
   });
   app.get("/api/directory", (req, res) => {
+    const s = readState();
+    // Reputation shown on each card: average stars, number of reviews and closed operations.
+    const reputation = (id) => {
+      const scores = s.ratings.filter((r) => r.targetId === id).map((r) => r.score);
+      return {
+        rating: scores.length
+          ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10
+          : null,
+        reviews: scores.length,
+        completed: s.shipments.filter(
+          (sh) => sh.status === "delivered" && (sh.ownerId === id || sh.carrierId === id),
+        ).length,
+        recent: s.ratings
+          .filter((r) => r.targetId === id && r.comment)
+          .slice(-2)
+          .map((r) => ({ score: r.score, comment: r.comment.slice(0, 200) })),
+      };
+    };
     res.json(
-      readState()
-        .users.filter(
+      s.users
+        .filter(
           (u) =>
             u.role !== "admin" && !requiresApproval(u) && u.profile?.about && !!u.demo === !!req.user.demo,
         )
@@ -37,6 +55,9 @@ export function profileRoutes(app) {
           name: u.name,
           accountType: u.accountType,
           verified: u.verified,
+          ...reputation(u.id),
+          routes: u.accountType === "carrier" ? u.details?.routes || "" : "",
+          fleetSize: u.accountType === "carrier" ? u.details?.fleetSize || null : null,
           profile: {
             about: u.profile.about,
             services: u.profile.services,

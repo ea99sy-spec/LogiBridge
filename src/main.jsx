@@ -7,7 +7,8 @@ import { translate, languages, documentKeys, documentLabels, errorText } from ".
 import "./style.css";
 import "./access.css";
 import "./landing.css";
-import AccountAccess, { ResetPassword } from "./AccountAccess";
+import AccountAccess, { ResetPassword, VerifyEmail } from "./AccountAccess";
+import Legal, { LegalLinks } from "./Legal";
 import Landing from "./Landing";
 import { QuickActions, ShipmentEntry, DocumentCenter, TrackingPanel, AdminPanel } from "./Operations";
 import "./operations.css";
@@ -467,6 +468,7 @@ function App() {
         });
       return r;
     } catch (e) {
+      options.onError?.(e);
       // An ended session sends the visitor back to the sign-in page.
       if (e.message === "Sign in required" && path !== "/auth/login") await refresh();
       setToast({
@@ -497,6 +499,10 @@ function App() {
     </select>
   );
   if (window.location.pathname === "/driver") return <DriverPortal t={t} />;
+  if (["/terms", "/privacy"].includes(window.location.pathname))
+    return <Legal page={window.location.pathname.slice(1)} t={t} lang={lang} langSelect={langSelect} />;
+  if (window.location.pathname === "/verify-email")
+    return <VerifyEmail t={t} langSelect={langSelect} run={run} />;
   if (window.location.pathname === "/reset-password")
     return <ResetPassword t={t} langSelect={langSelect} run={run} busy={busy} toast={toast} />;
   if (loading) return <div className="loading">{t("loading")}</div>;
@@ -663,6 +669,20 @@ function App() {
             </div>
           )}
           {user.disabled && <p className="notice">{t("err_Account disabled")}</p>}
+          {!user.demo && user.emailVerified === false && (
+            <div className={`notice email-verify ${data.emailVerificationRequired ? "blocking" : ""}`}>
+              <span>{t(data.emailVerificationRequired ? "emailVerifyRequired" : "emailVerifyPending")}</span>
+              <button
+                className="button small-button"
+                disabled={busy}
+                onClick={() =>
+                  run("/account/resend-verification", {}, "POST", { success: "verificationSent" })
+                }
+              >
+                {t("resendVerification")}
+              </button>
+            </div>
+          )}
           <div className="content">
             {activeTab === "dashboard" && data.approvalRequired && (
               <PendingAccount data={data} t={t} navigate={setTab} />
@@ -1072,7 +1092,7 @@ function App() {
             )}
           </div>
           <footer>
-            © 2026 LogiBridge <span>{t("tagline")} · AR / EN / TR</span>
+            <LegalLinks t={t} />© 2026 LogiBridge <span>{t("tagline")} · AR / EN / TR</span>
           </footer>
         </main>
         {toast && (

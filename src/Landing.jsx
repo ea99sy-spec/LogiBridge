@@ -1,4 +1,5 @@
 import React from "react";
+import { LegalLinks } from "./Legal";
 export default function Landing({ t, langSelect, user }) {
   const types = ["merchant", "carrier", "supplier", "individual"];
   const symbols = { merchant: "▤", carrier: "⇄", supplier: "▧", individual: "◉" };
@@ -120,6 +121,7 @@ export default function Landing({ t, langSelect, user }) {
         </section>
       </main>
       <footer className="landing-footer">
+        <LegalLinks t={t} />
         <a className="brand" href="/">
           LogiBridge
         </a>

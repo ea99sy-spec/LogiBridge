@@ -22,9 +22,10 @@ const subjects = {
   shipment_cancelled: "أُلغيت شحنة في LogiBridge",
   order_update: "تحديث على طلب الشراء في LogiBridge",
   order_received: "وصلك طلب شراء جديد في LogiBridge",
+  verify_email: "أكّد بريدك الإلكتروني في LogiBridge",
 };
 // Security emails also reach administrators; everything else is for platform accounts.
-const securityEvents = new Set(["password_reset", "password_changed", "login"]);
+const securityEvents = new Set(["password_reset", "password_changed", "login", "verify_email"]);
 export function queueEmail(s, userId, event, details = {}, key) {
   const u = s.users.find((x) => x.id === userId);
   if (!u || u.demo || !u.email || !subjects[event]) return;
@@ -62,6 +63,7 @@ export function queueEmail(s, userId, event, details = {}, key) {
     shipment_cancelled: "أُلغيت الشحنة من صاحبها. لم يعد مطلوبًا أي إجراء منك.",
     order_update: "تغيّرت حالة طلب الشراء الخاص بك. افتح الموقع للتفاصيل.",
     order_received: "وصلك طلب شراء جديد لأحد منتجاتك. افتح قسم الطلبات للتأكيد.",
+    verify_email: "شكرًا لتسجيلك. اضغط الرابط التالي خلال 3 أيام لتأكيد بريدك الإلكتروني:",
     password_reset:
       "طلب أحدهم إعادة تعيين كلمة مرور حسابك. افتح الرابط التالي خلال ساعة لاختيار كلمة مرور جديدة. إذا لم تطلب ذلك فتجاهل هذه الرسالة وستبقى كلمة مرورك كما هي.",
     password_changed:

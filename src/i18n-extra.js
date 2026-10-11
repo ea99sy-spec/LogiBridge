@@ -1,5 +1,245 @@
 // Additional interface texts: [Arabic, English, Turkish].
 export const extraRows = {
+  // Country-specific tax field
+  taxField_TR: ["الرقم الضريبي (VKN أو TCKN)", "Tax number (VKN or TCKN)", "Vergi numarası (VKN veya TCKN)"],
+  taxField_VAT15: ["الرقم الضريبي (15 رقمًا)", "VAT number (15 digits)", "KDV numarası (15 hane)"],
+  taxField_OM: ["رقم التسجيل الضريبي VATIN", "VAT number (VATIN)", "KDV numarası (VATIN)"],
+  taxField_CR: ["رقم السجل التجاري", "Commercial registration number", "Ticaret sicil numarası"],
+  taxField_license: ["رقم الرخصة التجارية", "Commercial licence number", "Ticari lisans numarası"],
+  taxField_EU: ["رقم ضريبة القيمة المضافة VAT", "VAT number", "KDV (VAT) numarası"],
+  taxField_other: [
+    "الرقم الضريبي أو رقم السجل التجاري",
+    "Tax or commercial registration number",
+    "Vergi veya ticaret sicil numarası",
+  ],
+  taxHint_choose: [
+    "اختر البلد أولًا ليظهر نوع الرقم المطلوب.",
+    "Choose the country first to see which number is needed.",
+    "Hangi numaranın gerektiğini görmek için önce ülkeyi seçin.",
+  ],
+  taxHint_TR: [
+    "10 أرقام للشركات (VKN) أو 11 رقمًا للمؤسسات الفردية (TCKN). يتم التحقق منه تلقائيًا.",
+    "10 digits for companies (VKN) or 11 for sole traders (TCKN). Checked automatically.",
+    "Şirketler için 10 haneli VKN, şahıs işletmeleri için 11 haneli TCKN. Otomatik kontrol edilir.",
+  ],
+  taxHint_SA: [
+    "الرقم الضريبي من هيئة الزكاة والضريبة: 15 رقمًا ويبدأ بالرقم 3.",
+    "ZATCA VAT number: 15 digits starting with 3.",
+    "ZATCA KDV numarası: 3 ile başlayan 15 hane.",
+  ],
+  taxHint_AE: [
+    "رقم التسجيل الضريبي TRN من الهيئة الاتحادية للضرائب: 15 رقمًا.",
+    "FTA Tax Registration Number (TRN): 15 digits.",
+    "FTA vergi kayıt numarası (TRN): 15 hane.",
+  ],
+  taxHint_BH: [
+    "رقم حساب ضريبة القيمة المضافة من الجهاز الوطني للإيرادات: 15 رقمًا.",
+    "NBR VAT account number: 15 digits.",
+    "NBR KDV hesap numarası: 15 hane.",
+  ],
+  taxHint_OM: [
+    "رقم VATIN من جهاز الضرائب العُماني كما في شهادة التسجيل.",
+    "VATIN from the Oman Tax Authority, as on your certificate.",
+    "Umman Vergi İdaresi'nden alınan VATIN.",
+  ],
+  taxHint_QA: [
+    "لا تطبّق قطر ضريبة القيمة المضافة، لذلك أدخل رقم السجل التجاري.",
+    "Qatar has no VAT, so enter your commercial registration number.",
+    "Katar'da KDV yoktur; ticaret sicil numaranızı girin.",
+  ],
+  taxHint_KW: [
+    "لا تطبّق الكويت ضريبة القيمة المضافة، لذلك أدخل رقم الرخصة التجارية.",
+    "Kuwait has no VAT, so enter your commercial licence number.",
+    "Kuveyt'te KDV yoktur; ticari lisans numaranızı girin.",
+  ],
+  taxHint_EU: [
+    "رقم VAT الأوروبي، ويُفحص تلقائيًا عبر نظام VIES.",
+    "EU VAT number, checked automatically with VIES.",
+    "AB KDV numarası, VIES ile otomatik kontrol edilir.",
+  ],
+  taxHint_other: [
+    "أدخل الرقم كما يظهر في وثيقة السجل التجاري. تتحقق منه الإدارة يدويًا.",
+    "Enter the number as shown on your registry document. The administration checks it manually.",
+    "Numarayı sicil belgenizdeki gibi girin. Yönetim elle kontrol eder.",
+  ],
+  officialTaxCheck: [
+    "التحقق من الموقع الرسمي (يُنسخ الرقم تلقائيًا)",
+    "Verify on the official site (number copied)",
+    "Resmî sitede doğrula (numara kopyalanır)",
+  ],
+  taxMethod_gcc_format: [
+    "(الصيغة صحيحة — أكّد الشركة من الموقع الرسمي)",
+    "(format correct — confirm the company on the official site)",
+    "(biçim doğru — şirketi resmî sitede doğrulayın)",
+  ],
+
+  // Legal pages
+  termsOfUse: ["الشروط والأحكام", "Terms of Use", "Kullanım Koşulları"],
+  privacyPolicy: ["سياسة الخصوصية", "Privacy Policy", "Gizlilik Politikası"],
+  lastUpdated: ["آخر تحديث", "Last updated", "Son güncelleme"],
+  agreeTo: ["وأوافق على", "and I accept the", "ve şunları kabul ediyorum:"],
+  and: ["و", "and", "ve"],
+  "err_Accept the terms to continue": [
+    "يجب الموافقة على الشروط وسياسة الخصوصية.",
+    "You must accept the terms and privacy policy.",
+    "Koşulları ve gizlilik politikasını kabul etmelisiniz.",
+  ],
+
+  // Two-factor sign-in
+  twoFactorTitle: ["التحقق بخطوتين", "Two-step sign-in", "İki adımlı giriş"],
+  twoFactorIntro: [
+    "بعد التفعيل، يطلب الدخول رمزًا من تطبيق المصادقة على هاتفك (Google Authenticator أو Microsoft Authenticator) إضافة لكلمة المرور. ننصح به بشدة لحساب المسؤول.",
+    "Once on, signing in also asks for a code from an authenticator app on your phone (Google or Microsoft Authenticator). Strongly recommended for the administrator.",
+    "Açıldığında girişte parolaya ek olarak telefonunuzdaki doğrulama uygulamasından (Google veya Microsoft Authenticator) bir kod istenir. Yönetici için önemle önerilir.",
+  ],
+  twoFactorStart: ["بدء التفعيل", "Start setup", "Kurulumu başlat"],
+  twoFactorScan: [
+    "امسح الرمز بتطبيق المصادقة، ثم اكتب الرمز المكوّن من 6 أرقام الظاهر فيه.",
+    "Scan the code with your authenticator app, then enter the 6-digit code it shows.",
+    "Kodu doğrulama uygulamanızla tarayın, ardından gösterilen 6 haneli kodu girin.",
+  ],
+  twoFactorManual: [
+    "أو أدخل هذا المفتاح يدويًا",
+    "Or enter this key manually",
+    "Veya bu anahtarı elle girin",
+  ],
+  twoFactorConfirm: ["تأكيد وتفعيل", "Confirm and turn on", "Onayla ve aç"],
+  twoFactorCode: [
+    "رمز التحقق (6 أرقام) أو رمز احتياطي",
+    "Verification code (6 digits) or backup code",
+    "Doğrulama kodu (6 hane) veya yedek kod",
+  ],
+  twoFactorLoginHint: [
+    "افتح تطبيق المصادقة واكتب الرمز الحالي.",
+    "Open your authenticator app and enter the current code.",
+    "Doğrulama uygulamanızı açıp güncel kodu girin.",
+  ],
+  twoFactorOn: ["التحقق بخطوتين مفعّل", "Two-step sign-in is on", "İki adımlı giriş açık"],
+  twoFactorEnabled: ["تم تفعيل التحقق بخطوتين", "Two-step sign-in turned on", "İki adımlı giriş açıldı"],
+  twoFactorDisable: ["إيقاف التحقق بخطوتين", "Turn off two-step sign-in", "İki adımlı girişi kapat"],
+  twoFactorDisabled: ["تم إيقاف التحقق بخطوتين", "Two-step sign-in turned off", "İki adımlı giriş kapatıldı"],
+  backupCodesNote: [
+    "احفظ هذه الرموز الاحتياطية في مكان آمن. كل رمز يعمل مرة واحدة إذا فقدت هاتفك. لن تظهر مرة أخرى.",
+    "Save these backup codes somewhere safe. Each works once if you lose your phone. They will not be shown again.",
+    "Bu yedek kodları güvenli bir yerde saklayın. Telefonunuzu kaybederseniz her biri bir kez çalışır. Tekrar gösterilmeyecek.",
+  ],
+  backupCodesSaved: ["حفظتها", "I saved them", "Kaydettim"],
+  backupCodesLeft: ["رموز احتياطية متبقية", "Backup codes left", "Kalan yedek kod"],
+  "err_Two-factor code required": [
+    "أدخل رمز التحقق من تطبيق المصادقة.",
+    "Enter the code from your authenticator app.",
+    "Doğrulama uygulamanızdaki kodu girin.",
+  ],
+  "err_Invalid two-factor code": [
+    "رمز التحقق غير صحيح.",
+    "Incorrect verification code.",
+    "Doğrulama kodu hatalı.",
+  ],
+  "err_Start two-factor setup again": [
+    "ابدأ التفعيل من جديد.",
+    "Start the setup again.",
+    "Kurulumu yeniden başlatın.",
+  ],
+  "err_Demo accounts cannot change passwords": [
+    "غير متاح للحسابات التجريبية.",
+    "Not available for demo accounts.",
+    "Demo hesaplar için kullanılamaz.",
+  ],
+
+  // GPS tracking
+  gpsIntro: [
+    "يمكن للناقل أو السائق مشاركة موقع الشحنة من هاتفه عبر GPS، ويظهر هنا على الخريطة مع سجل التحديثات.",
+    "The carrier or driver can share the shipment's position from a phone by GPS; it appears here on the map with the update history.",
+    "Taşıyıcı veya sürücü sevkiyatın konumunu telefondan GPS ile paylaşabilir; burada harita ve güncelleme geçmişiyle görünür.",
+  ],
+  gpsShareNow: ["شارك موقعي الآن", "Share my location now", "Konumumu şimdi paylaş"],
+  gpsKeepSharing: [
+    "مشاركة تلقائية كل دقيقتين ما دامت الصفحة مفتوحة",
+    "Keep sharing every 2 minutes while this page is open",
+    "Bu sayfa açıkken her 2 dakikada paylaş",
+  ],
+  gpsLocating: ["جارٍ تحديد الموقع…", "Getting your location…", "Konum alınıyor…"],
+  gpsShared: ["تمت مشاركة الموقع ✓", "Location shared ✓", "Konum paylaşıldı ✓"],
+  gpsDenied: [
+    "لم يُسمح بالوصول للموقع. فعّل إذن الموقع للمتصفح.",
+    "Location permission denied. Allow location for this browser.",
+    "Konum izni reddedildi. Tarayıcı için konuma izin verin.",
+  ],
+  gpsUnavailable: [
+    "تعذّر تحديد الموقع. حاول في مكان مكشوف.",
+    "Could not get a location. Try somewhere with open sky.",
+    "Konum alınamadı. Açık bir alanda deneyin.",
+  ],
+  gpsUnsupported: [
+    "هذا المتصفح لا يدعم تحديد الموقع.",
+    "This browser does not support location.",
+    "Bu tarayıcı konumu desteklemiyor.",
+  ],
+  gpsMap: ["خريطة موقع الشحنة", "Shipment location map", "Sevkiyat konum haritası"],
+  gpsLastUpdate: ["آخر موقع GPS", "Last GPS position", "Son GPS konumu"],
+  gpsOpenMap: ["فتح الخريطة", "Open map", "Haritayı aç"],
+  gpsUpdate: ["تحديث GPS", "GPS update", "GPS güncellemesi"],
+  "err_Invalid location": ["الموقع غير صالح.", "Invalid location.", "Geçersiz konum."],
+
+  // Directory reputation
+  reviewsCount: ["تقييمات", "reviews", "değerlendirme"],
+  noReviewsYet: ["لا تقييمات بعد", "No reviews yet", "Henüz değerlendirme yok"],
+  completedOperations: ["عملية مكتملة", "completed operations", "tamamlanan işlem"],
+  trucks: ["شاحنة", "trucks", "araç"],
+
+  // Email confirmation
+  verifyEmailTitle: ["تأكيد البريد الإلكتروني", "Email confirmation", "E-posta doğrulama"],
+  emailVerifiedDone: [
+    "تم تأكيد بريدك الإلكتروني. شكرًا!",
+    "Your email is confirmed. Thank you!",
+    "E-postanız doğrulandı. Teşekkürler!",
+  ],
+  "err_Verification link invalid or expired": [
+    "رابط التأكيد غير صالح أو انتهت صلاحيته. اطلب رابطًا جديدًا من مساحة العمل.",
+    "The confirmation link is invalid or expired. Request a new one from your workspace.",
+    "Doğrulama bağlantısı geçersiz veya süresi dolmuş. Çalışma alanından yenisini isteyin.",
+  ],
+  emailVerifyPending: [
+    "لم تؤكد بريدك الإلكتروني بعد. افتح الرسالة التي أرسلناها لك.",
+    "You have not confirmed your email yet. Open the message we sent you.",
+    "E-postanızı henüz doğrulamadınız. Gönderdiğimiz mesajı açın.",
+  ],
+  emailVerifyRequired: [
+    "يجب تأكيد بريدك الإلكتروني قبل استخدام المنصة. افتح الرابط في الرسالة التي أرسلناها لك.",
+    "You must confirm your email before using the platform. Open the link in the message we sent you.",
+    "Platformu kullanmadan önce e-postanızı doğrulamalısınız. Gönderdiğimiz mesajdaki bağlantıyı açın.",
+  ],
+  resendVerification: [
+    "إعادة إرسال رابط التأكيد",
+    "Resend confirmation link",
+    "Doğrulama bağlantısını yeniden gönder",
+  ],
+  verificationSent: [
+    "أرسلنا رابط تأكيد جديدًا إلى بريدك.",
+    "A new confirmation link was sent to your email.",
+    "E-postanıza yeni bir doğrulama bağlantısı gönderildi.",
+  ],
+  requireEmailVerification: [
+    "إلزام المستخدمين بتأكيد البريد الإلكتروني",
+    "Require email confirmation",
+    "E-posta doğrulamasını zorunlu kıl",
+  ],
+  requireEmailVerificationNote: [
+    "لا تفعّله إلا بعد ربط دومين خاص بخدمة البريد، وإلا لن تصل الرسائل للعملاء ولن يستطيعوا المتابعة.",
+    "Turn on only after your own domain is connected to the email service, or customers will not receive the message and cannot continue.",
+    "Yalnızca kendi alan adınız e-posta hizmetine bağlandıktan sonra açın; aksi halde müşteriler mesajı alamaz ve devam edemez.",
+  ],
+  requireEmailVerificationOff: [
+    "يتطلب تفعيل خدمة البريد أولًا (RESEND_API_KEY وMAIL_FROM).",
+    "Needs the email service first (RESEND_API_KEY and MAIL_FROM).",
+    "Önce e-posta hizmeti gerekir (RESEND_API_KEY ve MAIL_FROM).",
+  ],
+  "err_Email verification required": [
+    "أكّد بريدك الإلكتروني أولًا من الرسالة التي أرسلناها لك.",
+    "Confirm your email first using the message we sent you.",
+    "Önce size gönderdiğimiz mesajla e-postanızı doğrulayın.",
+  ],
+
   // Registration details per account type
   residenceCountry: ["بلد الإقامة", "Country of residence", "İkamet ülkesi"],
   registrationCountry: ["بلد تسجيل الشركة", "Company registration country", "Şirketin kayıtlı olduğu ülke"],

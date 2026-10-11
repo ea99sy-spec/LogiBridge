@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { GpsShare, PositionMap } from "./Gps";
 const request = async (path, body, method = "POST") => {
   const r = await fetch("/api" + path, {
     method: body === undefined ? "GET" : method,
@@ -44,6 +45,20 @@ export function DriverPortal({ t }) {
           </p>
           <b>{t(task.shipment.status)}</b>
           <p>{task.shipment.lastLocation}</p>
+          <PositionMap position={task.shipment.lastPosition} t={t} lang={document.documentElement.lang} />
+          <GpsShare
+            t={t}
+            disabled={busy}
+            send={async (position) => {
+              const r = await fetch("/driver-api/update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+                body: JSON.stringify(position),
+              });
+              if (r.ok) await load();
+              return r.ok;
+            }}
+          />
           <form
             className="form-stack"
             onSubmit={async (e) => {
@@ -70,8 +85,8 @@ export function DriverPortal({ t }) {
               <input name="location" required maxLength="120" placeholder={t("manualLocation")} />
             </label>
             <label className="field">
-              {t("note")}
-              <textarea name="note" required maxLength="500" />
+              {t("noteOptional")}
+              <textarea name="note" maxLength="500" />
             </label>
             <label className="field">
               {t("status")}

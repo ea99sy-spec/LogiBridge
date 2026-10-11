@@ -1,6 +1,8 @@
 import { ContactEmail } from "./Profiles";
 import React, { useState, useEffect } from "react";
 import CountrySelect from "./CountrySelect";
+import { taxField } from "../shared/tax";
+import { LegalLinks } from "./Legal";
 const accounts = ["merchant", "carrier", "supplier", "individual", "admin"];
 const symbols = { merchant: "▤", carrier: "⇄", supplier: "▧", individual: "◉", admin: "◇" };
 export default function AccountAccess({ t, langSelect, run, busy, toast, onEntered, user }) {
@@ -15,6 +17,8 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
   const [demo, setDemo] = useState(false),
     [error, setError] = useState(""),
     [forgot, setForgot] = useState(false),
+    [country, setCountry] = useState(""),
+    [needCode, setNeedCode] = useState(false),
     [forgotResult, setForgotResult] = useState(null);
   useEffect(() => {
     fetch("/api/health")
@@ -39,7 +43,11 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
     const { confirmPassword, ...fields } = b;
     const result = await run(
       register ? "/auth/register" : "/auth/login",
-      register ? { ...fields, accountType: type } : { email: b.email, password: b.password },
+      register
+        ? { ...fields, accountType: type }
+        : { email: b.email, password: b.password, ...(needCode ? { code: b.code } : {}) },
+      "POST",
+      { onError: (err) => /Two-factor/.test(err.message) && setNeedCode(true) },
     );
     if (result) onEntered?.(register, result.user);
   }
@@ -162,6 +170,7 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
                       <CountrySelect
                         t={t}
                         label={type === "individual" ? "residenceCountry" : "registrationCountry"}
+                        onChange={setCountry}
                       />
                       <div className="form-grid">
                         <label className="field">
@@ -185,7 +194,7 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
                   )}
                   {register && type !== "individual" && (
                     <label className="field">
-                      <span>{t("taxId")}</span>
+                      <span>{t(taxField(country).label)}</span>
                       <input
                         name="taxId"
                         required
@@ -194,7 +203,7 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
                         dir="ltr"
                         autoComplete="off"
                       />
-                      <small>{t("taxIdHint")}</small>
+                      <small>{t(country ? taxField(country).hint : "taxHint_choose")}</small>
                     </label>
                   )}
                   {register && type === "merchant" && (
@@ -278,6 +287,21 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
                       {register && <small>{t("passwordRule")}</small>}
                     </label>
                   )}
+                  {needCode && !register && !forgot && (
+                    <label className="field">
+                      <span>{t("twoFactorCode")}</span>
+                      <input
+                        name="code"
+                        required
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        maxLength="11"
+                        dir="ltr"
+                        autoFocus
+                      />
+                      <small>{t("twoFactorLoginHint")}</small>
+                    </label>
+                  )}
                   {register && (
                     <>
                       <label className="field">
@@ -292,8 +316,17 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
                         />
                       </label>
                       <label className="consent">
-                        <input type="checkbox" required />
-                        <span>{t("registrationConsent")}</span>
+                        <input type="checkbox" name="acceptTerms" value="yes" required />
+                        <span>
+                          {t("registrationConsent")} {t("agreeTo")}{" "}
+                          <a href="/terms" target="_blank" rel="noopener">
+                            {t("termsOfUse")}
+                          </a>{" "}
+                          {t("and")}{" "}
+                          <a href="/privacy" target="_blank" rel="noopener">
+                            {t("privacyPolicy")}
+                          </a>
+                        </span>
                       </label>
                     </>
                   )}
@@ -348,6 +381,7 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
       </div>
       <ContactEmail t={t} />
       <footer className="access-footer">
+        <LegalLinks t={t} />
         <span>© 2026 LogiBridge</span>
         <span>{t("tagline")}</span>
       </footer>
@@ -447,6 +481,48 @@ export function ResetPassword({ t, langSelect, run, busy, toast }) {
           {toast.text}
         </div>
       )}
+    </div>
+  );
+}
+// Page opened from the confirmation email: /verify-email#<token>
+export function VerifyEmail({ t, langSelect, run }) {
+  const [state, setState] = useState("checking");
+  useEffect(() => {
+    const token = window.location.hash.slice(1);
+    history.replaceState(null, "", "/verify-email");
+    if (!token) return setState("failed");
+    run("/auth/verify-email", { token }, "POST", { silent: true }).then((r) =>
+      setState(r ? "done" : "failed"),
+    );
+  }, []);
+  return (
+    <div className="access-page">
+      <header className="access-header">
+        <a href="/" className="brand">
+          <span className="brand-icon">⇄</span>LogiBridge
+        </a>
+        <div>{langSelect}</div>
+      </header>
+      <div className="access-layout single">
+        <section className="access-card">
+          <span className="access-form-icon">✉</span>
+          <h2>{t("verifyEmailTitle")}</h2>
+          <p className="notice">
+            {t(
+              state === "done"
+                ? "emailVerifiedDone"
+                : state === "failed"
+                  ? "err_Verification link invalid or expired"
+                  : "loading",
+            )}
+          </p>
+          {state !== "checking" && (
+            <a className="button access-submit" href="/workspace/dashboard">
+              {t("openWorkspace")} ↗
+            </a>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

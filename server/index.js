@@ -38,7 +38,14 @@ import { paymentRoutes, paymentState } from "./payments.js";
 import { requiresApproval } from "../shared/access.js";
 import { queueEmail, queueAdminEmail, mailConfigured, flushEmails } from "./email.js";
 import { profileRoutes, announceCompany } from "./profiles.js";
-import { publicAccountRoutes, privateAccountRoutes } from "./account.js";
+import {
+  publicAccountRoutes,
+  privateAccountRoutes,
+  twoFactorRoutes,
+  checkSecondFactor,
+  queueEmailVerification,
+  emailVerificationRequired,
+} from "./account.js";
 import { readDetails } from "./details.js";
 import { verifyTaxId } from "./tax.js";
 import { normalizeTaxId } from "../shared/tax.js";
@@ -178,6 +185,7 @@ export async function createApp() {
       throw new Error("Invalid account type");
     const email = txt(b.email, 254).toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Invalid email");
+    if (b.acceptTerms !== "yes" && b.acceptTerms !== true) throw new Error("Accept the terms to continue");
     const credential = await hashPassword(b.password);
     const details = readDetails(b.accountType, b);
     const taxId = b.accountType === "individual" ? null : normalizeTaxId(txt(b.taxId, 40));
@@ -203,10 +211,12 @@ export async function createApp() {
       plan: "free",
       demo: false,
       createdAt: new Date().toISOString(),
+      termsAcceptedAt: new Date().toISOString(),
     };
     await mutate((s) => {
       if (s.users.some((u) => u.email === email)) throw new Error("Email already registered");
       s.users.push(user);
+      queueEmailVerification(s, user);
       queueEmail(s, user.id, "registered");
       for (const a of s.users.filter((u) => u.role === "admin" && !u.demo))
         notice(s, a.id, "account_registered");
@@ -237,6 +247,15 @@ export async function createApp() {
     if (!user || !(await checkPassword(req.body.password, user.credential)))
       return res.status(401).json({ error: "Invalid credentials or account type" });
     if (user.disabled) return res.status(403).json({ error: "Account disabled" });
+    if (user.totp) {
+      if (!req.body.code) return res.status(401).json({ error: "Two-factor code required", twoFactor: true });
+      const factor = checkSecondFactor(user, req.body.code);
+      if (!factor) return res.status(401).json({ error: "Invalid two-factor code", twoFactor: true });
+      if (factor.kind === "backup")
+        await mutate((s) => {
+          s.users.find((u) => u.id === user.id).totp.backup.splice(factor.index, 1);
+        });
+    }
     await mutate((s) => queueEmail(s, user.id, "login", { time: new Date().toISOString() }));
     await sessionFor(user, res);
   });
@@ -288,11 +307,32 @@ export async function createApp() {
     if (req.user.disabled) return res.status(403).json({ error: "Account disabled" });
     if (
       requiresApproval(req.user) &&
-      !["/state", "/logout", "/kyb", "/profile", "/account/password", "/fx", "/notifications/read"].includes(
-        req.path,
-      )
+      ![
+        "/state",
+        "/logout",
+        "/kyb",
+        "/profile",
+        "/account/password",
+        "/fx",
+        "/notifications/read",
+        "/account/2fa/setup",
+        "/account/2fa/enable",
+        "/account/2fa/disable",
+      ].includes(req.path)
     )
       return res.status(403).json({ error: "Account approval required" });
+    if (
+      emailVerificationRequired(readState(), req.user) &&
+      ![
+        "/state",
+        "/logout",
+        "/fx",
+        "/account/resend-verification",
+        "/account/password",
+        "/notifications/read",
+      ].includes(req.path)
+    )
+      return res.status(403).json({ error: "Email verification required" });
     next();
   });
   app.get("/api/state", (req, res) => {
@@ -303,6 +343,7 @@ export async function createApp() {
         user: publicUser(req.user, true),
         users: [publicUser(req.user)],
         approvalRequired: true,
+        emailVerificationRequired: emailVerificationRequired(s, req.user),
         realtime: false,
         emailConfigured: mailConfigured(),
         supportEmail: s.supportEmail || "",
@@ -367,7 +408,7 @@ export async function createApp() {
       ...paymentState(s, req.user),
       fleets: (s.fleets || []).filter((f) => f.userId === req.user.id),
       shipments: visibleShipments(s, req.user).map((sh) => {
-        const { privateDetails, ...publicShipment } = sh;
+        const { privateDetails, lastPosition, ...publicShipment } = sh;
         return admin || [sh.ownerId, sh.carrierId].includes(req.user.id) ? sh : publicShipment;
       }),
       shipmentDocuments: s.shipmentDocuments
@@ -379,6 +420,7 @@ export async function createApp() {
       trackingEvents: s.trackingEvents.filter((e) => visibleShipment(e.shipmentId)),
       users: s.users.map((u) => publicUser(u)),
       user: publicUser(req.user, true),
+      emailVerificationRequired: emailVerificationRequired(readState(), req.user),
       demo: DEMO_NOW(),
       kyb: s.kyb
         .filter((x) => mayReview(x) || x.userId === req.user.id)
@@ -418,6 +460,7 @@ export async function createApp() {
   });
   profileRoutes(app);
   privateAccountRoutes(app, { sessionFor });
+  twoFactorRoutes(app);
   operationRoutes(app);
   paymentRoutes(app);
   advancedRoutes(app);

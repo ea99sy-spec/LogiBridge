@@ -8,7 +8,7 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
-  external_node_modules = ["express", "exceljs", "pg", "redis", "@netlify/blobs"]
+  external_node_modules = ["express", "exceljs", "pg", "redis", "@netlify/blobs", "qrcode"]
 
 [functions.emails]
   schedule = "* * * * *"
@@ -37,4 +37,4 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(self)"

@@ -73,5 +73,34 @@ export function checkTaxFormat(country, raw) {
     return { status: "invalid", method: "tr_length" };
   }
   if (euCountries.includes(country)) return { status: "format_ok", method: "eu_vies_pending" };
+  // Gulf VAT numbers have 15 digits; Saudi ones start with 3. Official lookups need a
+  // captcha, so the administrator confirms the owner with the link in the admin panel.
+  if (country === "SA")
+    return { status: /^3\d{14}$/.test(id) ? "format_ok" : "invalid", method: "gcc_format" };
+  if (country === "AE" || country === "BH")
+    return { status: /^\d{15}$/.test(id) ? "format_ok" : "invalid", method: "gcc_format" };
   return { status: "format_ok", method: "manual" };
+}
+
+// What to ask for in each country, and where the administrator can confirm it.
+export function taxField(country) {
+  if (country === "TR") return { label: "taxField_TR", hint: "taxHint_TR" };
+  if (["SA", "AE", "BH"].includes(country)) return { label: "taxField_VAT15", hint: "taxHint_" + country };
+  if (country === "OM") return { label: "taxField_OM", hint: "taxHint_OM" };
+  if (country === "QA") return { label: "taxField_CR", hint: "taxHint_QA" };
+  if (country === "KW") return { label: "taxField_license", hint: "taxHint_KW" };
+  if (euCountries.includes(country)) return { label: "taxField_EU", hint: "taxHint_EU" };
+  return { label: "taxField_other", hint: "taxHint_other" };
+}
+
+export const officialTaxLinks = {
+  TR: "https://intvrg.gib.gov.tr/",
+  SA: "https://zatca.gov.sa/en/eServices/Pages/eservices-007.aspx",
+  AE: "https://tax.gov.ae/en/statuscheck.aspx",
+  BH: "https://www.nbr.gov.bh/vat/tp/ms",
+  OM: "https://tms.taxoman.gov.om/portal/vat-tax",
+  EU: "https://ec.europa.eu/taxation_customs/vies/",
+};
+export function officialTaxLink(country) {
+  return officialTaxLinks[country] || (euCountries.includes(country) ? officialTaxLinks.EU : "");
 }

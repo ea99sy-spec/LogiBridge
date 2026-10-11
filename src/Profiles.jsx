@@ -110,7 +110,7 @@ export function Directory({ t, data }) {
       <div className="cards">
         {items
           .filter((u) =>
-            `${u.name} ${u.profile.services} ${u.profile.location}`
+            `${u.name} ${u.profile.services} ${u.profile.location} ${u.routes || ""}`
               .toLowerCase()
               .includes(query.toLowerCase()),
           )
@@ -121,10 +121,35 @@ export function Directory({ t, data }) {
                 {u.name} {u.verified ? "✓" : ""}
               </h2>
               <p>{u.profile.location}</p>
+              <p className="reputation">
+                {u.rating ? (
+                  <>
+                    <span className="stars" aria-label={`${u.rating} / 5`}>
+                      {"★".repeat(Math.round(u.rating))}
+                      {"☆".repeat(5 - Math.round(u.rating))}
+                    </span>{" "}
+                    <b>{u.rating}</b> ({u.reviews} {t("reviewsCount")})
+                  </>
+                ) : (
+                  <span className="muted">{t("noReviewsYet")}</span>
+                )}{" "}
+                · {u.completed} {t("completedOperations")}
+              </p>
+              {u.routes && (
+                <p className="small">
+                  <b>{t("serviceRoutes")}:</b> {u.routes}
+                  {u.fleetSize ? ` · ${u.fleetSize} ${t("trucks")}` : ""}
+                </p>
+              )}
               <h3>{t("aboutUs")}</h3>
               <p className="profile-text">{u.profile.about}</p>
               <h3>{t("ourServices")}</h3>
               <p className="profile-text">{u.profile.services}</p>
+              {u.recent?.map((r, i) => (
+                <blockquote className="review-quote" key={i}>
+                  {"★".repeat(r.score)} {r.comment}
+                </blockquote>
+              ))}
               {u.profile.website && (
                 <a
                   className="button ghost"
@@ -298,6 +323,7 @@ export function AccountSecurity({ data, t, run, busy }) {
           </form>
         )}
       </div>
+      <TwoFactorSettings data={data} t={t} run={run} busy={busy} />
     </>
   );
 }
@@ -330,6 +356,21 @@ export function AdminSiteSettings({ data, t, run, busy }) {
           <b>{t("showDemoAccounts")}</b>
           <br />
           <small>{t("showDemoAccountsNote")}</small>
+        </span>
+      </label>
+      <label className="consent">
+        <input
+          type="checkbox"
+          checked={settings.requireEmailVerification}
+          disabled={busy || (!settings.emailConfigured && !settings.requireEmailVerification)}
+          onChange={(e) => save({ requireEmailVerification: e.target.checked })}
+        />
+        <span>
+          <b>{t("requireEmailVerification")}</b>
+          <br />
+          <small>
+            {t(settings.emailConfigured ? "requireEmailVerificationNote" : "requireEmailVerificationOff")}
+          </small>
         </span>
       </label>
       <label className="consent">
@@ -414,5 +455,117 @@ export function TaxBadge({ check, t }) {
       <span className={`badge ${kind}`}>{t("tax_" + check.status)}</span> {t("taxMethod_" + check.method)}
       {check.registeredName ? ` · ${check.registeredName}` : ""}
     </p>
+  );
+}
+// Two-factor sign-in with an authenticator app (recommended for the administrator).
+export function TwoFactorSettings({ data, t, run, busy }) {
+  const user = data.user;
+  const [setup, setSetup] = useState(null),
+    [codes, setCodes] = useState(null);
+  if (user.demo) return null;
+  const passwordField = (
+    <label className="field">
+      <span>{t("currentPassword")}</span>
+      <input name="password" type="password" required maxLength="128" autoComplete="current-password" />
+    </label>
+  );
+  return (
+    <div className="panel form-stack security-panel">
+      <h3>{t("twoFactorTitle")}</h3>
+      <p className="muted small">{t("twoFactorIntro")}</p>
+      {codes ? (
+        <>
+          <p className="notice">{t("backupCodesNote")}</p>
+          <pre className="backup-codes" dir="ltr">
+            {codes.join("\n")}
+          </pre>
+          <button className="button" onClick={() => setCodes(null)}>
+            {t("backupCodesSaved")}
+          </button>
+        </>
+      ) : user.twoFactor ? (
+        <>
+          <p>
+            <span className="badge approved">✓ {t("twoFactorOn")}</span>{" "}
+            <small>
+              {t("backupCodesLeft")}: {user.backupCodesLeft}
+            </small>
+          </p>
+          <form
+            className="form-stack"
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const b = Object.fromEntries(new FormData(e.currentTarget));
+              await run("/account/2fa/disable", b, "POST", { success: "twoFactorDisabled" });
+            }}
+          >
+            {passwordField}
+            <label className="field">
+              <span>{t("twoFactorCode")}</span>
+              <input name="code" required inputMode="numeric" maxLength="11" dir="ltr" />
+            </label>
+            <button className="button ghost danger" disabled={busy}>
+              {t("twoFactorDisable")}
+            </button>
+          </form>
+        </>
+      ) : setup ? (
+        <form
+          className="form-stack"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const r = await run(
+              "/account/2fa/enable",
+              { code: new FormData(e.currentTarget).get("code") },
+              "POST",
+              { success: "twoFactorEnabled" },
+            );
+            if (r) {
+              setSetup(null);
+              setCodes(r.backupCodes);
+            }
+          }}
+        >
+          <p>{t("twoFactorScan")}</p>
+          <img src={setup.qr} alt="QR" width="200" height="200" className="qr" />
+          <p className="small">
+            {t("twoFactorManual")}: <code dir="ltr">{setup.secret}</code>
+          </p>
+          <label className="field">
+            <span>{t("twoFactorCode")}</span>
+            <input
+              name="code"
+              required
+              inputMode="numeric"
+              maxLength="6"
+              dir="ltr"
+              autoComplete="one-time-code"
+            />
+          </label>
+          <button className="button" disabled={busy}>
+            {t("twoFactorConfirm")}
+          </button>
+        </form>
+      ) : (
+        <form
+          className="form-stack"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const r = await run(
+              "/account/2fa/setup",
+              { password: new FormData(e.currentTarget).get("password") },
+              "POST",
+              { silent: true },
+            );
+            if (r) setSetup(r);
+          }}
+        >
+          {passwordField}
+          <button className="button" disabled={busy}>
+            {t("twoFactorStart")}
+          </button>
+        </form>
+      )}
+    </div>
   );
 }

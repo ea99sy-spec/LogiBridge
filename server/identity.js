@@ -69,6 +69,9 @@ export function publicUser(user, own = false) {
           taxCheck: user.taxCheck || null,
           review: user.review || null,
           disabled: !!user.disabled,
+          twoFactor: !!user.totp,
+          emailVerified: user.emailVerified !== false,
+          backupCodesLeft: user.totp?.backup?.length ?? 0,
         }
       : {}),
   };

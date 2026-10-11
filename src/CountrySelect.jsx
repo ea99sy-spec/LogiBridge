@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { countryOptions } from "../shared/countries";
-export default function CountrySelect({ t, label, name = "country", disabled = false }) {
+export default function CountrySelect({ t, label, name = "country", disabled = false, onChange }) {
   const [search, setSearch] = useState(""),
     [value, setValue] = useState("");
   const lang = document.documentElement.lang || "ar";
@@ -25,7 +25,10 @@ export default function CountrySelect({ t, label, name = "country", disabled = f
         aria-label={t(label)}
         name={name}
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(e) => {
+          setValue(e.target.value);
+          onChange?.(e.target.value);
+        }}
         required
         disabled={disabled}
       >

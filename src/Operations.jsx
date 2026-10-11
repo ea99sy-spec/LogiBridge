@@ -1,4 +1,6 @@
 import { AdminEmailSettings, AdminSiteSettings, AccountDetails, TaxBadge } from "./Profiles";
+import { officialTaxLink } from "../shared/tax";
+import { GpsShare, PositionMap } from "./Gps";
 import { AdminPayments, BankTransfers } from "./Payments";
 import React, { useEffect, useState } from "react";
 import { countryName } from "../shared/countries";
@@ -286,7 +288,7 @@ export function TrackingPanel({ data, user, t, run, busy, refresh, navigate, Shi
           {t("refreshStatus")} ↻
         </button>
       </div>
-      <p className="notice">{t("noLiveGPS")}</p>
+      <p className="notice">{t("gpsIntro")}</p>
       <div className="filters">
         <input
           aria-label={t("trackingSearch")}
@@ -332,6 +334,7 @@ export function TrackingPanel({ data, user, t, run, busy, refresh, navigate, Shi
               <p>
                 <b>{t("lastKnownLocation")}:</b> {shipment.lastLocation || t("notReported")}
               </p>
+              <PositionMap position={shipment.lastPosition} t={t} lang={document.documentElement.lang} />
               <p className="muted small">{t("updatedByCarrier")}</p>
               {user.id === shipment.carrierId &&
                 ["assigned", "transit", "arrived"].includes(shipment.status) && (
@@ -346,13 +349,22 @@ export function TrackingPanel({ data, user, t, run, busy, refresh, navigate, Shi
                     }}
                   >
                     <h3>{t("reportLocation")}</h3>
+                    <GpsShare
+                      t={t}
+                      disabled={busy}
+                      send={(position) =>
+                        run(`/shipments/${shipment.id}/location`, position, "POST", { silent: true }).then(
+                          Boolean,
+                        )
+                      }
+                    />
                     <label className="field">
                       <span>{t("currentLocation")}</span>
                       <input name="location" required maxLength="120" />
                     </label>
                     <label className="field">
-                      <span>{t("note")}</span>
-                      <textarea name="note" required rows="2" maxLength="500" />
+                      <span>{t("noteOptional")}</span>
+                      <textarea name="note" rows="2" maxLength="500" />
                     </label>
                     <button className="button" disabled={busy}>
                       {t("saveLocation")}
@@ -377,9 +389,11 @@ export function TrackingPanel({ data, user, t, run, busy, refresh, navigate, Shi
                             {t(
                               e.source === "demo"
                                 ? "demoOnly"
-                                : e.source === "carrier_manual"
+                                : ["carrier_manual", "driver_manual"].includes(e.source)
                                   ? "carrierUpdate"
-                                  : "platformUpdate",
+                                  : ["carrier_gps", "driver_gps"].includes(e.source)
+                                    ? "gpsUpdate"
+                                    : "platformUpdate",
                             )}
                           </small>
                         </div>
@@ -650,14 +664,15 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
                   >
                     {t("recheckTax")}
                   </button>
-                  {detail.account.details?.country === "TR" && (
+                  {officialTaxLink(detail.account.details?.country) && (
                     <a
                       className="button ghost small-button"
-                      href="https://intvrg.gib.gov.tr/"
+                      href={officialTaxLink(detail.account.details?.country)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => navigator.clipboard?.writeText(detail.account.taxId).catch?.(() => {})}
                     >
-                      {t("gibCheck")} ↗
+                      {t("officialTaxCheck")} ↗
                     </a>
                   )}
                 </p>
