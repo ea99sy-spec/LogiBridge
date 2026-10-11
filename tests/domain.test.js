@@ -1,10 +1,55 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import {acceptBid,reserveGroup,transitionShipment,positive} from '../server/domain.js';
-const fixture=()=>({shipments:[{id:'s',ownerId:'m',status:'open'}],bids:[{id:'b',shipmentId:'s',carrierId:'c',price:500}],escrows:[]});
-test('accepting an offer assigns its carrier and creates one unfunded escrow',()=>{const s=fixture();acceptBid(s,'s','b','m');assert.equal(s.shipments[0].carrierId,'c');assert.equal(s.escrows[0].status,'awaiting_funding');assert.throws(()=>acceptBid(s,'s','b','m'));assert.equal(s.escrows.length,1)});
-test('a different merchant cannot accept someone else’s offer',()=>assert.throws(()=>acceptBid(fixture(),'s','b','intruder')));
-test('only the merchant releases held escrow after carrier arrival',()=>{const s=fixture();const sh=acceptBid(s,'s','b','m');const m={id:'m',role:'merchant'},c={id:'c',role:'carrier'};assert.throws(()=>transitionShipment(s,sh,'dispatch',c));transitionShipment(s,sh,'fund',m);assert.throws(()=>transitionShipment(s,sh,'confirm',m));transitionShipment(s,sh,'dispatch',c);transitionShipment(s,sh,'arrive',c);assert.throws(()=>transitionShipment(s,sh,'confirm',c));transitionShipment(s,sh,'confirm',m);assert.equal(sh.status,'delivered');assert.equal(s.escrows[0].status,'released')});
-test('disputed funds remain held for admin resolution',()=>{const s=fixture(),sh=acceptBid(s,'s','b','m');transitionShipment(s,sh,'fund',{id:'m'});transitionShipment(s,sh,'dispute',{id:'m'});assert.throws(()=>transitionShipment(s,sh,'refund',{id:'m',role:'merchant'}));transitionShipment(s,sh,'refund',{id:'a',role:'admin'});assert.equal(s.escrows[0].status,'refunded');assert.equal(sh.status,'cancelled')});
-test('shared bookings cannot overfill a truck or use negative volume',()=>{const g={capacity:60,booked:58,pricePerM3:38};assert.throws(()=>reserveGroup(g,3));assert.throws(()=>reserveGroup(g,-1));assert.equal(g.booked,58);assert.deepEqual(reserveGroup(g,2),{volume:2,price:76});assert.equal(g.booked,60);assert.throws(()=>reserveGroup(g,.01))});
-test('invalid numeric input is rejected',()=>{for(const v of ['oops',null,0,-5,Infinity])assert.throws(()=>positive(v,'value'))});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { acceptBid, reserveGroup, transitionShipment, positive } from "../server/domain.js";
+const fixture = () => ({
+  shipments: [{ id: "s", ownerId: "m", status: "open" }],
+  bids: [{ id: "b", shipmentId: "s", carrierId: "c", price: 500 }],
+  escrows: [],
+});
+test("accepting an offer assigns its carrier and creates one unfunded escrow", () => {
+  const s = fixture();
+  acceptBid(s, "s", "b", "m");
+  assert.equal(s.shipments[0].carrierId, "c");
+  assert.equal(s.escrows[0].status, "awaiting_funding");
+  assert.throws(() => acceptBid(s, "s", "b", "m"));
+  assert.equal(s.escrows.length, 1);
+});
+test("a different merchant cannot accept someone else’s offer", () =>
+  assert.throws(() => acceptBid(fixture(), "s", "b", "intruder")));
+test("only the merchant releases held escrow after carrier arrival", () => {
+  const s = fixture();
+  const sh = acceptBid(s, "s", "b", "m");
+  const m = { id: "m", role: "merchant" },
+    c = { id: "c", role: "carrier" };
+  assert.throws(() => transitionShipment(s, sh, "dispatch", c));
+  transitionShipment(s, sh, "fund", m);
+  assert.throws(() => transitionShipment(s, sh, "confirm", m));
+  transitionShipment(s, sh, "dispatch", c);
+  transitionShipment(s, sh, "arrive", c);
+  assert.throws(() => transitionShipment(s, sh, "confirm", c));
+  transitionShipment(s, sh, "confirm", m);
+  assert.equal(sh.status, "delivered");
+  assert.equal(s.escrows[0].status, "released");
+});
+test("disputed funds remain held for admin resolution", () => {
+  const s = fixture(),
+    sh = acceptBid(s, "s", "b", "m");
+  transitionShipment(s, sh, "fund", { id: "m" });
+  transitionShipment(s, sh, "dispute", { id: "m" });
+  assert.throws(() => transitionShipment(s, sh, "refund", { id: "m", role: "merchant" }));
+  transitionShipment(s, sh, "refund", { id: "a", role: "admin" });
+  assert.equal(s.escrows[0].status, "refunded");
+  assert.equal(sh.status, "cancelled");
+});
+test("shared bookings cannot overfill a truck or use negative volume", () => {
+  const g = { capacity: 60, booked: 58, pricePerM3: 38 };
+  assert.throws(() => reserveGroup(g, 3));
+  assert.throws(() => reserveGroup(g, -1));
+  assert.equal(g.booked, 58);
+  assert.deepEqual(reserveGroup(g, 2), { volume: 2, price: 76 });
+  assert.equal(g.booked, 60);
+  assert.throws(() => reserveGroup(g, 0.01));
+});
+test("invalid numeric input is rejected", () => {
+  for (const v of ["oops", null, 0, -5, Infinity]) assert.throws(() => positive(v, "value"));
+});

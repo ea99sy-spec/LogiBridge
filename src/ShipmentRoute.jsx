@@ -1,7 +1,56 @@
-import React,{useState} from 'react';
-import CountrySelect from './CountrySelect';
-export default function ShipmentRoute({t}){
- const [type,setType]=useState('crossBorder'),[direction,setDirection]=useState('TR-SY');
- const countries=type==='domesticTR'?['TR','TR']:type==='domesticSY'?['SY','SY']:direction.split('-');
- return <><label className="field"><span>{t('transportType')}</span><select name="transportType" value={type} onChange={e=>setType(e.target.value)}>{['domesticTR','domesticSY','crossBorder','international'].map(k=><option key={k} value={k}>{t(k)}</option>)}</select></label>{type==='international'?<><CountrySelect t={t} label="originCountry" name="originCountry"/><CountrySelect t={t} label="destinationCountry" name="destinationCountry"/></>:<><input type="hidden" name="originCountry" value={countries[0]}/><input type="hidden" name="destinationCountry" value={countries[1]}/>{type==='crossBorder'?<label className="field"><span>{t('routeDirection')}</span><select value={direction} onChange={e=>setDirection(e.target.value)}><option value="TR-SY">{t('turkeyToSyria')}</option><option value="SY-TR">{t('syriaToTurkey')}</option></select></label>:<p className="notice">{t('domesticRouteNote')}</p>}</>}{type==='crossBorder'&&<label className="field"><span>{t('crossing')}</span><select name="crossing" required>{['bab','rai','kasab'].map(k=><option key={k} value={k}>{t(k)}</option>)}</select></label>}</>
+import React, { useState } from "react";
+import CountrySelect from "./CountrySelect";
+export default function ShipmentRoute({ t }) {
+  const [type, setType] = useState("crossBorder"),
+    [direction, setDirection] = useState("TR-SY");
+  const countries =
+    type === "domesticTR" ? ["TR", "TR"] : type === "domesticSY" ? ["SY", "SY"] : direction.split("-");
+  return (
+    <>
+      <label className="field">
+        <span>{t("transportType")}</span>
+        <select name="transportType" value={type} onChange={(e) => setType(e.target.value)}>
+          {["domesticTR", "domesticSY", "crossBorder", "international"].map((k) => (
+            <option key={k} value={k}>
+              {t(k)}
+            </option>
+          ))}
+        </select>
+      </label>
+      {type === "international" ? (
+        <>
+          <CountrySelect t={t} label="originCountry" name="originCountry" />
+          <CountrySelect t={t} label="destinationCountry" name="destinationCountry" />
+        </>
+      ) : (
+        <>
+          <input type="hidden" name="originCountry" value={countries[0]} />
+          <input type="hidden" name="destinationCountry" value={countries[1]} />
+          {type === "crossBorder" ? (
+            <label className="field">
+              <span>{t("routeDirection")}</span>
+              <select value={direction} onChange={(e) => setDirection(e.target.value)}>
+                <option value="TR-SY">{t("turkeyToSyria")}</option>
+                <option value="SY-TR">{t("syriaToTurkey")}</option>
+              </select>
+            </label>
+          ) : (
+            <p className="notice">{t("domesticRouteNote")}</p>
+          )}
+        </>
+      )}
+      {type === "crossBorder" && (
+        <label className="field">
+          <span>{t("crossing")}</span>
+          <select name="crossing" required>
+            {["bab", "rai", "kasab"].map((k) => (
+              <option key={k} value={k}>
+                {t(k)}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+    </>
+  );
 }

@@ -1,1 +1,96 @@
-.driver-portal{max-width:650px;margin:40px auto;padding:24px}.notification-bell{position:relative}.notification-pop{position:absolute;inset-inline-end:0;top:40px;width:340px;max-height:440px;overflow:auto;z-index:25;box-shadow:0 15px 45px #102d5b33}.notification-item{display:flex;gap:8px;flex-wrap:wrap;text-align:start;width:100%;padding:12px;border:0;background:transparent;border-bottom:1px solid #e4eaf2;color:#14315b}.notification-item small{width:100%}.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:20px 0}.calendar-grid>div{padding:10px 4px;border-radius:8px;text-align:center}.calendar-grid small{display:block;font-size:10px}.calendar-grid .available{background:#e3f3ed;color:#216147}.calendar-grid .occupied{background:#fff0d0;color:#7a5611}.dispute-panel{margin-top:16px}.estimate{margin:15px 0}.content pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf3fc;padding:20px;border-radius:12px}.notice input{width:100%;padding:12px}.fx-date{font-size:10px}.currency-select{max-width:100px}@media(max-width:600px){.notification-pop{position:fixed;top:90px;left:12px;right:12px;width:auto}.calendar-grid>div{padding:8px 0}}@media print{.print-hide{display:none!important}}
+.driver-portal {
+  max-width: 650px;
+  margin: 40px auto;
+  padding: 24px;
+}
+.notification-bell {
+  position: relative;
+}
+.notification-pop {
+  position: absolute;
+  inset-inline-end: 0;
+  top: 40px;
+  width: 340px;
+  max-height: 440px;
+  overflow: auto;
+  z-index: 25;
+  box-shadow: 0 15px 45px #102d5b33;
+}
+.notification-item {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  text-align: start;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  background: transparent;
+  border-bottom: 1px solid #e4eaf2;
+  color: #14315b;
+}
+.notification-item small {
+  width: 100%;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin: 20px 0;
+}
+.calendar-grid > div {
+  padding: 10px 4px;
+  border-radius: 8px;
+  text-align: center;
+}
+.calendar-grid small {
+  display: block;
+  font-size: 10px;
+}
+.calendar-grid .available {
+  background: #e3f3ed;
+  color: #216147;
+}
+.calendar-grid .occupied {
+  background: #fff0d0;
+  color: #7a5611;
+}
+.dispute-panel {
+  margin-top: 16px;
+}
+.estimate {
+  margin: 15px 0;
+}
+.content pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  background: #edf3fc;
+  padding: 20px;
+  border-radius: 12px;
+}
+.notice input {
+  width: 100%;
+  padding: 12px;
+}
+.fx-date {
+  font-size: 10px;
+}
+.currency-select {
+  max-width: 100px;
+}
+@media (max-width: 600px) {
+  .notification-pop {
+    position: fixed;
+    top: 90px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+  .calendar-grid > div {
+    padding: 8px 0;
+  }
+}
+@media print {
+  .print-hide {
+    display: none !important;
+  }
+}

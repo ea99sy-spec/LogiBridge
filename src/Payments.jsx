@@ -1,19 +1,261 @@
-import React,{useState} from 'react';
-async function receipt(file){if(!file?.size||file.size>2000000||!['application/pdf','image/png','image/jpeg'].includes(file.type))throw Error();const content=await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result.split(',')[1]);r.onerror=reject;r.readAsDataURL(file)});return {content,filename:file.name,mime:file.type}}
-export function ShipmentPayment({s,data,t,run,busy}){
-  const [open,setOpen]=useState(false),[error,setError]=useState('');const bank=data.bankAccount,payment=data.payments?.filter(p=>p.shipmentId===s.id).at(-1);
-  if(payment?.status==='pending')return <p className="notice">{t('paymentReviewPending')}</p>;
-  if(payment?.status==='approved')return null;
-  return <div className="shipment-payment"><button className="button" disabled={busy} onClick={()=>setOpen(!open)}>{t('payBankTransfer')}</button>{open&&<div className="panel">{!bank?.enabled?<p className="notice">{t('bankNotConfigured')}</p>:<><h3>{t('bankTransferDetails')}</h3><p>{t('beneficiary')}: {bank.beneficiary}</p><p>{t('bankName')}: {bank.bank}</p><p>{t('bankAccountNumber')}: <b dir="ltr">{bank.accountNumber}</b></p><p>SWIFT: <b dir="ltr">{bank.swift}</b></p><p>{t('amount')}: <b>{data.escrows.find(e=>e.shipmentId===s.id)?.amount} USD</b></p><p>{t('shipmentReference')}: <b dir="ltr">{s.id}</b></p><p>{bank.instructions}</p><p className="notice">{t('bankPaymentNote')}</p>{payment?.status==='rejected'&&<p className="form-error">{t('paymentRejected')}: {payment.review?.note}</p>}<form className="form-stack" onSubmit={async e=>{e.preventDefault();setError('');const f=new FormData(e.currentTarget);try{const file=await receipt(f.get('file'));await run('/payments/receipts',{shipmentId:s.id,reference:f.get('reference'),...file})}catch{setError(t('invalidFile'))}}}><label className="field"><span>{t('bankReference')}</span><input name="reference" required maxLength="120"/></label><label className="field"><span>{t('paymentReceipt')}</span><input type="file" name="file" accept="application/pdf,image/png,image/jpeg" required/></label>{error&&<p role="alert">{error}</p>}<button className="button" disabled={busy}>{t('submitReceipt')}</button></form></>}</div>}</div>
+import React, { useState } from "react";
+async function receipt(file) {
+  if (
+    !file?.size ||
+    file.size > 2000000 ||
+    !["application/pdf", "image/png", "image/jpeg"].includes(file.type)
+  )
+    throw Error();
+  const content = await new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result.split(",")[1]);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+  return { content, filename: file.name, mime: file.type };
 }
-export function AdminPayments({data,t,run,busy}){
-  if(data.user.demo)return <p className="notice">{t('realAdminPayments')}</p>;
-  const bank=data.bankAccount||{},pending=(data.payments||[]).filter(p=>p.status==='pending');
-  const field=(label,name,maxLength=120)=><label className="field"><span>{t(label)}</span><input name={name} required defaultValue={bank[name]||''} maxLength={maxLength}/></label>;
-  return <section className="panel"><h2>{t('paymentsAdmin')}</h2><p>{t('bankSetupNote')}</p><form className="form-stack" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);run('/payments/bank-account',{...Object.fromEntries(f),enabled:f.has('enabled'),currency:'USD'},'PUT')}}><div className="form-grid">{field('beneficiary','beneficiary')}{field('bankName','bank')}{field('bankAccountNumber','accountNumber',80)}{field('swift','swift',20)}</div><label className="field"><span>{t('paymentInstructions')}</span><textarea name="instructions" defaultValue={bank.instructions||''} maxLength="500"/></label><label className="consent"><input type="checkbox" name="enabled" defaultChecked={bank.enabled}/><span>{t('enableBankPayment')}</span></label><button className="button" disabled={busy}>{t('save')}</button></form><h3>{t('paymentReviewQueue')} · {pending.length}</h3>{pending.map(p=><article className="identity-review" key={p.id}><h3>{data.users.find(u=>u.id===p.userId)?.name} · {p.amount} {p.currency}</h3><p>{t('shipmentReference')}: {p.shipmentId}</p><p>{t('bankReference')}: {p.reference}</p><p>{t('beneficiary')}: {p.bankAccount.beneficiary} · <b dir="ltr">{p.bankAccount.accountNumber}</b></p><a className="button ghost" href={`/api/payments/${p.id}/document`}>{t('download')} ↗</a><form className="form-stack" onSubmit={e=>{e.preventDefault();const f=new FormData(e.currentTarget);run('/payments/'+p.id+'/review',{status:f.get('status'),note:f.get('note'),bankReceived:f.has('bankReceived')})}}><label className="field"><span>{t('reviewDecision')}</span><select name="status"><option value="approved">{t('approve')}</option><option value="rejected">{t('reject')}</option></select></label><label className="consent"><input type="checkbox" name="bankReceived"/><span>{t('bankReceivedCheck')}</span></label><label className="field"><span>{t('reviewReference')}</span><textarea name="note" required maxLength="500"/></label><p className="muted">{t('bankPaymentNote')}</p><button className="button" disabled={busy}>{t('saveReview')}</button></form></article>)}{!pending.length&&<p>{t('empty')}</p>}<p className="notice">{t('bankPayoutNote')}</p></section>
+export function ShipmentPayment({ s, data, t, run, busy }) {
+  const [open, setOpen] = useState(false),
+    [error, setError] = useState("");
+  const bank = data.bankAccount,
+    payment = data.payments?.filter((p) => p.shipmentId === s.id).at(-1);
+  if (payment?.status === "pending") return <p className="notice">{t("paymentReviewPending")}</p>;
+  if (payment?.status === "approved") return null;
+  return (
+    <div className="shipment-payment">
+      <button className="button" disabled={busy} onClick={() => setOpen(!open)}>
+        {t("payBankTransfer")}
+      </button>
+      {open && (
+        <div className="panel">
+          {!bank?.enabled ? (
+            <p className="notice">{t("bankNotConfigured")}</p>
+          ) : (
+            <>
+              <h3>{t("bankTransferDetails")}</h3>
+              <p>
+                {t("beneficiary")}: {bank.beneficiary}
+              </p>
+              <p>
+                {t("bankName")}: {bank.bank}
+              </p>
+              <p>
+                {t("bankAccountNumber")}: <b dir="ltr">{bank.accountNumber}</b>
+              </p>
+              <p>
+                SWIFT: <b dir="ltr">{bank.swift}</b>
+              </p>
+              <p>
+                {t("amount")}: <b>{data.escrows.find((e) => e.shipmentId === s.id)?.amount} USD</b>
+              </p>
+              <p>
+                {t("shipmentReference")}: <b dir="ltr">{s.id}</b>
+              </p>
+              <p>{bank.instructions}</p>
+              <p className="notice">{t("bankPaymentNote")}</p>
+              {payment?.status === "rejected" && (
+                <p className="form-error">
+                  {t("paymentRejected")}: {payment.review?.note}
+                </p>
+              )}
+              <form
+                className="form-stack"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setError("");
+                  const f = new FormData(e.currentTarget);
+                  try {
+                    const file = await receipt(f.get("file"));
+                    await run("/payments/receipts", {
+                      shipmentId: s.id,
+                      reference: f.get("reference"),
+                      ...file,
+                    });
+                  } catch {
+                    setError(t("invalidFile"));
+                  }
+                }}
+              >
+                <label className="field">
+                  <span>{t("bankReference")}</span>
+                  <input name="reference" required maxLength="120" />
+                </label>
+                <label className="field">
+                  <span>{t("paymentReceipt")}</span>
+                  <input type="file" name="file" accept="application/pdf,image/png,image/jpeg" required />
+                </label>
+                {error && <p role="alert">{error}</p>}
+                <button className="button" disabled={busy}>
+                  {t("submitReceipt")}
+                </button>
+              </form>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
-export function BankTransfers({data,t,run,busy}){
-  const [error,setError]=useState('');if(data.user.demo)return null;
-  const items=data.escrows.filter(e=>e.simulated===false&&['payout_pending','refund_pending'].includes(e.status));
-  return <section className="panel"><h2>{t('bankTransfersPending')}</h2><p>{t('bankPayoutNote')}</p>{items.map(e=><article className="identity-review" key={e.id}><h3>{t(e.status)}</h3><p>{t('shipmentReference')}: {e.shipmentId}</p><p>{e.status==='refund_pending'?e.amount:e.carrierNet} {e.currency}</p><form className="form-stack" onSubmit={async ev=>{ev.preventDefault();setError('');const f=new FormData(ev.currentTarget);try{const file=await receipt(f.get('file'));await run('/payments/'+e.paymentId+'/transfer',{reference:f.get('reference'),sent:f.has('sent'),...file})}catch{setError(t('invalidFile'))}}}><label className="field"><span>{t('bankReference')}</span><input name="reference" required maxLength="120"/></label><label className="field"><span>{t('paymentReceipt')}</span><input type="file" name="file" accept="application/pdf,image/png,image/jpeg" required/></label><label className="consent"><input type="checkbox" name="sent" required/><span>{t('bankSentCheck')}</span></label><button className="button" disabled={busy}>{t('recordBankTransfer')}</button></form></article>)}{error&&<p role="alert">{error}</p>}{!items.length&&<p>{t('empty')}</p>}</section>
+export function AdminPayments({ data, t, run, busy }) {
+  if (data.user.demo) return <p className="notice">{t("realAdminPayments")}</p>;
+  const bank = data.bankAccount || {},
+    pending = (data.payments || []).filter((p) => p.status === "pending");
+  const field = (label, name, maxLength = 120) => (
+    <label className="field">
+      <span>{t(label)}</span>
+      <input name={name} required defaultValue={bank[name] || ""} maxLength={maxLength} />
+    </label>
+  );
+  return (
+    <section className="panel">
+      <h2>{t("paymentsAdmin")}</h2>
+      <p>{t("bankSetupNote")}</p>
+      <form
+        className="form-stack"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const f = new FormData(e.currentTarget);
+          run(
+            "/payments/bank-account",
+            { ...Object.fromEntries(f), enabled: f.has("enabled"), currency: "USD" },
+            "PUT",
+          );
+        }}
+      >
+        <div className="form-grid">
+          {field("beneficiary", "beneficiary")}
+          {field("bankName", "bank")}
+          {field("bankAccountNumber", "accountNumber", 80)}
+          {field("swift", "swift", 20)}
+        </div>
+        <label className="field">
+          <span>{t("paymentInstructions")}</span>
+          <textarea name="instructions" defaultValue={bank.instructions || ""} maxLength="500" />
+        </label>
+        <label className="consent">
+          <input type="checkbox" name="enabled" defaultChecked={bank.enabled} />
+          <span>{t("enableBankPayment")}</span>
+        </label>
+        <button className="button" disabled={busy}>
+          {t("save")}
+        </button>
+      </form>
+      <h3>
+        {t("paymentReviewQueue")} · {pending.length}
+      </h3>
+      {pending.map((p) => (
+        <article className="identity-review" key={p.id}>
+          <h3>
+            {data.users.find((u) => u.id === p.userId)?.name} · {p.amount} {p.currency}
+          </h3>
+          <p>
+            {t("shipmentReference")}: {p.shipmentId}
+          </p>
+          <p>
+            {t("bankReference")}: {p.reference}
+          </p>
+          <p>
+            {t("beneficiary")}: {p.bankAccount.beneficiary} · <b dir="ltr">{p.bankAccount.accountNumber}</b>
+          </p>
+          <a className="button ghost" href={`/api/payments/${p.id}/document`}>
+            {t("download")} ↗
+          </a>
+          <form
+            className="form-stack"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const f = new FormData(e.currentTarget);
+              run("/payments/" + p.id + "/review", {
+                status: f.get("status"),
+                note: f.get("note"),
+                bankReceived: f.has("bankReceived"),
+              });
+            }}
+          >
+            <label className="field">
+              <span>{t("reviewDecision")}</span>
+              <select name="status">
+                <option value="approved">{t("approve")}</option>
+                <option value="rejected">{t("reject")}</option>
+              </select>
+            </label>
+            <label className="consent">
+              <input type="checkbox" name="bankReceived" />
+              <span>{t("bankReceivedCheck")}</span>
+            </label>
+            <label className="field">
+              <span>{t("reviewReference")}</span>
+              <textarea name="note" required maxLength="500" />
+            </label>
+            <p className="muted">{t("bankPaymentNote")}</p>
+            <button className="button" disabled={busy}>
+              {t("saveReview")}
+            </button>
+          </form>
+        </article>
+      ))}
+      {!pending.length && <p>{t("empty")}</p>}
+      <p className="notice">{t("bankPayoutNote")}</p>
+    </section>
+  );
+}
+export function BankTransfers({ data, t, run, busy }) {
+  const [error, setError] = useState("");
+  if (data.user.demo) return null;
+  const items = data.escrows.filter(
+    (e) => e.simulated === false && ["payout_pending", "refund_pending"].includes(e.status),
+  );
+  return (
+    <section className="panel">
+      <h2>{t("bankTransfersPending")}</h2>
+      <p>{t("bankPayoutNote")}</p>
+      {items.map((e) => (
+        <article className="identity-review" key={e.id}>
+          <h3>{t(e.status)}</h3>
+          <p>
+            {t("shipmentReference")}: {e.shipmentId}
+          </p>
+          <p>
+            {e.status === "refund_pending" ? e.amount : e.carrierNet} {e.currency}
+          </p>
+          <form
+            className="form-stack"
+            onSubmit={async (ev) => {
+              ev.preventDefault();
+              setError("");
+              const f = new FormData(ev.currentTarget);
+              try {
+                const file = await receipt(f.get("file"));
+                await run("/payments/" + e.paymentId + "/transfer", {
+                  reference: f.get("reference"),
+                  sent: f.has("sent"),
+                  ...file,
+                });
+              } catch {
+                setError(t("invalidFile"));
+              }
+            }}
+          >
+            <label className="field">
+              <span>{t("bankReference")}</span>
+              <input name="reference" required maxLength="120" />
+            </label>
+            <label className="field">
+              <span>{t("paymentReceipt")}</span>
+              <input type="file" name="file" accept="application/pdf,image/png,image/jpeg" required />
+            </label>
+            <label className="consent">
+              <input type="checkbox" name="sent" required />
+              <span>{t("bankSentCheck")}</span>
+            </label>
+            <button className="button" disabled={busy}>
+              {t("recordBankTransfer")}
+            </button>
+          </form>
+        </article>
+      ))}
+      {error && <p role="alert">{error}</p>}
+      {!items.length && <p>{t("empty")}</p>}
+    </section>
+  );
 }
