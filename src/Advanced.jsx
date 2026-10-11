@@ -208,6 +208,11 @@ export function NotificationBell({ data, t, run, navigate }) {
                 }}
               >
                 <b>{t("event_" + n.event)}</b>
+                {n.detail && (
+                  <small className="notice-detail">
+                    {t("rejectionReason")}: {n.detail}
+                  </small>
+                )}
                 <small>{new Date(n.createdAt).toLocaleString(document.documentElement.lang)}</small>
                 {!n.read && <span>●</span>}
               </button>

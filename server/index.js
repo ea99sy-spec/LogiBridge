@@ -40,6 +40,7 @@ import { cloudEnabled, writeSession, readSession, deleteSession } from "./cloud-
 import { paymentRoutes, paymentState } from "./payments.js";
 import { requiresApproval } from "../shared/access.js";
 import { queueEmail, queueAdminEmail, mailConfigured, flushEmails } from "./email.js";
+import { whatsappConfigured, flushWhatsApp } from "./whatsapp.js";
 import { profileRoutes, announceCompany } from "./profiles.js";
 import {
   publicAccountRoutes,
@@ -160,6 +161,8 @@ export async function createApp() {
       redis: !!redis,
     }),
   );
+  // Border and customs notices posted by the administration (public, like the rules page).
+  app.get("/api/border", (req, res) => res.json({ notices: readState().settings?.borderNotices || [] }));
   async function sessionFor(user, res, respond = true) {
     const token = randomBytes(32).toString("hex"),
       expiry = Date.now() + 86400000;
@@ -349,6 +352,8 @@ export async function createApp() {
         emailVerificationRequired: emailVerificationRequired(s, req.user),
         realtime: false,
         emailConfigured: mailConfigured(),
+        whatsappConfigured: whatsappConfigured(),
+        borderNotices: s.settings?.borderNotices || [],
         supportEmail: s.supportEmail || "",
         demo: DEMO_NOW(),
         flags: s.flags,
@@ -395,6 +400,9 @@ export async function createApp() {
       s.shipments.some((sh) => sh.id === id && (admin || [sh.ownerId, sh.carrierId].includes(req.user.id)));
     const {
       emailOutbox,
+      whatsappOutbox: _whatsapp,
+      settings: _settings,
+      stagedDemoSeeded: _staged,
       passwordResets,
       operationsDemoSeeded,
       fx,
@@ -405,6 +413,8 @@ export async function createApp() {
     res.json({
       ...shared,
       emailConfigured: mailConfigured(),
+      whatsappConfigured: whatsappConfigured(),
+      borderNotices: s.settings?.borderNotices || [],
       supportEmail: s.supportEmail || "",
       realtime: !cloudEnabled(),
       ...advancedState(s, req.user),
@@ -676,7 +686,13 @@ export async function createApp() {
       transitionShipment(s, sh, req.body.action, req.user);
       if (sh.parentId && syncOrder(s, sh.parentId) && !req.user.demo) {
         const order = s.shipments.find((x) => x.id === sh.parentId);
-        queueEmail(s, order.ownerId, "operation_completed", { shipment: order.title }, `order-done/${order.id}`);
+        queueEmail(
+          s,
+          order.ownerId,
+          "operation_completed",
+          { shipment: order.title },
+          `order-done/${order.id}`,
+        );
         queueAdminEmail(
           s,
           "operation_completed",
@@ -913,7 +929,7 @@ export async function createApp() {
         businessActive: b.businessActive === true,
         passportMatches: b.passportMatches === true,
       };
-      notice(s, owner.id, "verification_" + b.status);
+      notice(s, owner.id, "verification_" + b.status, undefined, doc.review.reason);
       owner.verified = b.status === "approved";
       owner.verificationStatus = b.status;
       owner.verificationLevel = owner.verified ? (owner.demo ? "demo" : "manual_review") : "none";
@@ -1118,6 +1134,17 @@ export async function createApp() {
   // Outside Netlify there is no scheduled function, so deliver queued emails here.
   if (process.env.LOGIBRIDGE_SERVERLESS !== "true" && mailConfigured() && !process.env.NODE_TEST_CONTEXT) {
     const timer = setInterval(() => flushEmails(5).catch((e) => console.error("Email:", e.message)), 30000);
+    timer.unref();
+  }
+  if (
+    process.env.LOGIBRIDGE_SERVERLESS !== "true" &&
+    whatsappConfigured() &&
+    !process.env.NODE_TEST_CONTEXT
+  ) {
+    const timer = setInterval(
+      () => flushWhatsApp(5).catch((e) => console.error("WhatsApp:", e.message)),
+      30000,
+    );
     timer.unref();
   }
   return app;

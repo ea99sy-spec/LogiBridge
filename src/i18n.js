@@ -918,7 +918,7 @@ const rows = {
   customs: ["المستشار الجمركي", "Customs advisor", "Gümrük danışmanı"],
   hub: ["غرفة التواصل", "Networking hub", "İletişim merkezi"],
   kyb: ["توثيق الشركات", "Company verification", "Şirket doğrulama"],
-  border: ["وثائق المعابر", "Border checklist", "Sınır belgeleri"],
+  border: ["الحدود والجمارك", "Border & customs", "Sınır ve gümrük"],
   tracking: ["تتبع الشحنات", "Shipment tracking", "Sevkiyat takibi"],
   ratings: ["التقييمات", "Reputation", "Değerlendirmeler"],
   marketplace: ["سوق المعدات", "Equipment marketplace", "Ekipman pazarı"],

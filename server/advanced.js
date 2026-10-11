@@ -18,13 +18,14 @@ const date = (v) => {
     throw new Error("Invalid date");
   return v;
 };
-export function notice(s, userId, event, shipmentId) {
+export function notice(s, userId, event, shipmentId, detail) {
   if (!userId) return;
   s.notifications.push({
     id: id(),
     userId,
     event,
     shipmentId,
+    ...(detail ? { detail: String(detail).slice(0, 500) } : {}),
     createdAt: new Date().toISOString(),
     status: "in_app",
     read: false,

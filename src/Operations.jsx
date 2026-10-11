@@ -1,3 +1,4 @@
+import { waLink } from "../shared/wa.js";
 import { AdminEmailSettings, AdminSiteSettings, AccountDetails, TaxBadge } from "./Profiles";
 import { officialTaxLink } from "../shared/tax";
 import { GpsShare, PositionMap } from "./Gps";
@@ -612,12 +613,40 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
                         disabled={busy}
                         onClick={() => {
                           const reason = window.prompt(t("rejectionReasonPrompt"));
-                          if (reason && reason.trim())
-                            run(`/admin/accounts/${a.id}/review`, { status: "rejected", reason });
+                          if (!reason || !reason.trim()) return;
+                          // Open WhatsApp now (inside the click) so pop-up blockers allow it.
+                          const link = waLink(
+                            a.details?.phone,
+                            `${t("waRejectGreeting")} ${a.name},\n${t("waRejectBody")}\n${t("rejectionReason")}: ${reason.trim()}\n${location.origin}/workspace/kyb`,
+                          );
+                          const tab =
+                            link && window.confirm(t("sendReasonWhatsappConfirm"))
+                              ? window.open("", "_blank")
+                              : null;
+                          Promise.resolve(
+                            run(`/admin/accounts/${a.id}/review`, { status: "rejected", reason }),
+                          ).then((ok) => {
+                            if (!tab) return;
+                            if (!ok) tab.close();
+                            else tab.location.href = link;
+                          });
                         }}
                       >
                         ✕ {t("rejectAccount")}
                       </button>
+                    )}
+                    {a.verificationStatus === "rejected" && a.rejectionReason && waLink(a.details?.phone) && (
+                      <a
+                        className="button ghost small-button whatsapp"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={waLink(
+                          a.details.phone,
+                          `${t("waRejectGreeting")} ${a.name},\n${t("waRejectBody")}\n${t("rejectionReason")}: ${a.rejectionReason}\n${location.origin}/workspace/kyb`,
+                        )}
+                      >
+                        {t("sendReasonWhatsapp")}
+                      </a>
                     )}
                     {!data.user.demo && !a.demo && (
                       <button

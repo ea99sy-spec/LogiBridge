@@ -584,7 +584,9 @@ test("Türkiye⇄Syria orders run as three stages with the right providers", asy
   assert.equal(legs[2].origin, "Bab al-Salama (Azaz)");
   // Carriers see transport stages, brokers see clearance; nobody bids on the order itself.
   const carrierSees = (await call("carrier", "/state")).body.shipments.map((s) => s.id);
-  assert.ok(carrierSees.includes(legs[0].id) && !carrierSees.includes(legs[1].id) && !carrierSees.includes(order.id));
+  assert.ok(
+    carrierSees.includes(legs[0].id) && !carrierSees.includes(legs[1].id) && !carrierSees.includes(order.id),
+  );
   assert.ok((await call("broker", "/state")).body.shipments.some((s) => s.id === legs[1].id));
   assert.equal((await call("carrier", "/bids", { shipmentId: legs[1].id, price: 50, days: 1 })).status, 400);
   assert.equal((await call("broker", "/bids", { shipmentId: legs[0].id, price: 50, days: 1 })).status, 400);
@@ -592,7 +594,10 @@ test("Türkiye⇄Syria orders run as three stages with the right providers", asy
   // Assign the three stages and pay each directly.
   const providers = ["carrier", "broker", "carrier"];
   for (const [i, leg] of legs.entries()) {
-    assert.equal((await call(providers[i], "/bids", { shipmentId: leg.id, price: 100 + i, days: 1 })).status, 201);
+    assert.equal(
+      (await call(providers[i], "/bids", { shipmentId: leg.id, price: 100 + i, days: 1 })).status,
+      201,
+    );
     const bid = (await call("merchant", "/state")).body.bids.find((b) => b.shipmentId === leg.id);
     assert.equal((await call("merchant", `/shipments/${leg.id}/accept`, { bidId: bid.id })).status, 200);
     await call("merchant", `/shipments/${leg.id}/action`, { action: "pay_direct" });
@@ -621,4 +626,96 @@ test("Türkiye⇄Syria orders run as three stages with the right providers", asy
   assert.equal((await call("merchant", `/shipments/${second.id}/action`, { action: "cancel" })).status, 200);
   const after = (await call("merchant", "/state")).body.shipments.filter((s) => s.parentId === second.id);
   assert.ok(after.every((s) => s.status === "cancelled"));
+});
+
+test("border notices, WhatsApp alerts and rejection reasons", async (t) => {
+  const { waNumber, waLink } = await import("../shared/wa.js");
+  assert.equal(waNumber("+90 532 000 11 22"), "905320001122");
+  assert.equal(waNumber("00963 944 123 456"), "963944123456");
+  assert.equal(waNumber("0532 000 11 22"), "", "local numbers need the country code");
+  assert.equal(waLink("", "a b"), "https://wa.me/?text=a%20b");
+
+  const server = await startServer(3219, { DEMO_MODE: "" });
+  t.after(server.stop);
+  const { call } = server;
+  const broker = {
+    accountType: "broker",
+    name: "Gate Clearance",
+    email: "gate@test.local",
+    password,
+    ...personFields,
+    taxId: "1234567890",
+    license: "GM-77",
+  };
+  assert.equal((await call("b", "/auth/register", broker)).body.error, "Choose your crossings");
+  assert.equal((await call("b", "/auth/register", { ...broker, crossings: "bab,nowhere" })).status, 400);
+  const reg = await call("b", "/auth/register", { ...broker, crossings: "bab,salameh" });
+  assert.equal(reg.status, 200);
+  assert.deepEqual(reg.body.user.details.crossings, ["bab", "salameh"]);
+  const bid = reg.body.user.id;
+  assert.equal(
+    (
+      await call(
+        "b",
+        "/profile",
+        {
+          about: "Clearance at Bab al-Hawa",
+          services: "Clearance",
+          contactEmail: "ops@gate.test",
+          companyEmails: true,
+          whatsappNotify: true,
+        },
+        "PUT",
+      )
+    ).status,
+    200,
+  );
+
+  await call("owner", "/auth/login", { email: "owner@test.local", password: "Owner-test-password-2026" });
+  // WhatsApp number for admin alerts must be international.
+  assert.equal((await call("owner", "/admin/settings", { adminWhatsapp: "0532" }, "PUT")).status, 400);
+  assert.equal(
+    (await call("owner", "/admin/settings", { adminWhatsapp: "+90 532 000 11 22" }, "PUT")).status,
+    200,
+  );
+  // New sign-ups now also alert the administrator on WhatsApp.
+  await call("s", "/auth/register", { ...broker, email: "second@test.local", crossings: "rai" });
+  // Border notices: only the administrator posts; everyone can read them.
+  const notice = {
+    date: "2026-10-12",
+    title: "Queue at Öncüpınar",
+    body: "Expect delays",
+    crossing: "salameh",
+  };
+  assert.equal((await call("b", "/admin/border-notices", notice)).status, 403);
+  assert.equal((await call("owner", "/admin/border-notices", { ...notice, date: "12/10" })).status, 400);
+  assert.equal((await call("owner", "/admin/border-notices", notice)).status, 200);
+  const published = (await call("anon", "/border")).body.notices;
+  assert.equal(published[0].title, "Queue at Öncüpınar");
+
+  // Rejecting needs a reason; the company sees it in its notifications and by email/WhatsApp.
+  assert.equal((await call("owner", `/admin/accounts/${bid}/review`, { status: "rejected" })).status, 400);
+  assert.equal(
+    (await call("owner", `/admin/accounts/${bid}/review`, { status: "rejected", reason: "Licence expired" }))
+      .status,
+    200,
+  );
+  const mine = (await call("b", "/state")).body;
+  assert.equal(mine.notifications.find((n) => n.event === "verification_rejected").detail, "Licence expired");
+  assert.equal(mine.settings, undefined, "platform settings stay private");
+  assert.equal(mine.whatsappOutbox, undefined);
+  assert.equal(mine.borderNotices[0].title, "Queue at Öncüpınar");
+  const listed = (await call("owner", "/admin/accounts")).body.find((a) => a.id === bid);
+  assert.equal(listed.rejectionReason, "Licence expired");
+  const saved = JSON.parse(await readFile(resolve(server.directory, "state.json"), "utf8"));
+  const wa = saved.whatsappOutbox.find((x) => x.to === "905550000000");
+  assert.ok(wa && wa.text.includes("Licence expired") && !/\n/.test(wa.text));
+  assert.ok(
+    saved.whatsappOutbox.some((x) => x.to === "905320001122"),
+    "admin alert queued",
+  );
+
+  const id = published[0].id;
+  assert.equal((await call("owner", `/admin/border-notices/${id}`, {}, "DELETE")).status, 200);
+  assert.equal((await call("anon", "/border")).body.notices.length, 0);
 });

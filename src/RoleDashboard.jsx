@@ -3,15 +3,16 @@ import { accountKind, workspaceModules } from "../shared/workspaces";
 export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }) {
   const user = data.user,
     kind = accountKind(user),
+    provider = kind === "carrier" || kind === "broker",
     own = data.shipments.filter((s) =>
-      kind === "carrier" ? s.carrierId === user.id : s.ownerId === user.id,
+      provider ? s.carrierId === user.id : s.ownerId === user.id && !s.parentId,
     ),
     active = own.filter((s) => !["delivered", "cancelled"].includes(s.status));
   const allowed = workspaceModules(user, data.flags);
   const bids = data.bids.filter((b) =>
-    kind === "carrier"
+    provider
       ? b.carrierId === user.id
-      : own.some((s) => s.id === b.shipmentId && s.status === "open"),
+      : data.shipments.some((s) => s.id === b.shipmentId && s.ownerId === user.id && s.status === "open"),
   );
   const listings = data.products.filter((p) => p.supplierId === user.id),
     orders = data.orders.filter((o) => listings.some((p) => p.id === o.productId));
@@ -39,6 +40,12 @@ export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }
       ["availableJobs", data.shipments.filter((s) => s.status === "open").length],
       ["submittedOffers", bids.length],
       ["myVehicles", fleet.length],
+    ],
+    broker: [
+      ["assignedJobs", active.length],
+      ["availableJobs", data.shipments.filter((s) => s.status === "open").length],
+      ["submittedOffers", bids.length],
+      ["completedOperations", own.filter((s) => s.status === "delivered").length],
     ],
     supplier: [
       ["myEquipment", listings.length],
@@ -75,6 +82,12 @@ export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }
       ["tracking", "updateMyJobs", "◎"],
       ["groups", "myDepartures", "▦"],
     ],
+    broker: [
+      ["jobs", "availableJobs", "▤"],
+      ["tracking", "updateMyJobs", "◎"],
+      ["documents", "uploadDocuments", "⇧"],
+      ["border", "border", "☷"],
+    ],
     supplier: [
       ["inventory", "manageEquipment", "▧"],
       ["orders", "manageOrders", "▤"],
@@ -92,10 +105,11 @@ export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }
     merchant: "newShipment",
     individual: "newShipment",
     carrier: "jobs",
+    broker: "jobs",
     supplier: "inventory",
     admin: "kyb",
   }[kind];
-  const list = kind === "carrier" ? active : own;
+  const list = provider ? active : own;
   return (
     <>
       <div className="page-intro">
@@ -137,17 +151,14 @@ export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }
           )}
         </div>
         <span className="role-hero-icon">
-          {{ merchant: "▤", individual: "◉", carrier: "⇄", supplier: "▧", admin: "◇" }[kind]}
+          {{ merchant: "▤", individual: "◉", carrier: "⇄", broker: "⚖", supplier: "▧", admin: "◇" }[kind]}
         </span>
       </section>
       {!["supplier", "admin"].includes(kind) && (
         <>
           <div className="section-heading">
-            <h2>{t(kind === "carrier" ? "myAssignedJobs" : "myShipments")}</h2>
-            <button
-              className="text-button"
-              onClick={() => navigate(kind === "carrier" ? "jobs" : "shipments")}
-            >
+            <h2>{t(provider ? "myAssignedJobs" : "myShipments")}</h2>
+            <button className="text-button" onClick={() => navigate(provider ? "jobs" : "shipments")}>
               {t("viewAll")} ↗
             </button>
           </div>
@@ -161,18 +172,12 @@ export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }
           </div>
           {!list.length && (
             <div className="panel">
-              <p>{t(kind === "carrier" ? "noAssignedJobs" : "noPersonalShipments")}</p>
+              <p>{t(provider ? "noAssignedJobs" : "noPersonalShipments")}</p>
             </div>
           )}
           <div className="panel">
             <h3>
-              {t(
-                kind === "carrier"
-                  ? "submittedOffers"
-                  : kind === "individual"
-                    ? "myReservations"
-                    : "receivedOffers",
-              )}
+              {t(provider ? "submittedOffers" : kind === "individual" ? "myReservations" : "receivedOffers")}
             </h3>
             {kind === "individual"
               ? reservations.map((r) => (
@@ -289,7 +294,7 @@ export function CarrierJobs({ data, t, ShipmentCard }) {
       <div className="section-heading">
         <div>
           <h1>{t("carrierJobs")}</h1>
-          <p>{t("boardIntro_carrier")}</p>
+          <p>{t(data.user.role === "broker" ? "boardIntro_broker" : "boardIntro_carrier")}</p>
         </div>
       </div>
       <div className="role-tabs">

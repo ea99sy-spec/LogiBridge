@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { waLink } from "../shared/wa";
 export function PendingAccount({ data, t, navigate }) {
   const status = data.user.verificationStatus;
   return (
@@ -84,7 +85,12 @@ export function Profile({ data, t, run, busy, navigate }) {
           f.delete("logoFile");
           run(
             "/profile",
-            { ...Object.fromEntries(f), companyEmails: f.has("companyEmails"), logo: logo || null },
+            {
+              ...Object.fromEntries(f),
+              companyEmails: f.has("companyEmails"),
+              whatsappNotify: f.has("whatsappNotify"),
+              logo: logo || null,
+            },
             "PUT",
           );
         }}
@@ -180,6 +186,24 @@ export function Profile({ data, t, run, busy, navigate }) {
         <label className="consent">
           <input type="checkbox" name="companyEmails" defaultChecked={p.companyEmails !== false} />
           <span>{t("companyEmailPreference")}</span>
+        </label>
+        <label className="consent">
+          <input
+            type="checkbox"
+            name="whatsappNotify"
+            defaultChecked={p.whatsappNotify === true}
+            disabled={!waLink(data.user.details?.phone)}
+          />
+          <span>
+            <b>{t("whatsappNotify")}</b>
+            <br />
+            <small>
+              {waLink(data.user.details?.phone)
+                ? `${t("whatsappNotifyNote")} ${data.user.details.phone}`
+                : t("whatsappPhoneMissing")}
+              {!data.whatsappConfigured && <> · {t("whatsappNotActive")}</>}
+            </small>
+          </span>
         </label>
         <p className="muted">{t("profilePrivacyNote")}</p>
         <button className="button" disabled={busy}>
@@ -532,6 +556,44 @@ export function AdminSiteSettings({ data, t, run, busy }) {
         {t("activityRecipient")}: <b dir="ltr">{settings.recipient || "—"}</b>
         {!settings.emailConfigured && <> · {t("emailServiceMissing")}</>}
       </p>
+      <form
+        className="inline-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          save({ adminWhatsapp: new FormData(e.currentTarget).get("adminWhatsapp") });
+        }}
+      >
+        <label className="field">
+          <span>{t("adminWhatsapp")}</span>
+          <input
+            type="tel"
+            name="adminWhatsapp"
+            maxLength="30"
+            dir="ltr"
+            placeholder="+90 5xx xxx xx xx"
+            defaultValue={settings.adminWhatsapp}
+            key={settings.adminWhatsapp}
+          />
+        </label>
+        <button className="button" disabled={busy}>
+          {t("save")}
+        </button>
+      </form>
+      <p className="muted small">
+        {t(settings.whatsappConfigured ? "whatsappActive" : "whatsappNotActive")}
+        {waLink(settings.adminWhatsapp) && (
+          <>
+            {" · "}
+            <a
+              href={waLink(settings.adminWhatsapp, "LogiBridge ✓")}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t("testWhatsappLink")}
+            </a>
+          </>
+        )}
+      </p>
     </section>
   );
 }
@@ -550,6 +612,7 @@ export function AccountDetails({ account, t }) {
     ["serviceRoutes", d.routes],
     ["equipmentTypes", d.equipment],
     ["warehouseLocation", d.warehouse],
+    ["brokerCrossings", d.crossings?.map((c) => t(c)).join("، ")],
     ["taxId", account.taxId],
   ].filter(([, v]) => v !== undefined && v !== null && v !== "");
   if (!rows.length && !tc) return null;
@@ -815,6 +878,18 @@ export function CompanyProfile({ id, t, data, navigate, money }) {
               ☎{" "}
               <a href={`tel:${c.profile.contactPhone.replace(/[^+0-9]/g, "")}`} dir="ltr">
                 {c.profile.contactPhone}
+              </a>
+            </p>
+          )}
+          {waLink(c.profile.contactPhone) && (
+            <p>
+              <a
+                className="button ghost small-button whatsapp"
+                href={waLink(c.profile.contactPhone, `${t("waHello")} ${c.name} — LogiBridge`)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t("chatWhatsapp")}
               </a>
             </p>
           )}

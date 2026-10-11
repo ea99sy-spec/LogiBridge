@@ -122,7 +122,7 @@ export function paymentRoutes(app) {
         for (const u of [sh.ownerId, sh.carrierId])
           queueEmail(s, u, "payment_approved", { shipment: sh.title }, `payment/${p.id}/${u}`);
       } else {
-        notice(s, p.userId, "payment_rejected", sh.id);
+        notice(s, p.userId, "payment_rejected", sh.id, note);
         queueEmail(s, p.userId, "payment_rejected", { shipment: sh.title, reason: note }, `payment/${p.id}`);
       }
     });

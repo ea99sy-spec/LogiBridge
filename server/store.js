@@ -413,8 +413,24 @@ export async function initialize() {
       ...legs,
     );
     state.bids.push(
-      { id: "demo-bid-leg1", shipmentId: "demo-order-leg-1", carrierId: "carrier", price: 220, days: 1, note: "Gaziantep pickup, same day to Öncüpınar", createdAt: now },
-      { id: "demo-bid-leg2", shipmentId: "demo-order-leg-2", carrierId: "broker", price: 140, days: 1, note: "Declaration + yard transfer supervision", createdAt: now },
+      {
+        id: "demo-bid-leg1",
+        shipmentId: "demo-order-leg-1",
+        carrierId: "carrier",
+        price: 220,
+        days: 1,
+        note: "Gaziantep pickup, same day to Öncüpınar",
+        createdAt: now,
+      },
+      {
+        id: "demo-bid-leg2",
+        shipmentId: "demo-order-leg-2",
+        carrierId: "broker",
+        price: 140,
+        days: 1,
+        note: "Declaration + yard transfer supervision",
+        createdAt: now,
+      },
     );
   }
   if (!(await persist(state)) && cloudEnabled()) await refreshState();

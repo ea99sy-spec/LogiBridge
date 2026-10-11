@@ -533,3 +533,166 @@ td .small-button + .small-button {
   margin: 0;
   font-weight: 600;
 }
+/* Staged Türkiye⇄Syria orders */
+.badge.coordinating {
+  background: #fff4e0;
+  color: #9a6400;
+}
+.stage-track {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+.stage-step {
+  display: grid;
+  gap: 2px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #dfe5ee;
+  background: #fafbfc;
+  min-width: 0;
+}
+.stage-step b {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e6ebf3;
+  color: #33415c;
+  font-size: 12px;
+}
+.stage-step span {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.stage-step small {
+  color: #6b778c;
+}
+.stage-step.transit b,
+.stage-step.arrived b {
+  background: #315f9a;
+  color: #fff;
+}
+.stage-step.delivered b {
+  background: #12805c;
+  color: #fff;
+}
+.stage-step.cancelled {
+  opacity: 0.55;
+}
+.order-legs {
+  display: grid;
+  gap: 10px;
+  margin: 12px 0;
+  padding-inline-start: 12px;
+  border-inline-start: 3px solid #e2e8f0;
+}
+.order-legs .shipment-card {
+  box-shadow: none;
+}
+.stage-label {
+  display: inline-block;
+  margin-bottom: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef3fb;
+  color: #315f9a;
+  font-size: 12px;
+  font-weight: 600;
+}
+.crossing-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.crossing-choices label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #dfe5ee;
+  border-radius: 8px;
+}
+@media (max-width: 560px) {
+  .stage-track {
+    grid-template-columns: 1fr;
+  }
+}
+/* Border and customs rules */
+.border-rules {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.border-page {
+  max-width: 980px;
+}
+.rule-card {
+  padding: 12px 14px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  border-inline-start: 4px solid #315f9a;
+  background: #fbfcfe;
+}
+.rule-card.warning {
+  border-inline-start-color: #c27c0e;
+  background: #fffaf0;
+}
+.rule-card h3 {
+  margin: 4px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.rule-card p {
+  margin: 6px 0;
+  overflow-wrap: anywhere;
+}
+.rule-card > small {
+  color: #6b778c;
+}
+.source-link {
+  display: inline-block;
+  margin-inline-end: 10px;
+  overflow-wrap: anywhere;
+}
+.badge.crossing-open {
+  background: #e7f6ee;
+  color: #12805c;
+}
+.badge.crossing-upgrading,
+.badge.crossing-check {
+  background: #fff4e0;
+  color: #9a6400;
+}
+.notice-form {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed #d6dde8;
+}
+/* WhatsApp buttons */
+.button.whatsapp,
+a.whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-color: #25d366;
+  color: #128c4b;
+  text-decoration: none;
+}
+.button.whatsapp::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #25d366;
+}
+.notice-detail {
+  display: block;
+  color: #a26659;
+  white-space: normal;
+}

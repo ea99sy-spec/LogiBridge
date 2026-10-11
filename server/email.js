@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { queueWhatsApp } from "./whatsapp.js";
 const subjects = {
   registered: "استلمنا تسجيلك في LogiBridge",
   login: "تسجيل دخول إلى حسابك في LogiBridge",
@@ -103,6 +104,14 @@ export function queueEmail(s, userId, event, details = {}, key) {
     attempts: 0,
     createdAt: new Date().toISOString(),
   });
+  // Same notice on WhatsApp for accounts that turned it on (never security links).
+  if (u.profile?.whatsappNotify === true && !securityEvents.has(event))
+    queueWhatsApp(
+      s,
+      u.details?.phone,
+      `${subjects[event]}: ${lines[event]} ${info} ${link}`,
+      key && "wa/" + key,
+    );
 }
 export const mailConfigured = () => !!(process.env.RESEND_API_KEY && process.env.MAIL_FROM);
 export async function deliverEmail(job, fetcher = fetch) {
@@ -198,7 +207,15 @@ export function adminRecipient(s) {
 }
 export function queueAdminEmail(s, event, details = {}, key) {
   const to = adminRecipient(s);
-  if (!to || !adminSubjects[event] || s.settings?.activityEmails === false) return;
+  if (!adminSubjects[event] || s.settings?.activityEmails === false) return;
+  if (s.settings?.adminWhatsapp)
+    queueWhatsApp(
+      s,
+      s.settings.adminWhatsapp,
+      `LogiBridge · ${adminSubjects[event]}: ${Object.values(details).filter(Boolean).join(" · ")}`,
+      key && "wa/admin/" + key,
+    );
+  if (!to) return;
   s.emailOutbox ||= [];
   if (key && s.emailOutbox.some((x) => x.key === key)) return;
   const url = (process.env.URL || process.env.SITE_URL || "https://logibridge-ea99sy.netlify.app").replace(

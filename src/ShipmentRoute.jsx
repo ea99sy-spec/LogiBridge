@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import CountrySelect from "./CountrySelect";
+import { crossings, crossingKeys } from "../shared/crossings";
 export default function ShipmentRoute({ t }) {
   const [type, setType] = useState("crossBorder"),
     [direction, setDirection] = useState("TR-SY");
@@ -43,14 +44,16 @@ export default function ShipmentRoute({ t }) {
         <label className="field">
           <span>{t("crossing")}</span>
           <select name="crossing" required>
-            {["bab", "rai", "kasab"].map((k) => (
+            {crossingKeys.map((k) => (
               <option key={k} value={k}>
                 {t(k)}
+                {crossings[k].status !== "open" ? " — " + t("crossing_" + crossings[k].status) : ""}
               </option>
             ))}
           </select>
         </label>
       )}
+      {type === "crossBorder" && <p className="notice small">{t("stagedOrderNote")}</p>}
     </>
   );
 }

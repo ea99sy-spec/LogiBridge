@@ -147,7 +147,9 @@ export function cancelOrder(state, order, actor) {
     const cancellable =
       leg.status === "open" ||
       leg.status === "cancelled" ||
-      (leg.status === "assigned" && ["awaiting_funding", "direct_pending"].includes(escrow?.status) && !pending);
+      (leg.status === "assigned" &&
+        ["awaiting_funding", "direct_pending"].includes(escrow?.status) &&
+        !pending);
     if (!cancellable) throw new Error("Some stages already started");
   }
   for (const leg of legs) {

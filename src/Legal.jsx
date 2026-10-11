@@ -283,7 +283,8 @@ export default function Legal({ page, t, lang, langSelect }) {
 export function LegalLinks({ t }) {
   return (
     <span className="legal-footer-links">
-      <a href="/terms">{t("termsOfUse")}</a> · <a href="/privacy">{t("privacyPolicy")}</a>
+      <a href="/border">{t("borderRulesTitle")}</a> · <a href="/terms">{t("termsOfUse")}</a> ·{" "}
+      <a href="/privacy">{t("privacyPolicy")}</a>
     </span>
   );
 }

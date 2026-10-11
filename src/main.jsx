@@ -1,4 +1,6 @@
 import { requiresApproval } from "../shared/access";
+import BorderPage, { BorderRules } from "./BorderRules";
+import { waLink } from "../shared/wa";
 import { PendingAccount, Profile, Directory, AccountSecurity, CompanyProfile } from "./Profiles";
 import { ShipmentPayment } from "./Payments";
 import React, { createContext, useContext, useEffect, useState } from "react";
@@ -17,6 +19,7 @@ import { workspaceModules, accountKind } from "../shared/workspaces";
 import "./roles.css";
 import "./advanced.css";
 import ShipmentRoute from "./ShipmentRoute";
+import { crossingKeys } from "../shared/crossings";
 import {
   DriverPortal,
   NotificationBell,
@@ -76,11 +79,107 @@ function Select({ label, name, options, ...props }) {
     </label>
   );
 }
+// A Türkiye⇄Syria order: three stages, each with its own provider (rule of 6 Feb 2026).
+// Opens WhatsApp with a short shipment summary; the user picks the contact.
+function ShareWhatsapp({ s, t }) {
+  const text = `LogiBridge · ${s.title}\n${s.origin} → ${s.destination}${s.crossing ? ` (${t(s.crossing)})` : ""}\n${t(s.status)}\n${location.origin}/workspace/tracking`;
+  return (
+    <a
+      className="button ghost small-button whatsapp"
+      href={waLink("", text)}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {t("shareWhatsapp")}
+    </a>
+  );
+}
+function OrderCard({ s, compact }) {
+  const { data, user, t, run, busy, lang } = useWorkspace();
+  const legs = data.shipments.filter((x) => x.parentId === s.id).sort((a, b) => a.legIndex - b.legIndex);
+  const owner = user.id === s.ownerId;
+  const cancellable =
+    owner &&
+    !["cancelled", "delivered"].includes(s.status) &&
+    legs.every((l) => {
+      const escrow = data.escrows.find((e) => e.shipmentId === l.id);
+      return (
+        ["open", "cancelled"].includes(l.status) ||
+        (l.status === "assigned" &&
+          ["awaiting_funding", "direct_pending"].includes(escrow?.status) &&
+          !(data.payments || []).some((p) => p.shipmentId === l.id && p.status === "pending"))
+      );
+    });
+  return (
+    <article className="shipment-card order-card">
+      <div className="card-top">
+        <span className="tag">{t(s.category)}</span>
+        <span className={`badge ${s.status}`}>{t(s.status)}</span>
+      </div>
+      <h3>{s.title}</h3>
+      <div className="route">
+        <span>
+          <small>{t("origin")}</small>
+          {s.origin}
+        </span>
+        <span className="route-line">● ── {t(s.crossing)} ── ◉</span>
+        <span>
+          <small>{t("destination")}</small>
+          {s.destination}
+        </span>
+      </div>
+      <div className="stage-track">
+        {legs.map((l) => (
+          <div key={l.id} className={`stage-step ${l.status}`}>
+            <b>{l.legIndex + 1}</b>
+            <span>{t("leg_" + l.legType)}</span>
+            <small>{t(l.status)}</small>
+          </div>
+        ))}
+      </div>
+      {!compact && (
+        <>
+          <p className="notice small">{t("stagedOrderNote")}</p>
+          {owner && <ShareWhatsapp s={s} t={t} />}
+          <div className="order-legs">
+            {legs.map((l) => (
+              <ShipmentCard key={l.id} s={l} />
+            ))}
+          </div>
+          {cancellable && (
+            <button
+              disabled={busy}
+              className="button ghost danger"
+              onClick={() =>
+                window.confirm(t("cancelShipmentConfirm")) &&
+                run(`/shipments/${s.id}/action`, { action: "cancel" })
+              }
+            >
+              {t("cancelOrder")}
+            </button>
+          )}
+          {s.status === "delivered" && (
+            <div className="operation-complete">
+              <b>✓ {t("operationComplete")}</b>
+              <small>
+                {t("completedOn")} {new Date(s.completedAt || Date.now()).toLocaleDateString(lang)}
+              </small>
+            </div>
+          )}
+        </>
+      )}
+    </article>
+  );
+}
 function ShipmentCard({ s, compact = false }) {
   const { data, user, t, run, busy, money, num, lang, openProfile } = useWorkspace();
+  if (s.isOrder) return <OrderCard s={s} compact={compact} />;
   const admin = user.role === "admin",
     merchant = user.role === "merchant",
-    carrier = user.role === "carrier";
+    // Carriers and customs brokers are both "providers"; each bids on its own stage type.
+    carrier = user.role === "carrier" || user.role === "broker",
+    canBid = carrier && (s.legType === "clearance") === (user.role === "broker");
+  const clearance = s.legType === "clearance";
   const name = (id) => data.users.find((u) => u.id === id)?.name || "—";
   const badge = (status) => <span className={`badge ${status}`}>{t(status)}</span>;
   const action = (a) => run(`/shipments/${s.id}/action`, { action: a });
@@ -90,6 +189,7 @@ function ShipmentCard({ s, compact = false }) {
   const owner = merchant && s.ownerId === user.id;
   const canCancel =
     owner &&
+    !s.parentId &&
     (s.status === "open" ||
       (s.status === "assigned" &&
         escrow?.status === "awaiting_funding" &&
@@ -101,6 +201,15 @@ function ShipmentCard({ s, compact = false }) {
         {badge(s.status)}
       </div>
       <h3>{s.title}</h3>
+      {s.parentId && (
+        <p className="stage-label">
+          <b>
+            {t("stage")} {s.legIndex + 1}/3
+          </b>{" "}
+          · {t("leg_" + s.legType)}
+          {s.crossing ? " · " + t(s.crossing) : ""}
+        </p>
+      )}
       <div className="route">
         <span>
           <small>{t("origin")}</small>
@@ -129,6 +238,7 @@ function ShipmentCard({ s, compact = false }) {
             {t(s.transportType || (!s.crossing ? "international" : "crossBorder"))}
             {s.crossing ? " / " + t(s.crossing) : ""} · {name(s.ownerId)}
           </p>
+          {(s.ownerId === user.id || s.carrierId === user.id) && !s.parentId && <ShareWhatsapp s={s} t={t} />}
           {s.description && <p className="small">{s.description}</p>}
           <div className="offers">
             <h4>
@@ -187,7 +297,7 @@ function ShipmentCard({ s, compact = false }) {
                 )}
               </div>
             ))}
-            {carrier && s.status === "open" && !myBid && (
+            {canBid && s.status === "open" && !myBid && (
               <form
                 className="bid-form"
                 onSubmit={async (e) => {
@@ -260,12 +370,12 @@ function ShipmentCard({ s, compact = false }) {
               s.status === "assigned" &&
               ["held", "direct_paid"].includes(escrow?.status) && (
                 <button disabled={busy} className="button" onClick={() => action("dispatch")}>
-                  {t("dispatch")}
+                  {t(clearance ? "startClearance" : "dispatch")}
                 </button>
               )}
             {carrier && s.carrierId === user.id && s.status === "transit" && (
               <button disabled={busy} className="button" onClick={() => action("arrive")}>
-                {t("arrive")}
+                {t(clearance ? "clearanceDone" : "arrive")}
               </button>
             )}
             {owner && s.status === "arrived" && (
@@ -515,6 +625,7 @@ function App() {
     </select>
   );
   if (window.location.pathname === "/driver") return <DriverPortal t={t} />;
+  if (window.location.pathname === "/border") return <BorderPage t={t} lang={lang} langSelect={langSelect} />;
   if (["/terms", "/privacy"].includes(window.location.pathname))
     return <Legal page={window.location.pathname.slice(1)} t={t} lang={lang} langSelect={langSelect} />;
   if (window.location.pathname === "/verify-email")
@@ -731,7 +842,9 @@ function App() {
             {activeTab === "dashboard" && !data.approvalRequired && (
               <RoleDashboard data={data} t={t} navigate={setTab} money={money} ShipmentCard={ShipmentCard} />
             )}
-            {activeTab === "jobs" && carrier && <CarrierJobs data={data} t={t} ShipmentCard={ShipmentCard} />}
+            {activeTab === "jobs" && (carrier || user.role === "broker") && (
+              <CarrierJobs data={data} t={t} ShipmentCard={ShipmentCard} />
+            )}
             {activeTab === "inventory" && user.role === "supplier" && (
               <SupplierInventory data={data} t={t} run={run} busy={busy} money={money} />
             )}
@@ -783,6 +896,7 @@ function App() {
                   {data.shipments
                     .filter(
                       (s) =>
+                        !(s.parentId && data.shipments.some((p) => p.id === s.parentId)) &&
                         (filter === "all" || s.status === filter) &&
                         `${s.title} ${s.origin} ${s.destination}`
                           .toLowerCase()
@@ -922,6 +1036,15 @@ function App() {
             {activeTab === "border" && (
               <>
                 {heading("border")}
+                <BorderRules
+                  t={t}
+                  lang={lang}
+                  notices={data.borderNotices}
+                  admin={user.role === "admin" && !user.demo}
+                  run={run}
+                  busy={busy}
+                />
+                <h2>{t("borderChecklist")}</h2>
                 <p className="notice">{t("customsNote")}</p>
                 <Border data={data} t={t} run={run} />
               </>
@@ -1247,7 +1370,7 @@ function Border({ data, t, run }) {
       <label className="field">
         <span>{t("crossing")}</span>
         <select value={crossing} onChange={(e) => setCrossing(e.target.value)}>
-          {["bab", "rai", "kasab"].map((k) => (
+          {crossingKeys.map((k) => (
             <option key={k} value={k}>
               {t(k)}
             </option>

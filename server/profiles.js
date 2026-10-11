@@ -18,6 +18,7 @@ export function profileRoutes(app) {
       contactEmail: text(b.contactEmail || "", 254).toLowerCase(),
       contactPhone: text(b.contactPhone || "", 30),
       companyEmails: b.companyEmails,
+      whatsappNotify: b.whatsappNotify === true,
     };
     if (!profile.about || !profile.services) throw Error("Required field missing");
     if (profile.website && !/^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(profile.website))
@@ -134,6 +135,8 @@ export function profileRoutes(app) {
         fleetSize: d.fleetSize || null,
         equipment: d.equipment || "",
         warehouse: d.warehouse || "",
+        crossings: Array.isArray(d.crossings) ? d.crossings : [],
+        license: u.accountType === "broker" ? d.license || "" : "",
       },
       rating: scores.length
         ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10

@@ -2,9 +2,10 @@ import { ContactEmail } from "./Profiles";
 import React, { useState, useEffect } from "react";
 import CountrySelect from "./CountrySelect";
 import { taxField } from "../shared/tax";
+import { crossingKeys } from "../shared/crossings";
 import { LegalLinks } from "./Legal";
-const accounts = ["merchant", "carrier", "supplier", "individual", "admin"];
-const symbols = { merchant: "▤", carrier: "⇄", supplier: "▧", individual: "◉", admin: "◇" };
+const accounts = ["merchant", "carrier", "broker", "supplier", "individual", "admin"];
+const symbols = { merchant: "▤", carrier: "⇄", broker: "⚖", supplier: "▧", individual: "◉", admin: "◇" };
 export default function AccountAccess({ t, langSelect, run, busy, toast, onEntered, user }) {
   const segment = window.location.pathname.split("/").filter(Boolean),
     type = accounts.includes(segment[1]) ? segment[1] : null;
@@ -19,6 +20,7 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
     [forgot, setForgot] = useState(false),
     [country, setCountry] = useState(""),
     [needCode, setNeedCode] = useState(false),
+    [brokerCrossings, setBrokerCrossings] = useState([]),
     [forgotResult, setForgotResult] = useState(null);
   useEffect(() => {
     fetch("/api/health")
@@ -243,6 +245,34 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
                         <span>{t("serviceRoutes")}</span>
                         <input name="routes" required maxLength="300" placeholder={t("serviceRoutesHint")} />
                       </label>
+                    </>
+                  )}
+                  {register && type === "broker" && (
+                    <>
+                      <label className="field">
+                        <span>{t("brokerLicense")}</span>
+                        <input name="license" required maxLength="60" dir="ltr" />
+                      </label>
+                      <fieldset className="field crossing-choices">
+                        <span>{t("brokerCrossings")}</span>
+                        {crossingKeys.map((k) => (
+                          <label key={k} className="consent">
+                            <input
+                              type="checkbox"
+                              checked={brokerCrossings.includes(k)}
+                              onChange={(e) =>
+                                setBrokerCrossings(
+                                  e.target.checked
+                                    ? [...brokerCrossings, k]
+                                    : brokerCrossings.filter((x) => x !== k),
+                                )
+                              }
+                            />
+                            <span>{t(k)}</span>
+                          </label>
+                        ))}
+                        <input type="hidden" name="crossings" value={brokerCrossings.join(",")} />
+                      </fieldset>
                     </>
                   )}
                   {register && type === "supplier" && (

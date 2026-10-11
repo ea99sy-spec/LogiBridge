@@ -15,6 +15,7 @@ function TryPlatform({ t }) {
   const kinds = [
     ["merchant", "▤"],
     ["carrier", "⇄"],
+    ["broker", "⚖"],
     ["supplier", "▧"],
     ["individual", "◉"],
     ["admin", "◇"],
@@ -58,8 +59,8 @@ function TryPlatform({ t }) {
   );
 }
 export default function Landing({ t, langSelect, user }) {
-  const types = ["merchant", "carrier", "supplier", "individual"];
-  const symbols = { merchant: "▤", carrier: "⇄", supplier: "▧", individual: "◉" };
+  const types = ["merchant", "carrier", "broker", "supplier", "individual"];
+  const symbols = { merchant: "▤", carrier: "⇄", broker: "⚖", supplier: "▧", individual: "◉" };
   return (
     <div className="landing">
       <header className="landing-header">
@@ -70,6 +71,7 @@ export default function Landing({ t, langSelect, user }) {
           <a href="#try">{t("tryNav")}</a>
           <a href="#services">{t("ourServices")}</a>
           <a href="#verification">{t("identityReview")}</a>
+          <a href="/border">{t("borderNav")}</a>
           <a href="/accounts">{t("chooseAccount")}</a>
         </nav>
         <div className="landing-header-actions">

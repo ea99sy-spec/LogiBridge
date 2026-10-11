@@ -1,4 +1,7 @@
+import { randomUUID } from "node:crypto";
+import { crossingKeys } from "../shared/crossings.js";
 import { queueEmail, adminRecipient, mailConfigured } from "./email.js";
+import { whatsappConfigured, waNumber } from "./whatsapp.js";
 import { verifyTaxId } from "./tax.js";
 import { announceCompany } from "./profiles.js";
 import { demoActive } from "./world.js";
@@ -45,6 +48,12 @@ export function operationRoutes(app) {
           ...(!req.user.demo || u.demo ? { email: u.email } : {}),
           shipmentCount: s.shipments.filter((sh) => sh.ownerId === u.id || sh.carrierId === u.id).length,
           applicationCount: s.kyb.filter((d) => d.userId === u.id && (!req.user.demo || u.demo)).length,
+          rejectionReason:
+            u.verificationStatus === "rejected" && (!req.user.demo || u.demo)
+              ? u.review?.reason ||
+                s.kyb.filter((d) => d.userId === u.id && d.status === "rejected").at(-1)?.review?.reason ||
+                ""
+              : "",
         })),
     );
   });
@@ -79,6 +88,8 @@ export function operationRoutes(app) {
       requireEmailVerification: s.settings?.requireEmailVerification === true,
       activityEmails: s.settings?.activityEmails !== false,
       notifyEmail: s.settings?.notifyEmail || "",
+      adminWhatsapp: s.settings?.adminWhatsapp || "",
+      whatsappConfigured: whatsappConfigured(),
       recipient: adminRecipient(s),
       emailConfigured: mailConfigured(),
     });
@@ -96,12 +107,59 @@ export function operationRoutes(app) {
       if (notifyEmail && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(notifyEmail) || notifyEmail.length > 254))
         throw new Error("Invalid email");
     }
+    let adminWhatsapp;
+    if ("adminWhatsapp" in b) {
+      adminWhatsapp = String(b.adminWhatsapp || "").trim();
+      if (adminWhatsapp && !waNumber(adminWhatsapp)) throw new Error("Invalid phone number");
+    }
     await mutate((s) => {
       s.settings ||= {};
+      if (adminWhatsapp !== undefined) s.settings.adminWhatsapp = adminWhatsapp;
       if ("demoLogin" in b) s.settings.demoLogin = b.demoLogin;
       if ("activityEmails" in b) s.settings.activityEmails = b.activityEmails;
       if ("requireEmailVerification" in b) s.settings.requireEmailVerification = b.requireEmailVerification;
       if (notifyEmail !== undefined) s.settings.notifyEmail = notifyEmail;
+    });
+    res.json({ ok: true });
+  });
+  // Border and customs notices shown on the public rules page and in every workspace.
+  app.post("/api/admin/border-notices", async (req, res) => {
+    if (!realAdmin(req, res)) return;
+    const b = req.body;
+    const field = (v, max, optional) => {
+      const value = typeof v === "string" ? v.trim() : "";
+      if (!value && !optional) throw new Error("Required field missing");
+      if (value.length > max) throw new Error("Text too long");
+      return value;
+    };
+    const notice = {
+      id: randomUUID(),
+      date: field(b.date, 10),
+      title: field(b.title, 160),
+      body: field(b.body, 1500),
+      crossing: field(b.crossing, 20, true),
+      source: field(b.source, 300, true),
+      level: ["info", "warning"].includes(b.level) ? b.level : "info",
+      createdAt: new Date().toISOString(),
+    };
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(notice.date) || Number.isNaN(Date.parse(notice.date)))
+      throw new Error("Invalid date");
+    if (notice.crossing && !crossingKeys.includes(notice.crossing)) throw new Error("Invalid request");
+    if (notice.source && !/^https?:\/\/[^\s]+$/i.test(notice.source))
+      throw new Error("Website must use https:// or http://");
+    await mutate((s) => {
+      s.settings ||= {};
+      s.settings.borderNotices = [notice, ...(s.settings.borderNotices || [])]
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .slice(0, 50);
+    });
+    res.json({ ok: true });
+  });
+  app.delete("/api/admin/border-notices/:id", async (req, res) => {
+    if (!realAdmin(req, res)) return;
+    await mutate((s) => {
+      s.settings ||= {};
+      s.settings.borderNotices = (s.settings.borderNotices || []).filter((n) => n.id !== req.params.id);
     });
     res.json({ ok: true });
   });
@@ -124,7 +182,7 @@ export function operationRoutes(app) {
         d.status = b.status;
         d.review = { reviewerId: req.user.id, reviewedAt: now, reason: reason || null, direct: true };
       }
-      notice(s, u.id, "verification_" + b.status);
+      notice(s, u.id, "verification_" + b.status, undefined, reason);
       queueEmail(s, u.id, b.status, { reason }, `account-review/${u.id}/${now}`);
       if (u.verified) announceCompany(s, u);
     });

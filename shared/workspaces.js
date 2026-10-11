@@ -57,6 +57,20 @@ const modules = {
     "reports",
     "security",
   ],
+  broker: [
+    "dashboard",
+    "profile",
+    "directory",
+    "jobs",
+    "tracking",
+    "documents",
+    "border",
+    "hub",
+    "kyb",
+    "ratings",
+    "contracts",
+    "security",
+  ],
   supplier: [
     "dashboard",
     "profile",
@@ -68,7 +82,18 @@ const modules = {
     "kyb",
     "security",
   ],
-  admin: ["dashboard", "admin", "companies", "kyb", "shipments", "tracking", "documents", "hub", "security"],
+  admin: [
+    "dashboard",
+    "admin",
+    "companies",
+    "kyb",
+    "shipments",
+    "tracking",
+    "documents",
+    "border",
+    "hub",
+    "security",
+  ],
 };
 export function accountKind(user) {
   return user.role === "admin" ? "admin" : user.accountType === "individual" ? "individual" : user.role;
