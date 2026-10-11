@@ -1,5 +1,183 @@
 // Additional interface texts: [Arabic, English, Turkish].
 export const extraRows = {
+  // Registration details per account type
+  residenceCountry: ["بلد الإقامة", "Country of residence", "İkamet ülkesi"],
+  registrationCountry: ["بلد تسجيل الشركة", "Company registration country", "Şirketin kayıtlı olduğu ülke"],
+  countryLabel: ["البلد", "Country", "Ülke"],
+  city: ["المدينة", "City", "Şehir"],
+  phone: ["رقم الهاتف", "Phone number", "Telefon numarası"],
+  choose: ["اختر", "Choose", "Seçin"],
+  taxIdHint: [
+    "تركيا: رقم ضريبي من 10 أرقام (VKN) أو رقم هوية من 11 رقمًا للمؤسسات الفردية — يتم التحقق منه تلقائيًا. دول الاتحاد الأوروبي: رقم VAT ويُفحص عبر VIES.",
+    "Türkiye: 10-digit tax number (VKN) or 11-digit ID for sole traders — checked automatically. EU: VAT number, checked with VIES.",
+    "Türkiye: 10 haneli VKN veya şahıs şirketleri için 11 haneli TCKN — otomatik kontrol edilir. AB: KDV numarası, VIES ile kontrol edilir.",
+  ],
+  tradeActivity: ["نوع النشاط التجاري", "Trade activity", "Ticari faaliyet"],
+  activity_import: ["استيراد", "Import", "İthalat"],
+  activity_export: ["تصدير", "Export", "İhracat"],
+  activity_both: ["استيراد وتصدير", "Import and export", "İthalat ve ihracat"],
+  mainProducts: ["أهم البضائع التي تتعامل بها", "Main goods you trade", "Başlıca ticaret ürünleri"],
+  mainProductsHint: [
+    "مثال: أقمشة، مواد غذائية، آلات",
+    "e.g. fabrics, food, machinery",
+    "örn. kumaş, gıda, makine",
+  ],
+  transportLicense: ["رقم رخصة النقل", "Transport licence number", "Taşıma yetki belgesi no"],
+  fleetSize: ["عدد الشاحنات", "Number of trucks", "Araç sayısı"],
+  serviceRoutes: ["الخطوط التي تخدمها", "Routes you serve", "Hizmet verilen güzergâhlar"],
+  serviceRoutesHint: ["مثال: غازي عنتاب ⇄ حلب", "e.g. Gaziantep ⇄ Aleppo", "örn. Gaziantep ⇄ Halep"],
+  equipmentTypes: ["أنواع المعدات التي تقدمها", "Equipment you offer", "Sunduğunuz ekipmanlar"],
+  equipmentTypesHint: [
+    "مثال: حاويات، أجهزة تتبع، منصات",
+    "e.g. containers, trackers, pallets",
+    "örn. konteyner, takip cihazı, palet",
+  ],
+  warehouseLocation: [
+    "موقع المستودع (اختياري)",
+    "Warehouse location (optional)",
+    "Depo konumu (isteğe bağlı)",
+  ],
+
+  // Tax check results
+  tax_valid: ["رقم ضريبي صحيح", "Tax number valid", "Vergi numarası geçerli"],
+  tax_invalid: ["رقم ضريبي غير صحيح", "Tax number invalid", "Vergi numarası geçersiz"],
+  tax_format_ok: ["يحتاج تحقق يدوي", "Needs manual check", "Elle kontrol gerekli"],
+  taxMethod_tr_vkn_checksum: [
+    "(فحص خانة التحقق لرقم VKN التركي)",
+    "(Turkish VKN check digit)",
+    "(VKN kontrol hanesi)",
+  ],
+  taxMethod_tr_tckn_checksum: [
+    "(فحص خانة التحقق لرقم TCKN التركي)",
+    "(Turkish TCKN check digit)",
+    "(TCKN kontrol hanesi)",
+  ],
+  taxMethod_tr_length: [
+    "(الرقم التركي يجب أن يكون 10 أو 11 رقمًا)",
+    "(Turkish number must have 10 or 11 digits)",
+    "(10 veya 11 hane olmalı)",
+  ],
+  taxMethod_eu_vies: [
+    "(تم التحقق عبر نظام VIES الأوروبي)",
+    "(verified with EU VIES)",
+    "(AB VIES ile doğrulandı)",
+  ],
+  taxMethod_eu_vies_unavailable: [
+    "(خدمة VIES لم ترد — أعد الفحص لاحقًا)",
+    "(VIES did not answer — check again later)",
+    "(VIES yanıt vermedi — sonra tekrar deneyin)",
+  ],
+  taxMethod_eu_vies_pending: ["(بانتظار فحص VIES)", "(VIES check pending)", "(VIES kontrolü bekleniyor)"],
+  taxMethod_manual: [
+    "(لا يوجد سجل إلكتروني عام لهذا البلد — طابقه مع وثيقة السجل التجاري)",
+    "(no public online register for this country — compare with the registry document)",
+    "(bu ülke için açık çevrimiçi kayıt yok — sicil belgesiyle karşılaştırın)",
+  ],
+  taxMethod_format: ["(صيغة غير صالحة)", "(invalid format)", "(geçersiz biçim)"],
+  recheckTax: ["إعادة فحص الرقم الضريبي", "Check tax number again", "Vergi numarasını tekrar kontrol et"],
+  gibCheck: ["التحقق من بوابة الضرائب التركية GİB", "Verify on Turkish GİB portal", "GİB üzerinden doğrula"],
+
+  // Admin approval
+  approveAccount: ["موافقة", "Approve", "Onayla"],
+  rejectAccount: ["رفض", "Reject", "Reddet"],
+  approveAccountConfirm: [
+    "الموافقة على هذا الحساب تسمح له باستخدام المنصة فورًا. متابعة؟",
+    "Approving lets this account use the platform immediately. Continue?",
+    "Onay bu hesabın platformu hemen kullanmasına izin verir. Devam edilsin mi?",
+  ],
+  rejectionReasonPrompt: [
+    "اكتب سبب الرفض (سيصل لصاحب الحساب):",
+    "Write the reason for rejection (sent to the account owner):",
+    "Ret nedenini yazın (hesap sahibine gönderilir):",
+  ],
+  rejectionReason: ["سبب الرفض", "Reason", "Ret nedeni"],
+
+  // Site settings
+  siteSettings: ["إعدادات الموقع", "Site settings", "Site ayarları"],
+  showDemoAccounts: ["إظهار الحسابات التجريبية", "Show demo accounts", "Demo hesapları göster"],
+  showDemoAccountsNote: [
+    "يظهر زر «تجربة» تحت كل صفحة دخول. بيانات التجربة منفصلة تمامًا عن الحسابات الحقيقية. إخفاؤه يُخرج كل جلسات التجربة.",
+    "Shows a “Try demo” button under every sign-in page. Demo data is fully separate from real accounts. Hiding it ends all demo sessions.",
+    "Her giriş sayfasının altında “Demo dene” düğmesi gösterir. Demo verileri gerçek hesaplardan tamamen ayrıdır. Gizlemek tüm demo oturumlarını kapatır.",
+  ],
+  activityEmails: [
+    "إرسال عمليات الموقع إلى بريدي",
+    "Email me site activity",
+    "Site etkinliğini bana e-postayla gönder",
+  ],
+  activityEmailsNote: [
+    "تسجيل حساب، طلب توثيق، شحنة جديدة، قبول عرض، دفع، انطلاق، اكتمال عملية، نزاع، إلغاء، طلبات وحجوزات.",
+    "New accounts, verification requests, shipments, accepted offers, payments, dispatch, completed operations, disputes, cancellations, orders and bookings.",
+    "Yeni hesaplar, doğrulama talepleri, sevkiyatlar, kabul edilen teklifler, ödemeler, çıkışlar, tamamlanan işlemler, ihtilaflar, iptaller, siparişler ve rezervasyonlar.",
+  ],
+  notifyEmail: ["بريد استلام التقارير", "Activity email address", "Etkinlik e-posta adresi"],
+  activityRecipient: ["تصل الرسائل حاليًا إلى", "Currently sent to", "Şu adrese gönderiliyor"],
+
+  // Payment methods and completion
+  choosePayment: ["اختر طريقة الدفع:", "Choose how to pay:", "Ödeme yöntemini seçin:"],
+  payDirect: ["الدفع مباشرة للناقل", "Pay the carrier directly", "Taşıyıcıya doğrudan öde"],
+  payDirectConfirm: [
+    "ستدفع المبلغ للناقل مباشرة (نقدًا أو تحويلًا) خارج المنصة، ولن يكون محفوظًا كضمان. يبدأ النقل بعد أن يؤكد الناقل استلام المبلغ. متابعة؟",
+    "You will pay the carrier directly (cash or transfer) outside the platform, without escrow protection. Transport starts after the carrier confirms receipt. Continue?",
+    "Taşıyıcıya platform dışında doğrudan ödeyeceksiniz (nakit veya havale), emanet koruması olmadan. Taşıyıcı ödemeyi onayladıktan sonra taşıma başlar. Devam edilsin mi?",
+  ],
+  paymentMethodsNote: [
+    "التحويل البنكي للمنصة يحفظ المبلغ كضمان حتى تأكيد الاستلام (أكثر أمانًا). الدفع المباشر أسرع لكنه بدون ضمان.",
+    "Bank transfer to the platform keeps the money in escrow until you confirm delivery (safer). Direct payment is faster but has no escrow.",
+    "Platforma banka havalesi, teslimatı onaylayana kadar parayı emanette tutar (daha güvenli). Doğrudan ödeme daha hızlıdır ama emanet yoktur.",
+  ],
+  waitingCarrierPayment: [
+    "اخترت الدفع المباشر. بانتظار تأكيد الناقل استلام المبلغ.",
+    "You chose direct payment. Waiting for the carrier to confirm receipt.",
+    "Doğrudan ödeme seçtiniz. Taşıyıcının onayı bekleniyor.",
+  ],
+  confirmPaymentReceived: ["أكّد استلام المبلغ", "Confirm payment received", "Ödemenin alındığını onayla"],
+  confirmPaymentConfirm: [
+    "هل استلمت مبلغ الشحنة كاملًا من صاحبها؟",
+    "Did you receive the full shipment payment from the owner?",
+    "Sevkiyat ödemesinin tamamını aldınız mı?",
+  ],
+  confirmDeliveryConfirm: [
+    "تأكيد الاستلام يغلق العملية ويحرر المبلغ للناقل. هل وصلت الشحنة سليمة؟",
+    "Confirming receipt closes the operation and releases payment to the carrier. Did the shipment arrive in good condition?",
+    "Teslim onayı işlemi kapatır ve ödemeyi taşıyıcıya bırakır. Sevkiyat sağlam ulaştı mı?",
+  ],
+  direct_pending: ["بانتظار تأكيد الدفع المباشر", "Direct payment pending", "Doğrudan ödeme bekleniyor"],
+  direct_paid: ["مدفوع مباشرة للناقل", "Paid directly to carrier", "Taşıyıcıya doğrudan ödendi"],
+  paidDirect: ["دُفع مباشرة للناقل", "paid directly to the carrier", "taşıyıcıya doğrudan ödendi"],
+  operationComplete: [
+    "العملية مكتملة ومغلقة",
+    "Operation completed and closed",
+    "İşlem tamamlandı ve kapandı",
+  ],
+  completedOn: ["تاريخ الإغلاق:", "Closed on", "Kapanış:"],
+  operationSummary: ["ملخص العملية", "Operation summary", "İşlem özeti"],
+  event_order_update: ["تحديث على طلب الشراء", "Purchase order update", "Sipariş güncellemesi"],
+  event_pay_direct: ["اختير الدفع المباشر", "Direct payment chosen", "Doğrudan ödeme seçildi"],
+  event_confirm_payment: [
+    "أكّد الناقل استلام الدفع",
+    "Carrier confirmed payment",
+    "Taşıyıcı ödemeyi onayladı",
+  ],
+
+  "err_Invalid phone number": ["رقم الهاتف غير صالح.", "Invalid phone number.", "Geçersiz telefon numarası."],
+  "err_Choose the trade activity": [
+    "اختر نوع النشاط التجاري.",
+    "Choose the trade activity.",
+    "Ticari faaliyeti seçin.",
+  ],
+  "err_Invalid fleet size": ["عدد الشاحنات غير صالح.", "Invalid number of trucks.", "Geçersiz araç sayısı."],
+  "err_Rejection reason required": [
+    "اكتب سبب الرفض.",
+    "Write the reason for rejection.",
+    "Ret nedenini yazın.",
+  ],
+  "err_Account has no tax number": [
+    "لا يوجد رقم ضريبي لهذا الحساب.",
+    "This account has no tax number.",
+    "Bu hesabın vergi numarası yok.",
+  ],
+
   // Notifications added with the new features
   event_bid_withdrawn: ["سحب ناقل عرضه", "A carrier withdrew an offer", "Bir taşıyıcı teklifini geri çekti"],
   event_cancel: ["أُلغيت شحنة", "A shipment was cancelled", "Bir sevkiyat iptal edildi"],
@@ -134,9 +312,9 @@ export const extraRows = {
     "Parola 12 ile 128 karakter arasında olmalıdır.",
   ],
   "err_Invalid company tax number": [
-    "الرقم الضريبي غير صالح (أحرف وأرقام، 3 إلى 40 خانة).",
-    "Invalid tax number (letters and digits, 3–40 characters).",
-    "Geçersiz vergi numarası (harf ve rakam, 3–40 karakter).",
+    "الرقم الضريبي غير صحيح. تحقق من الأرقام (للأرقام التركية يتم فحص خانة التحقق).",
+    "The tax number is not valid. Check the digits (Turkish numbers are checked automatically).",
+    "Vergi numarası geçersiz. Rakamları kontrol edin (Türk numaraları otomatik kontrol edilir).",
   ],
   "err_Too many attempts. Try again later.": [
     "محاولات كثيرة. انتظر عشر دقائق ثم حاول مجددًا.",

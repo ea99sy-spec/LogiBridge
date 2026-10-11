@@ -120,24 +120,24 @@ export async function createApp() {
     const ref = `${action}/${sh.id}`;
     if (action === "pay_direct") {
       queueEmail(s, sh.carrierId, "direct_payment", { shipment: sh.title }, ref);
-      queueAdminEmail(s, "direct_payment", info, ref);
+      queueAdminEmail(s, "direct_payment", info, "admin/" + ref);
     } else if (action === "confirm_payment") {
       queueEmail(s, sh.ownerId, "payment_confirmed", { shipment: sh.title }, ref);
     } else if (action === "dispatch") {
       queueEmail(s, sh.ownerId, "dispatched", { shipment: sh.title }, ref);
-      queueAdminEmail(s, "dispatched", info, ref);
+      queueAdminEmail(s, "dispatched", info, "admin/" + ref);
     } else if (action === "arrive") {
       queueEmail(s, sh.ownerId, "arrived", { shipment: sh.title }, ref);
     } else if (action === "confirm") {
       for (const u of [sh.ownerId, sh.carrierId])
         queueEmail(s, u, "operation_completed", { shipment: sh.title }, `${ref}/${u}`);
-      queueAdminEmail(s, "operation_completed", info, ref);
+      queueAdminEmail(s, "operation_completed", info, "admin/" + ref);
     } else if (action === "dispute") {
-      queueAdminEmail(s, "dispute_opened", info, ref);
+      queueAdminEmail(s, "dispute_opened", info, "admin/" + ref);
     } else if (action === "cancel") {
       for (const c of new Set([...bidders, sh.carrierId].filter(Boolean)))
         queueEmail(s, c, "shipment_cancelled", { shipment: sh.title }, `${ref}/${c}`);
-      queueAdminEmail(s, "shipment_cancelled", info, ref);
+      queueAdminEmail(s, "shipment_cancelled", info, "admin/" + ref);
     }
   }
   app.get("/api/health", (req, res) =>
@@ -212,7 +212,9 @@ export async function createApp() {
         notice(s, a.id, "account_registered");
       queueAdminEmail(s, "account_registered", {
         الاسم: user.name,
-        النوع: { merchant: "تاجر", carrier: "ناقل", supplier: "مورد معدات", individual: "فرد" }[user.accountType],
+        النوع: { merchant: "تاجر", carrier: "ناقل", supplier: "مورد معدات", individual: "فرد" }[
+          user.accountType
+        ],
         البريد: user.email,
         الهاتف: details.phone,
         البلد: details.country,
@@ -278,7 +280,8 @@ export async function createApp() {
     )
       return res.status(403).json({ error: "Origin rejected" });
     req.user = readState().users.find((u) => u.id === session.userId);
-    if (!req.user || (!DEMO_NOW() && req.user.demo)) return res.status(401).json({ error: "Sign in required" });
+    if (!req.user || (!DEMO_NOW() && req.user.demo))
+      return res.status(401).json({ error: "Sign in required" });
     // Password changes and resets end every session that was opened before them.
     if (req.user.sessionsValidAfter && (session.createdAt || 0) < req.user.sessionsValidAfter)
       return res.status(401).json({ error: "Sign in required" });

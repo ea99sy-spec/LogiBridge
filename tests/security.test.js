@@ -119,7 +119,10 @@ test("demo visitors are isolated from registered accounts", async (t) => {
     400,
     "a rejection needs a reason",
   );
-  assert.equal((await call("owner", `/admin/accounts/${personId}/review`, { status: "approved" })).status, 200);
+  assert.equal(
+    (await call("owner", `/admin/accounts/${personId}/review`, { status: "approved" })).status,
+    200,
+  );
   const created = await call("person", "/shipments", {
     ...shipment,
     senderName: "Real Sender",
@@ -198,6 +201,33 @@ test("shipment owners can cancel and carriers can withdraw offers", async (t) =>
   const cancelled = (await call("merchant", "/state")).body.shipments.find((s) => s.id === first.id);
   assert.equal(cancelled.status, "cancelled");
   assert.equal((await call("carrier", "/bids", { shipmentId: first.id, price: 90, days: 2 })).status, 400);
+  // Direct payment: the carrier confirms receipt, then the operation runs to completion.
+  const direct = (await call("merchant", "/shipments", shipment)).body;
+  await call("carrier", "/bids", { shipmentId: direct.id, price: 50, days: 1 });
+  const directBid = (await call("merchant", "/state")).body.bids.find((b) => b.shipmentId === direct.id);
+  await call("merchant", `/shipments/${direct.id}/accept`, { bidId: directBid.id });
+  assert.equal((await call("carrier", `/shipments/${direct.id}/action`, { action: "dispatch" })).status, 400);
+  assert.equal(
+    (await call("merchant", `/shipments/${direct.id}/action`, { action: "pay_direct" })).status,
+    200,
+  );
+  assert.equal(
+    (await call("merchant", `/shipments/${direct.id}/action`, { action: "confirm_payment" })).status,
+    400,
+  );
+  assert.equal(
+    (await call("carrier", `/shipments/${direct.id}/action`, { action: "confirm_payment" })).status,
+    200,
+  );
+  for (const [who, a] of [
+    ["carrier", "dispatch"],
+    ["carrier", "arrive"],
+    ["merchant", "confirm"],
+  ])
+    assert.equal((await call(who, `/shipments/${direct.id}/action`, { action: a })).status, 200, a);
+  const closed = (await call("merchant", "/state")).body.shipments.find((s) => s.id === direct.id);
+  assert.equal(closed.status, "delivered");
+  assert.ok(closed.completedAt);
   // Days must be a whole number.
   const second = (await call("merchant", "/shipments", shipment)).body;
   assert.equal((await call("carrier", "/bids", { shipmentId: second.id, price: 90, days: 1.5 })).status, 400);
@@ -305,12 +335,17 @@ test("tax numbers are checked and the administrator controls demo sign-in", asyn
     routes: "Istanbul - Aleppo",
   };
   const wrong = valid.slice(0, 9) + ((Number(valid[9]) + 1) % 10);
-  const rejected = await call("bad2", "/auth/register", { ...company, email: "bad2@test.local", taxId: wrong });
+  const rejected = await call("bad2", "/auth/register", {
+    ...company,
+    email: "bad2@test.local",
+    taxId: wrong,
+  });
   assert.equal(rejected.status, 400);
   assert.equal(rejected.body.error, "Invalid company tax number");
   // Carriers must give their licence and fleet size.
   assert.equal(
-    (await call("x", "/auth/register", { ...company, email: "x@test.local", taxId: valid, fleetSize: "" })).status,
+    (await call("x", "/auth/register", { ...company, email: "x@test.local", taxId: valid, fleetSize: "" }))
+      .status,
     400,
   );
   const ok = await call("good", "/auth/register", { ...company, email: "good@test.local", taxId: valid });

@@ -37,9 +37,9 @@ const rows = {
     "Şirket hesabı yönetici onayını bekliyor",
   ],
   approvalRestrictionNote: [
-    "لا يمكنك استخدام خدمات المنصة قبل موافقة المسؤول. يمكنك استكمال التعريف ورفع وثائق الشركة فقط.",
-    "Platform services are locked until administrator approval. You can complete your profile and upload company documents.",
-    "Yönetici onayına kadar hizmetler kapalıdır. Profilinizi tamamlayıp şirket belgelerini yükleyebilirsiniz.",
+    "لا يمكنك استخدام خدمات المنصة قبل موافقة إدارة المنصة على حسابك. يمكنك الآن استكمال التعريف ورفع وثائق التوثيق فقط.",
+    "Platform services are locked until the administration approves your account. Meanwhile you can complete your profile and upload verification documents.",
+    "Hesabınız yönetim tarafından onaylanana kadar hizmetler kapalıdır. Bu sırada profilinizi tamamlayıp doğrulama belgelerini yükleyebilirsiniz.",
   ],
   reviewEmailNote: [
     "سيتم تقييم طلبك والوثائق، وسنرد بالقبول أو الرفض على بريدك الإلكتروني.",

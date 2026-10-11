@@ -7,6 +7,11 @@ export function PendingAccount({ data, t, navigate }) {
       <h1>{t("accountAwaitingApproval")}</h1>
       <p>{t("approvalRestrictionNote")}</p>
       <span className={`badge ${status}`}>{t(status || "not_submitted")}</span>
+      {status === "rejected" && data.user.review?.reason && (
+        <p className="form-error">
+          {t("rejectionReason")}: {data.user.review.reason}
+        </p>
+      )}
       <p>{t(status === "rejected" ? "rejectedAccountNext" : "reviewEmailNote")}</p>
       <div className="actions">
         <button className="button" onClick={() => navigate("kyb")}>
@@ -35,6 +40,7 @@ export function Profile({ data, t, run, busy }) {
       >
         <h3>{data.user.name}</h3>
         <p dir="ltr">{data.user.email}</p>
+        <AccountDetails account={data.user} t={t} />
         <label className="field">
           <span>{t("aboutUs")}</span>
           <textarea name="about" rows="5" required maxLength="2000" defaultValue={p.about || ""} />
@@ -293,5 +299,120 @@ export function AccountSecurity({ data, t, run, busy }) {
         )}
       </div>
     </>
+  );
+}
+// Owner switches: demo sign-in buttons and the activity emails about the site.
+export function AdminSiteSettings({ data, t, run, busy }) {
+  const [settings, setSettings] = useState(null);
+  useEffect(() => {
+    if (data.user.demo) return;
+    fetch("/api/admin/settings")
+      .then((r) => (r.ok ? r.json() : null))
+      .then(setSettings)
+      .catch(() => {});
+  }, [data]);
+  if (data.user.demo || !settings) return null;
+  const save = (body) => {
+    setSettings({ ...settings, ...body });
+    return run("/admin/settings", body, "PUT");
+  };
+  return (
+    <section className="panel form-stack">
+      <h2>{t("siteSettings")}</h2>
+      <label className="consent">
+        <input
+          type="checkbox"
+          checked={settings.demoLogin}
+          disabled={busy}
+          onChange={(e) => save({ demoLogin: e.target.checked })}
+        />
+        <span>
+          <b>{t("showDemoAccounts")}</b>
+          <br />
+          <small>{t("showDemoAccountsNote")}</small>
+        </span>
+      </label>
+      <label className="consent">
+        <input
+          type="checkbox"
+          checked={settings.activityEmails}
+          disabled={busy}
+          onChange={(e) => save({ activityEmails: e.target.checked })}
+        />
+        <span>
+          <b>{t("activityEmails")}</b>
+          <br />
+          <small>{t("activityEmailsNote")}</small>
+        </span>
+      </label>
+      <form
+        className="inline-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          save({ notifyEmail: new FormData(e.currentTarget).get("notifyEmail") });
+        }}
+      >
+        <label className="field">
+          <span>{t("notifyEmail")}</span>
+          <input
+            type="email"
+            name="notifyEmail"
+            maxLength="254"
+            dir="ltr"
+            defaultValue={settings.notifyEmail}
+            key={settings.notifyEmail}
+            placeholder={settings.recipient}
+          />
+        </label>
+        <button className="button" disabled={busy}>
+          {t("save")}
+        </button>
+      </form>
+      <p className="muted small">
+        {t("activityRecipient")}: <b dir="ltr">{settings.recipient || "—"}</b>
+        {!settings.emailConfigured && <> · {t("emailServiceMissing")}</>}
+      </p>
+    </section>
+  );
+}
+// Information each account type gave at registration.
+export function AccountDetails({ account, t }) {
+  const d = account.details || {};
+  const tc = account.taxCheck;
+  const rows = [
+    ["phone", d.phone],
+    ["countryLabel", d.country],
+    ["city", d.city],
+    ["tradeActivity", d.activity && t("activity_" + d.activity)],
+    ["mainProducts", d.products],
+    ["transportLicense", d.license],
+    ["fleetSize", d.fleetSize],
+    ["serviceRoutes", d.routes],
+    ["equipmentTypes", d.equipment],
+    ["warehouseLocation", d.warehouse],
+    ["taxId", account.taxId],
+  ].filter(([, v]) => v !== undefined && v !== null && v !== "");
+  if (!rows.length && !tc) return null;
+  return (
+    <div className="account-details">
+      <dl>
+        {rows.map(([k, v]) => (
+          <React.Fragment key={k}>
+            <dt>{t(k)}</dt>
+            <dd dir={["phone", "taxId", "transportLicense"].includes(k) ? "ltr" : undefined}>{v}</dd>
+          </React.Fragment>
+        ))}
+      </dl>
+      {tc && <TaxBadge check={tc} t={t} />}
+    </div>
+  );
+}
+export function TaxBadge({ check, t }) {
+  const kind = check.status === "valid" ? "approved" : check.status === "invalid" ? "rejected" : "pending";
+  return (
+    <p className="small">
+      <span className={`badge ${kind}`}>{t("tax_" + check.status)}</span> {t("taxMethod_" + check.method)}
+      {check.registeredName ? ` · ${check.registeredName}` : ""}
+    </p>
   );
 }

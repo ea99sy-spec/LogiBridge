@@ -163,11 +163,7 @@ export function publicAdvancedRoutes(app) {
         (l) => l.tokenHash === hash(token) && !l.revoked && Date.parse(l.expiresAt) > Date.now(),
       ),
       sh = s.shipments.find((sh) => sh.id === link?.shipmentId && sh.carrierId === link.carrierId);
-    if (
-      !link ||
-      !sh ||
-      (!demoActive(s) && s.users.find((u) => u.id === link.carrierId)?.demo)
-    )
+    if (!link || !sh || (!demoActive(s) && s.users.find((u) => u.id === link.carrierId)?.demo))
       throw Object.assign(new Error("Driver link expired or revoked"), { status: 401 });
     return { link, sh };
   };
@@ -551,8 +547,7 @@ export function integrationAuth(req, res, next) {
     user = s.users.find(
       (u) => u.id === key?.userId && u.role === "merchant" && u.accountType !== "individual",
     );
-  if (!user || (!demoActive(s) && user.demo))
-    return res.status(401).json({ error: "Invalid API key" });
+  if (!user || (!demoActive(s) && user.demo)) return res.status(401).json({ error: "Invalid API key" });
   if (requiresApproval(user)) return res.status(403).json({ error: "Account approval required" });
   const now = Date.now(),
     count = apiCounts.get(key.id) || { until: now + 60000, n: 0 };

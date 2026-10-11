@@ -15,7 +15,12 @@ test("every unapproved registered account has only onboarding modules", () => {
     verified: false,
   });
   assert.deepEqual(person, ["dashboard", "profile", "kyb", "security"]);
-  const approved = workspaceModules({ role: "merchant", accountType: "individual", demo: false, verified: true });
+  const approved = workspaceModules({
+    role: "merchant",
+    accountType: "individual",
+    demo: false,
+    verified: true,
+  });
   assert.ok(approved.includes("newShipment") && approved.includes("directory"));
 });
 test("email queue deduplicates events and honors company announcement preferences", () => {

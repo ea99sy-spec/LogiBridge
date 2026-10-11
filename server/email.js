@@ -85,7 +85,9 @@ export function queueEmail(s, userId, event, details = {}, key) {
   const link =
     details.url ||
     (shipmentEvents.has(event) ? `${url}/workspace/tracking` : "") ||
-    (event.startsWith("order_") ? `${url}/workspace/${event === "order_received" ? "orders" : "marketplace"}` : "") ||
+    (event.startsWith("order_")
+      ? `${url}/workspace/${event === "order_received" ? "orders" : "marketplace"}`
+      : "") ||
     `${url}/workspace/${event === "company_joined" ? "directory" : event === "message_received" ? "hub" : event === "bid_received" ? "shipments" : "dashboard"}`;
   s.emailOutbox.push({
     id: randomUUID(),

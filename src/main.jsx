@@ -210,21 +210,55 @@ function ShipmentCard({ s, compact = false }) {
                 {t("fund")}
               </button>
             )}
-            {owner && escrow?.status === "awaiting_funding" && !user.demo && (
-              <ShipmentPayment s={s} data={data} t={t} run={run} busy={busy} />
-            )}{" "}
-            {carrier && s.carrierId === user.id && s.status === "assigned" && escrow?.status === "held" && (
-              <button disabled={busy} className="button" onClick={() => action("dispatch")}>
-                {t("dispatch")}
-              </button>
+            {owner && escrow?.status === "awaiting_funding" && (
+              <div className="payment-options">
+                <p className="small">
+                  <b>{t("choosePayment")}</b>
+                </p>
+                {!user.demo && <ShipmentPayment s={s} data={data} t={t} run={run} busy={busy} />}
+                {!(data.payments || []).some((p) => p.shipmentId === s.id && p.status === "pending") && (
+                  <button
+                    disabled={busy}
+                    className="button ghost"
+                    onClick={() => window.confirm(t("payDirectConfirm")) && action("pay_direct")}
+                  >
+                    {t("payDirect")}
+                  </button>
+                )}
+                <p className="muted small">{t("paymentMethodsNote")}</p>
+              </div>
             )}
+            {owner && escrow?.status === "direct_pending" && (
+              <p className="notice">{t("waitingCarrierPayment")}</p>
+            )}
+            {carrier && s.carrierId === user.id && escrow?.status === "direct_pending" && (
+              <button
+                disabled={busy}
+                className="button"
+                onClick={() => window.confirm(t("confirmPaymentConfirm")) && action("confirm_payment")}
+              >
+                {t("confirmPaymentReceived")}
+              </button>
+            )}{" "}
+            {carrier &&
+              s.carrierId === user.id &&
+              s.status === "assigned" &&
+              ["held", "direct_paid"].includes(escrow?.status) && (
+                <button disabled={busy} className="button" onClick={() => action("dispatch")}>
+                  {t("dispatch")}
+                </button>
+              )}
             {carrier && s.carrierId === user.id && s.status === "transit" && (
               <button disabled={busy} className="button" onClick={() => action("arrive")}>
                 {t("arrive")}
               </button>
             )}
             {owner && s.status === "arrived" && (
-              <button disabled={busy} className="button" onClick={() => action("confirm")}>
+              <button
+                disabled={busy}
+                className="button"
+                onClick={() => window.confirm(t("confirmDeliveryConfirm")) && action("confirm")}
+              >
                 {t("confirm")}
               </button>
             )}
@@ -248,6 +282,25 @@ function ShipmentCard({ s, compact = false }) {
               </button>
             )}
           </div>
+          {s.status === "delivered" && (
+            <div className="operation-complete">
+              <b>✓ {t("operationComplete")}</b>
+              <small>
+                {t("completedOn")} {new Date(s.completedAt || s.date + "T12:00:00").toLocaleDateString(lang)}
+                {escrow?.paymentMethod === "direct" ? " · " + t("paidDirect") : ""}
+              </small>
+              {[s.ownerId, s.carrierId].includes(user.id) && (
+                <a
+                  className="button ghost small-button"
+                  href={`/api/reports?format=print&kind=invoices&shipment=${encodeURIComponent(s.id)}`}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {t("operationSummary")} ↗
+                </a>
+              )}
+            </div>
+          )}
           <DisputePanel s={s} data={data} t={t} run={run} busy={busy} />
         </>
       )}

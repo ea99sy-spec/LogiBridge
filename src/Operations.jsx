@@ -1,4 +1,4 @@
-import { AdminEmailSettings } from "./Profiles";
+import { AdminEmailSettings, AdminSiteSettings, AccountDetails, TaxBadge } from "./Profiles";
 import { AdminPayments, BankTransfers } from "./Payments";
 import React, { useEffect, useState } from "react";
 import { countryName } from "../shared/countries";
@@ -564,6 +564,7 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
                       {t(a.verificationStatus || "not_submitted")}
                     </span>
                     {a.disabled && <span className="badge rejected">{t("suspended")}</span>}
+                    {a.taxCheck && <TaxBadge check={a.taxCheck} t={t} />}
                   </td>
                   <td>{t(a.plan)}</td>
                   <td>{a.shipmentCount}</td>
@@ -579,6 +580,31 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
                     >
                       {t("accountDetails")} ↗
                     </button>
+                    {!data.user.demo && !a.demo && a.verificationStatus !== "approved" && (
+                      <button
+                        className="button small-button"
+                        disabled={busy}
+                        onClick={() =>
+                          window.confirm(t("approveAccountConfirm")) &&
+                          run(`/admin/accounts/${a.id}/review`, { status: "approved" })
+                        }
+                      >
+                        ✓ {t("approveAccount")}
+                      </button>
+                    )}
+                    {!data.user.demo && !a.demo && a.verificationStatus !== "rejected" && (
+                      <button
+                        className="button ghost small-button danger"
+                        disabled={busy}
+                        onClick={() => {
+                          const reason = window.prompt(t("rejectionReasonPrompt"));
+                          if (reason && reason.trim())
+                            run(`/admin/accounts/${a.id}/review`, { status: "rejected", reason });
+                        }}
+                      >
+                        ✕ {t("rejectAccount")}
+                      </button>
+                    )}
                     {!data.user.demo && !a.demo && (
                       <button
                         className={`button ghost small-button ${a.disabled ? "" : "danger"}`}
@@ -610,6 +636,32 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
           {detail ? (
             <>
               <h3>{detail.account.name}</h3>
+              <AccountDetails account={detail.account} t={t} />
+              {!data.user.demo && detail.account.taxId && (
+                <p className="actions">
+                  <button
+                    className="button ghost small-button"
+                    disabled={busy}
+                    onClick={async () => {
+                      await run(`/admin/accounts/${detail.account.id}/tax-check`, {});
+                      setSelected("");
+                      setTimeout(() => setSelected(detail.account.id), 0);
+                    }}
+                  >
+                    {t("recheckTax")}
+                  </button>
+                  {detail.account.details?.country === "TR" && (
+                    <a
+                      className="button ghost small-button"
+                      href="https://intvrg.gib.gov.tr/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {t("gibCheck")} ↗
+                    </a>
+                  )}
+                </p>
+              )}
               {detail.account.profile?.about && (
                 <>
                   <h4>{t("aboutUs")}</h4>
@@ -653,6 +705,7 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
       )}
       {!accountsOnly && (
         <>
+          <AdminSiteSettings data={data} t={t} run={run} busy={busy} />
           <AdminEmailSettings data={data} t={t} run={run} busy={busy} />
           <AdminPayments data={data} t={t} run={run} busy={busy} />
           <BankTransfers data={data} t={t} run={run} busy={busy} />

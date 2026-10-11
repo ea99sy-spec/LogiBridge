@@ -1,5 +1,6 @@
 import { ContactEmail } from "./Profiles";
 import React, { useState, useEffect } from "react";
+import CountrySelect from "./CountrySelect";
 const accounts = ["merchant", "carrier", "supplier", "individual", "admin"];
 const symbols = { merchant: "▤", carrier: "⇄", supplier: "▧", individual: "◉", admin: "◇" };
 export default function AccountAccess({ t, langSelect, run, busy, toast, onEntered, user }) {
@@ -35,13 +36,11 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
       if (result) setForgotResult(result);
       return;
     }
-    const result = await run(register ? "/auth/register" : "/auth/login", {
-      accountType: type,
-      name: b.name,
-      taxId: b.taxId,
-      email: b.email,
-      password: b.password,
-    });
+    const { confirmPassword, ...fields } = b;
+    const result = await run(
+      register ? "/auth/register" : "/auth/login",
+      register ? { ...fields, accountType: type } : { email: b.email, password: b.password },
+    );
     if (result) onEntered?.(register, result.user);
   }
   return (
@@ -158,6 +157,32 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
                       />
                     </label>
                   )}
+                  {register && !forgot && (
+                    <>
+                      <CountrySelect
+                        t={t}
+                        label={type === "individual" ? "residenceCountry" : "registrationCountry"}
+                      />
+                      <div className="form-grid">
+                        <label className="field">
+                          <span>{t("city")}</span>
+                          <input name="city" required maxLength="80" autoComplete="address-level2" />
+                        </label>
+                        <label className="field">
+                          <span>{t("phone")}</span>
+                          <input
+                            name="phone"
+                            type="tel"
+                            required
+                            maxLength="30"
+                            dir="ltr"
+                            placeholder="+90 5xx xxx xx xx"
+                            autoComplete="tel"
+                          />
+                        </label>
+                      </div>
+                    </>
+                  )}
                   {register && type !== "individual" && (
                     <label className="field">
                       <span>{t("taxId")}</span>
@@ -166,11 +191,67 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
                         required
                         minLength="3"
                         maxLength="40"
-                        pattern="[A-Za-z0-9][A-Za-z0-9 ./-]{2,39}"
                         dir="ltr"
                         autoComplete="off"
                       />
+                      <small>{t("taxIdHint")}</small>
                     </label>
+                  )}
+                  {register && type === "merchant" && (
+                    <>
+                      <label className="field">
+                        <span>{t("tradeActivity")}</span>
+                        <select name="activity" required defaultValue="">
+                          <option value="" disabled>
+                            {t("choose")}
+                          </option>
+                          {["import", "export", "both"].map((k) => (
+                            <option key={k} value={k}>
+                              {t("activity_" + k)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="field">
+                        <span>{t("mainProducts")}</span>
+                        <input name="products" required maxLength="300" placeholder={t("mainProductsHint")} />
+                      </label>
+                    </>
+                  )}
+                  {register && type === "carrier" && (
+                    <>
+                      <div className="form-grid">
+                        <label className="field">
+                          <span>{t("transportLicense")}</span>
+                          <input name="license" required maxLength="60" dir="ltr" />
+                        </label>
+                        <label className="field">
+                          <span>{t("fleetSize")}</span>
+                          <input name="fleetSize" type="number" required min="1" max="10000" step="1" />
+                        </label>
+                      </div>
+                      <label className="field">
+                        <span>{t("serviceRoutes")}</span>
+                        <input name="routes" required maxLength="300" placeholder={t("serviceRoutesHint")} />
+                      </label>
+                    </>
+                  )}
+                  {register && type === "supplier" && (
+                    <>
+                      <label className="field">
+                        <span>{t("equipmentTypes")}</span>
+                        <input
+                          name="equipment"
+                          required
+                          maxLength="300"
+                          placeholder={t("equipmentTypesHint")}
+                        />
+                      </label>
+                      <label className="field">
+                        <span>{t("warehouseLocation")}</span>
+                        <input name="warehouse" maxLength="120" />
+                      </label>
+                    </>
                   )}
                   <label className="field">
                     <span>{t("email")}</span>
@@ -246,7 +327,7 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
                   </a>
                 </p>
               )}
-              {demo && !forgot && type !== "admin" && (
+              {demo && !forgot && !register && (
                 <div className="demo-access">
                   <span>{t("demoOnly")}</span>
                   <button
