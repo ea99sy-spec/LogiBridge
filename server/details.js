@@ -1,4 +1,5 @@
 import { validCountry } from "../shared/countries.js";
+import { crossingKeys } from "../shared/crossings.js";
 
 const text = (v, max, label, optional = false) => {
   const value = typeof v === "string" ? v.trim() : "";
@@ -26,6 +27,13 @@ export function readDetails(accountType, b) {
     if (!Number.isInteger(fleet) || fleet < 1 || fleet > 10000) throw new Error("Invalid fleet size");
     details.fleetSize = fleet;
     details.routes = text(b.routes, 300);
+  } else if (accountType === "broker") {
+    details.license = text(b.license, 60);
+    const list = (Array.isArray(b.crossings) ? b.crossings : String(b.crossings || "").split(","))
+      .map((x) => String(x).trim())
+      .filter(Boolean);
+    if (!list.length || list.some((x) => !crossingKeys.includes(x))) throw new Error("Choose your crossings");
+    details.crossings = [...new Set(list)];
   } else if (accountType === "supplier") {
     details.equipment = text(b.equipment, 300);
     details.warehouse = text(b.warehouse, 120, "warehouse", true);

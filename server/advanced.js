@@ -2,7 +2,7 @@ import { requiresApproval } from "../shared/access.js";
 import { randomBytes, createHash } from "node:crypto";
 import { readPosition } from "./position.js";
 import { readState, mutate, id, subscribeState } from "./store.js";
-import { transitionShipment, positive } from "./domain.js";
+import { transitionShipment, positive, syncOrder } from "./domain.js";
 import { sameWorld, demoActive } from "./world.js";
 import { queueAdminEmail } from "./email.js";
 const hash = (v) => createHash("sha256").update(v).digest("hex");
@@ -199,8 +199,10 @@ export function publicAdvancedRoutes(app) {
             : text(req.body.location, 120),
         note = req.body.note ? text(req.body.note, 500) : "";
       if (position) sh.lastPosition = { ...position, at: new Date().toISOString() };
-      if (req.body.action)
+      if (req.body.action) {
         transitionShipment(s, sh, req.body.action, { id: link.carrierId, role: "carrier" });
+        if (sh.parentId) syncOrder(s, sh.parentId);
+      }
       sh.lastLocation = location;
       s.trackingEvents.push({
         id: id(),
@@ -295,7 +297,7 @@ export function advancedRoutes(app) {
     });
   });
   app.get("/api/reports", async (req, res) => {
-    allowed(req.user, "merchant", "carrier");
+    allowed(req.user, "merchant", "carrier", "broker");
     const month = req.query.month || "";
     if (month && !/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) throw new Error("Invalid month");
     const s = readState(),

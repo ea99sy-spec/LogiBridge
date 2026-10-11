@@ -1,9 +1,8 @@
+import { crossingKeys } from "../shared/crossings.js";
 export const optionalFeatures = ["tracking", "ratings", "marketplace", "contracts"];
-export const crossingDocuments = {
-  bab: ["invoice", "packing", "origin", "transport", "customs"],
-  rai: ["invoice", "packing", "origin", "transport", "customs"],
-  kasab: ["invoice", "packing", "origin", "transport", "customs"],
-};
+export const crossingDocuments = Object.fromEntries(
+  crossingKeys.map((k) => [k, ["invoice", "packing", "origin", "transport", "customs"]]),
+);
 export function positive(value, label) {
   const n = Number(value);
   if (!Number.isFinite(n) || n <= 0 || n > 100000000) throw new Error(`Invalid ${label}`);
@@ -36,7 +35,19 @@ export function reserveGroup(group, volume) {
   group.booked = Math.round((group.booked + volume) * 100) / 100;
   return { volume, price: Math.round(volume * group.pricePerM3 * 100) / 100 };
 }
+// A cross-border stage can only start after the previous stage has finished
+// (goods must reach the crossing before clearance, and be cleared before the last leg).
+function previousStageDone(state, shipment) {
+  if (!shipment.parentId || !shipment.legIndex) return true;
+  const previous = state.shipments.find(
+    (x) => x.parentId === shipment.parentId && x.legIndex === shipment.legIndex - 1,
+  );
+  return !previous || ["arrived", "delivered"].includes(previous.status);
+}
 export function transitionShipment(state, shipment, action, actor) {
+  if (shipment.isOrder) throw new Error("Invalid transition or actor");
+  if (action === "dispatch" && !previousStageDone(state, shipment))
+    throw new Error("Previous stage not finished");
   const escrow = state.escrows.find((e) => e.shipmentId === shipment.id);
   if (action === "cancel" && actor.id === shipment.ownerId && shipment.status === "open") {
     shipment.status = "cancelled";
@@ -106,4 +117,47 @@ export function transitionShipment(state, shipment, action, actor) {
     shipment.status = "cancelled";
     escrow.status = escrow.simulated === false ? "refund_pending" : "refunded";
   } else throw new Error("Invalid transition or actor");
+}
+
+// Keeps a cross-border order's overall status in line with its three stages.
+// Returns true when this call closed the whole order.
+export function syncOrder(state, parentId) {
+  const order = state.shipments.find((x) => x.id === parentId && x.isOrder);
+  if (!order) return false;
+  const legs = state.shipments.filter((x) => x.parentId === order.id);
+  const before = order.status;
+  if (legs.every((l) => l.status === "cancelled")) order.status = "cancelled";
+  else if (legs.every((l) => l.status === "delivered")) {
+    order.status = "delivered";
+    order.completedAt ||= new Date().toISOString();
+  } else if (legs.some((l) => l.status === "disputed")) order.status = "disputed";
+  else if (legs.some((l) => ["transit", "arrived", "delivered"].includes(l.status))) order.status = "transit";
+  else if (legs.every((l) => l.status !== "open")) order.status = "assigned";
+  else order.status = "coordinating";
+  return before !== "delivered" && order.status === "delivered";
+}
+
+// Cancels a whole order while nothing has been paid or started.
+export function cancelOrder(state, order, actor) {
+  if (!order.isOrder || actor.id !== order.ownerId) throw new Error("Invalid transition or actor");
+  const legs = state.shipments.filter((x) => x.parentId === order.id);
+  for (const leg of legs) {
+    const escrow = state.escrows.find((e) => e.shipmentId === leg.id);
+    const pending = (state.payments || []).some((p) => p.shipmentId === leg.id && p.status === "pending");
+    const cancellable =
+      leg.status === "open" ||
+      leg.status === "cancelled" ||
+      (leg.status === "assigned" && ["awaiting_funding", "direct_pending"].includes(escrow?.status) && !pending);
+    if (!cancellable) throw new Error("Some stages already started");
+  }
+  for (const leg of legs) {
+    if (leg.status === "cancelled") continue;
+    leg.status = "cancelled";
+    leg.cancelledAt = new Date().toISOString();
+    const escrow = state.escrows.find((e) => e.shipmentId === leg.id);
+    if (escrow) escrow.status = "cancelled";
+  }
+  order.status = "cancelled";
+  order.cancelledAt = new Date().toISOString();
+  return legs;
 }

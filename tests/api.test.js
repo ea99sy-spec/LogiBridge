@@ -79,9 +79,10 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
     await call("merchant", "/shipments", {
       title: "Integration cargo",
       origin: "Gaziantep",
-      destination: "Aleppo",
+      destination: "Istanbul",
       originCountry: "TR",
-      destinationCountry: "SY",
+      destinationCountry: "TR",
+      transportType: "domesticTR",
       description: "Cargo test",
       hsCode: "010121",
       senderName: "Test Sender",
@@ -89,7 +90,6 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
       phone: "TEST-ONLY-PHONE",
       destinationAddress: "Test delivery address",
       category: "textiles",
-      crossing: "bab",
       volume: 7,
       weight: 500,
       date: "2099-01-01",
@@ -117,7 +117,19 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
     assert.equal(domestic.body.crossing, null);
     assert.equal(domestic.body.transportType, type);
   }
-  assert.equal((await call("merchant", "/shipments", { ...shipment, crossing: null })).status, 400);
+  // A Türkiye⇄Syria shipment needs a border crossing.
+  assert.equal(
+    (
+      await call("merchant", "/shipments", {
+        ...shipment,
+        originCountry: "TR",
+        destinationCountry: "SY",
+        transportType: "crossBorder",
+        crossing: null,
+      })
+    ).status,
+    400,
+  );
   assert.equal(shipment.hsCode, "010121");
   assert.equal(
     (await call("merchant", "/state")).body.shipments.find((s) => s.id === shipment.id).hsCode,

@@ -2,7 +2,10 @@ import express from "express";
 import { randomBytes } from "node:crypto";
 import { createClient } from "redis";
 import { initialize, readState, mutate, id } from "./store.js";
+import { splitCrossBorder } from "../shared/crossings.js";
 import {
+  syncOrder,
+  cancelOrder,
   acceptBid,
   reserveGroup,
   transitionShipment,
@@ -181,7 +184,7 @@ export async function createApp() {
   }
   app.post("/api/auth/register", authLimit, async (req, res) => {
     const b = req.body;
-    if (!["merchant", "carrier", "supplier", "individual"].includes(b.accountType))
+    if (!["merchant", "carrier", "supplier", "individual", "broker"].includes(b.accountType))
       throw new Error("Invalid account type");
     const email = txt(b.email, 254).toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Invalid email");
@@ -520,8 +523,37 @@ export async function createApp() {
           shipment.integrationKey = requestKey;
         }
       }
-      s.shipments.push(shipment);
-      matchRoutes(s, shipment);
+      if (shipment.transportType === "crossBorder") {
+        // Türkiye⇄Syria: an order with three stages, each taken by its own provider.
+        shipment.isOrder = true;
+        shipment.status = "coordinating";
+        shipment.legs = [];
+        for (const leg of splitCrossBorder(shipment)) {
+          const child = {
+            ...shipment,
+            id: id(),
+            isOrder: false,
+            legs: undefined,
+            integrationKey: undefined,
+            parentId: shipment.id,
+            legType: leg.legType,
+            legIndex: leg.legIndex,
+            originCountry: leg.originCountry,
+            destinationCountry: leg.destinationCountry,
+            transportType: leg.transportType,
+            origin: leg.from || shipment.origin,
+            destination: leg.to || shipment.destination,
+            status: "open",
+          };
+          shipment.legs.push(child.id);
+          s.shipments.push(child);
+          if (leg.legType !== "clearance") matchRoutes(s, child);
+        }
+        s.shipments.push(shipment);
+      } else {
+        s.shipments.push(shipment);
+        matchRoutes(s, shipment);
+      }
       if (!req.user.demo)
         queueAdminEmail(s, "shipment_created", {
           الشحنة: shipment.title,
@@ -543,7 +575,7 @@ export async function createApp() {
     res.status(201).json(created);
   });
   app.post("/api/bids", async (req, res) => {
-    role(req.user, "carrier");
+    role(req.user, "carrier", "broker");
     const b = req.body;
     const price = positive(b.price, "price"),
       days = positive(b.days, "days"),
@@ -553,6 +585,9 @@ export async function createApp() {
       const target = s.shipments.find((x) => x.id === b.shipmentId);
       if (!target || !shipmentWorld(s, req.user, target)) throw new Error("Shipment unavailable");
       if (target.status !== "open") throw new Error("Shipment closed");
+      // Customs clearance stages are for customs brokers; transport stages for carriers.
+      if ((target.legType === "clearance") !== (req.user.role === "broker"))
+        throw new Error("This stage needs a different provider type");
       if (s.bids.some((x) => x.shipmentId === b.shipmentId && x.carrierId === req.user.id))
         throw new Error("You already submitted an offer");
       notice(s, s.shipments.find((x) => x.id === b.shipmentId).ownerId, "bid_received", b.shipmentId);
@@ -577,7 +612,7 @@ export async function createApp() {
   });
   // A carrier may withdraw its own offer while the shipment is still open.
   app.delete("/api/bids/:id", async (req, res) => {
-    role(req.user, "carrier");
+    role(req.user, "carrier", "broker");
     await mutate((s) => {
       const bid = s.bids.find((x) => x.id === req.params.id && x.carrierId === req.user.id);
       const sh = s.shipments.find((x) => x.id === bid?.shipmentId);
@@ -592,6 +627,7 @@ export async function createApp() {
     role(req.user, "merchant");
     const sh = await mutate((s) => {
       const sh = acceptBid(s, req.params.id, req.body.bidId, req.user.id);
+      if (sh.parentId) syncOrder(s, sh.parentId);
       s.trackingEvents.push({
         id: id(),
         shipmentId: sh.id,
@@ -623,8 +659,31 @@ export async function createApp() {
     await mutate((s) => {
       const sh = s.shipments.find((x) => x.id === req.params.id);
       if (!sh || !shipmentWorld(s, req.user, sh)) throw new Error("Unknown shipment");
+      if (sh.isOrder) {
+        if (req.body.action !== "cancel") throw new Error("Invalid transition or actor");
+        const legs = cancelOrder(s, sh, req.user);
+        for (const leg of legs) {
+          const people = new Set([
+            ...s.bids.filter((b) => b.shipmentId === leg.id).map((b) => b.carrierId),
+            leg.carrierId,
+          ]);
+          for (const c of [...people].filter(Boolean)) notice(s, c, "cancel", leg.id);
+          if (!req.user.demo) operationEmails(s, leg, "cancel", [...people].filter(Boolean));
+        }
+        return;
+      }
       const bidders = s.bids.filter((b) => b.shipmentId === sh.id).map((b) => b.carrierId);
       transitionShipment(s, sh, req.body.action, req.user);
+      if (sh.parentId && syncOrder(s, sh.parentId) && !req.user.demo) {
+        const order = s.shipments.find((x) => x.id === sh.parentId);
+        queueEmail(s, order.ownerId, "operation_completed", { shipment: order.title }, `order-done/${order.id}`);
+        queueAdminEmail(
+          s,
+          "operation_completed",
+          { الطلب: order.title, المسار: `${order.origin} → ${order.destination}` },
+          `admin/order-done/${order.id}`,
+        );
+      }
       if (req.body.action === "cancel") for (const c of new Set(bidders)) notice(s, c, "cancel", sh.id);
       s.trackingEvents.push({
         id: id(),

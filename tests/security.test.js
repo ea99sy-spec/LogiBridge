@@ -75,7 +75,9 @@ const shipment = {
   volume: 2,
   weight: 300,
   hsCode: "520812",
-  crossing: "bab",
+  originCountry: "TR",
+  destinationCountry: "TR",
+  transportType: "domesticTR",
   date: new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10),
 };
 
@@ -552,4 +554,71 @@ test("company profile pages are for approved members and show contact details", 
   assert.ok((await call("buyer", "/directory")).body.some((u) => u.id === sid));
   // Anonymous visitors cannot see profiles.
   assert.equal((await call("anon", `/companies/${sid}`)).status, 401);
+});
+
+test("Türkiye⇄Syria orders run as three stages with the right providers", async (t) => {
+  const server = await startServer(3218, { DEMO_MODE: "true" });
+  t.after(server.stop);
+  const { call } = server;
+  for (const who of ["merchant", "carrier", "broker"]) await call(who, "/login", { userId: who });
+  const order = (
+    await call("merchant", "/shipments", {
+      ...shipment,
+      origin: "Gaziantep",
+      destination: "Aleppo",
+      originCountry: "TR",
+      destinationCountry: "SY",
+      transportType: "crossBorder",
+      crossing: "salameh",
+    })
+  ).body;
+  assert.equal(order.isOrder, true);
+  assert.equal(order.legs.length, 3);
+  const state = (await call("merchant", "/state")).body;
+  const legs = order.legs.map((id) => state.shipments.find((s) => s.id === id));
+  assert.deepEqual(
+    legs.map((l) => l.legType),
+    ["origin_leg", "clearance", "destination_leg"],
+  );
+  assert.equal(legs[0].destination, "Öncüpınar (Kilis)");
+  assert.equal(legs[2].origin, "Bab al-Salama (Azaz)");
+  // Carriers see transport stages, brokers see clearance; nobody bids on the order itself.
+  const carrierSees = (await call("carrier", "/state")).body.shipments.map((s) => s.id);
+  assert.ok(carrierSees.includes(legs[0].id) && !carrierSees.includes(legs[1].id) && !carrierSees.includes(order.id));
+  assert.ok((await call("broker", "/state")).body.shipments.some((s) => s.id === legs[1].id));
+  assert.equal((await call("carrier", "/bids", { shipmentId: legs[1].id, price: 50, days: 1 })).status, 400);
+  assert.equal((await call("broker", "/bids", { shipmentId: legs[0].id, price: 50, days: 1 })).status, 400);
+  assert.equal((await call("carrier", "/bids", { shipmentId: order.id, price: 50, days: 1 })).status, 400);
+  // Assign the three stages and pay each directly.
+  const providers = ["carrier", "broker", "carrier"];
+  for (const [i, leg] of legs.entries()) {
+    assert.equal((await call(providers[i], "/bids", { shipmentId: leg.id, price: 100 + i, days: 1 })).status, 201);
+    const bid = (await call("merchant", "/state")).body.bids.find((b) => b.shipmentId === leg.id);
+    assert.equal((await call("merchant", `/shipments/${leg.id}/accept`, { bidId: bid.id })).status, 200);
+    await call("merchant", `/shipments/${leg.id}/action`, { action: "pay_direct" });
+    await call(providers[i], `/shipments/${leg.id}/action`, { action: "confirm_payment" });
+  }
+  const act = (who, leg, action) => call(who, `/shipments/${leg.id}/action`, { action });
+  // Clearance cannot start before goods reach the crossing.
+  assert.equal((await act("broker", legs[1], "dispatch")).body.error, "Previous stage not finished");
+  for (const [i, leg] of legs.entries()) {
+    assert.equal((await act(providers[i], leg, "dispatch")).status, 200);
+    assert.equal((await act(providers[i], leg, "arrive")).status, 200);
+    assert.equal((await act("merchant", leg, "confirm")).status, 200);
+  }
+  const done = (await call("merchant", "/state")).body.shipments.find((s) => s.id === order.id);
+  assert.equal(done.status, "delivered");
+  // A fresh order can be cancelled as a whole before anything started.
+  const second = (
+    await call("merchant", "/shipments", {
+      ...shipment,
+      originCountry: "SY",
+      destinationCountry: "TR",
+      transportType: "crossBorder",
+      crossing: "bab",
+    })
+  ).body;
+  assert.equal((await call("merchant", `/shipments/${second.id}/action`, { action: "cancel" })).status, 200);
+  const after = (await call("merchant", "/state")).body.shipments.filter((s) => s.parentId === second.id);
+  assert.ok(after.every((s) => s.status === "cancelled"));
 });

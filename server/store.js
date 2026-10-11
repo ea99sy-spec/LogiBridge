@@ -142,6 +142,15 @@ export async function initialize() {
       verified: false,
       plan: "free",
     });
+  if (!state.users.some((u) => u.id === "broker"))
+    state.users.push({
+      id: "broker",
+      role: "broker",
+      accountType: "broker",
+      name: "Border Clearance Co.",
+      verified: true,
+      plan: "free",
+    });
   if (!state.users.some((u) => u.id === "individual"))
     state.users.push({
       id: "individual",
@@ -153,7 +162,7 @@ export async function initialize() {
     });
   for (const user of state.users) {
     user.accountType ||= user.role;
-    user.demo ??= ["merchant", "carrier", "admin", "supplier", "individual"].includes(user.id);
+    user.demo ??= ["merchant", "carrier", "admin", "supplier", "individual", "broker"].includes(user.id);
     user.verificationStatus ||= user.verified ? "approved" : "not_submitted";
     user.verificationLevel ||= user.verified ? "demo" : "none";
   }
@@ -229,6 +238,26 @@ export async function initialize() {
         location: "Istanbul, Türkiye",
         website: "",
         companyEmails: false,
+      },
+    },
+    broker: {
+      email: "broker.demo@logibridge.example",
+      taxId: "1111111111",
+      details: {
+        phone: "+90 348 000 00 05",
+        city: "Kilis",
+        country: "TR",
+        license: "GM-DEMO-208",
+        crossings: ["salameh", "bab", "rai"],
+      },
+      profile: {
+        about: "Border Clearance Co. handles customs and truck-to-truck transfer at the northern crossings.",
+        services: "Customs declarations, transshipment supervision in the customs yard, document checks",
+        location: "Kilis, Türkiye",
+        website: "",
+        contactEmail: "clearance@border-co.example",
+        contactPhone: "+90 348 000 10 05",
+        companyEmails: true,
       },
     },
     admin: { email: "admin.demo@logibridge.example", details: {}, profile: {} },
@@ -334,6 +363,59 @@ export async function initialize() {
       source: "demo",
       createdAt: now,
     });
+  }
+  // Demo three-stage order (Türkiye → Syria) so visitors can see how a crossing works.
+  if (!state.stagedDemoSeeded) {
+    state.stagedDemoSeeded = true;
+    const now = new Date().toISOString(),
+      date = new Date(Date.now() + 6 * 86400000).toISOString().slice(0, 10);
+    const base = {
+      ownerId: "merchant",
+      title: "Cotton fabric — Gaziantep to Aleppo",
+      category: "textiles",
+      volume: 12,
+      weight: 1800,
+      hsCode: "520812",
+      date,
+      crossing: "salameh",
+      createdAt: now,
+    };
+    const legs = [
+      ["origin_leg", "Gaziantep", "Öncüpınar (Kilis)", "TR", "TR", "domesticTR"],
+      ["clearance", "Öncüpınar (Kilis)", "Bab al-Salama (Azaz)", "TR", "SY", "clearance"],
+      ["destination_leg", "Bab al-Salama (Azaz)", "Aleppo", "SY", "SY", "domesticSY"],
+    ].map(([legType, origin, destination, oc, dc, transportType], legIndex) => ({
+      ...base,
+      id: "demo-order-leg-" + (legIndex + 1),
+      parentId: "demo-order",
+      legType,
+      legIndex,
+      origin,
+      destination,
+      originCountry: oc,
+      destinationCountry: dc,
+      transportType,
+      status: "open",
+    }));
+    state.shipments.push(
+      {
+        ...base,
+        id: "demo-order",
+        isOrder: true,
+        legs: legs.map((l) => l.id),
+        origin: "Gaziantep",
+        destination: "Aleppo",
+        originCountry: "TR",
+        destinationCountry: "SY",
+        transportType: "crossBorder",
+        status: "coordinating",
+      },
+      ...legs,
+    );
+    state.bids.push(
+      { id: "demo-bid-leg1", shipmentId: "demo-order-leg-1", carrierId: "carrier", price: 220, days: 1, note: "Gaziantep pickup, same day to Öncüpınar", createdAt: now },
+      { id: "demo-bid-leg2", shipmentId: "demo-order-leg-2", carrierId: "broker", price: 140, days: 1, note: "Declaration + yard transfer supervision", createdAt: now },
+    );
   }
   if (!(await persist(state)) && cloudEnabled()) await refreshState();
 }

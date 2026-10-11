@@ -35,6 +35,7 @@ const modules = {
     "ratings",
     "marketplace",
     "contracts",
+    "border",
     "security",
   ],
   carrier: [
@@ -78,11 +79,16 @@ export function workspaceModules(user, flags = {}) {
     .filter((key) => !["ratings", "marketplace", "contracts"].includes(key) || flags[key])
     .filter((key) => !["inventory", "orders"].includes(key) || flags.marketplace);
 }
+// Carriers see open transport jobs, customs brokers see open clearance jobs,
+// and both always see the jobs assigned to them.
 export function visibleShipments(state, user) {
   return state.shipments.filter(
     (s) =>
       user.role === "admin" ||
-      (user.role === "carrier" && (s.status === "open" || s.carrierId === user.id)) ||
+      (user.role === "carrier" &&
+        ((s.status === "open" && s.legType !== "clearance" && !s.isOrder) || s.carrierId === user.id)) ||
+      (user.role === "broker" &&
+        ((s.status === "open" && s.legType === "clearance") || s.carrierId === user.id)) ||
       (user.role === "merchant" && s.ownerId === user.id),
   );
 }

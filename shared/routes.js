@@ -1,4 +1,5 @@
 import { validCountry } from "./countries.js";
+import { crossingKeys } from "./crossings.js";
 export function routeDetails(b) {
   const originCountry = b.originCountry || "TR",
     destinationCountry = b.destinationCountry || "SY";
@@ -14,7 +15,7 @@ export function routeDetails(b) {
           : "international";
   if (b.transportType && b.transportType !== transportType)
     throw new Error("Transport type conflicts with countries");
-  if (transportType === "crossBorder" && !["bab", "rai", "kasab"].includes(b.crossing))
+  if (transportType === "crossBorder" && !crossingKeys.includes(b.crossing))
     throw new Error("Border crossing required");
   return {
     originCountry,
