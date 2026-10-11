@@ -3,6 +3,12 @@
 // accounts, and registered accounts must never see demo data.
 
 export const demoEnabled = () => process.env.DEMO_MODE === "true";
+// The administrator can show or hide demo sign-in from the admin workspace.
+// Without a saved choice, the DEMO_MODE environment variable decides.
+export function demoActive(state) {
+  const saved = state?.settings?.demoLogin;
+  return typeof saved === "boolean" ? saved : demoEnabled();
+}
 
 export function isDemoUser(state, userId) {
   return !!(state.users || []).find((u) => u.id === userId)?.demo;

@@ -157,6 +157,84 @@ export async function initialize() {
     user.verificationStatus ||= user.verified ? "approved" : "not_submitted";
     user.verificationLevel ||= user.verified ? "demo" : "none";
   }
+  // Each demo account presents information that fits its own account type.
+  const demoProfiles = {
+    merchant: {
+      email: "merchant.demo@logibridge.example",
+      taxId: "1234567890",
+      details: {
+        phone: "+90 342 000 00 01",
+        city: "Gaziantep",
+        country: "TR",
+        activity: "both",
+        products: "Textiles, cotton fabric, home textiles",
+      },
+      profile: {
+        about: "Anatolia Trade imports and exports textiles between Türkiye and Syria since 2012.",
+        services: "Fabric export, raw cotton import, consolidated LCL orders",
+        location: "Gaziantep, Türkiye",
+        website: "",
+        companyEmails: true,
+      },
+    },
+    carrier: {
+      email: "carrier.demo@logibridge.example",
+      taxId: "9876543210",
+      details: {
+        phone: "+90 342 000 00 02",
+        city: "Gaziantep",
+        country: "TR",
+        license: "C2-DEMO-4471",
+        fleetSize: 14,
+        routes: "Gaziantep ⇄ Aleppo, Mersin ⇄ Idlib, Istanbul ⇄ Damascus",
+      },
+      profile: {
+        about: "Bridge Transport runs refrigerated and curtain-side trucks across Bab al-Hawa and Kasab.",
+        services: "FTL and LCL road freight, customs brokerage, door-to-door delivery",
+        location: "Gaziantep, Türkiye",
+        website: "",
+        companyEmails: true,
+      },
+    },
+    supplier: {
+      email: "supplier.demo@logibridge.example",
+      taxId: "5555555555",
+      details: {
+        phone: "+90 324 000 00 03",
+        city: "Mersin",
+        country: "TR",
+        equipment: "Containers, lashing kits, GPS trackers, pallets",
+        warehouse: "Mersin free zone",
+      },
+      profile: {
+        about: "Route Equipment rents and sells cargo equipment near Mersin port.",
+        services: "Container rental, cargo securing kits, GPS trackers",
+        location: "Mersin, Türkiye",
+        website: "",
+        companyEmails: true,
+      },
+    },
+    individual: {
+      email: "person.demo@logibridge.example",
+      details: { phone: "+90 555 000 00 04", city: "Istanbul", country: "TR" },
+      profile: {
+        about: "Sending personal goods and small parcels to family in Aleppo.",
+        services: "",
+        location: "Istanbul, Türkiye",
+        website: "",
+        companyEmails: false,
+      },
+    },
+    admin: { email: "admin.demo@logibridge.example", details: {}, profile: {} },
+  };
+  for (const [demoId, info] of Object.entries(demoProfiles)) {
+    const u = state.users.find((x) => x.id === demoId && x.demo);
+    if (!u) continue;
+    u.email ||= info.email;
+    if (info.taxId) u.taxId ||= info.taxId;
+    u.details = { ...info.details, ...(u.details || {}) };
+    if (!u.profile?.about && info.profile.about) u.profile = info.profile;
+  }
   for (const doc of state.kyb) {
     doc.kind ||= "company";
     if (doc.content) {
@@ -182,7 +260,8 @@ export async function initialize() {
       verificationLevel: "none",
       plan: "pro",
     });
-  if (process.env.DEMO_MODE === "true" && !state.operationsDemoSeeded) {
+  // Demo-only sample records; invisible to registered accounts.
+  if (!state.operationsDemoSeeded) {
     state.operationsDemoSeeded = true;
     const now = new Date().toISOString();
     state.users.push({

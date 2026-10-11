@@ -36,18 +36,21 @@ import {
 import { cloudEnabled, writeSession, readSession, deleteSession } from "./cloud-store.js";
 import { paymentRoutes, paymentState } from "./payments.js";
 import { requiresApproval } from "../shared/access.js";
-import { queueEmail, mailConfigured, flushEmails } from "./email.js";
+import { queueEmail, queueAdminEmail, mailConfigured, flushEmails } from "./email.js";
 import { profileRoutes, announceCompany } from "./profiles.js";
 import { publicAccountRoutes, privateAccountRoutes } from "./account.js";
-import { demoEnabled, sameWorld, shipmentWorld, isDemoUser } from "./world.js";
+import { readDetails } from "./details.js";
+import { verifyTaxId } from "./tax.js";
+import { normalizeTaxId } from "../shared/tax.js";
+import { demoEnabled, demoActive, sameWorld, shipmentWorld, isDemoUser } from "./world.js";
 export async function createApp() {
   await initialize();
   const app = express();
   const sessions = new Map();
   if (process.env.LOGIBRIDGE_SERVERLESS === "true" || process.env.TRUST_PROXY === "true")
     app.set("trust proxy", 1);
-  // Demo accounts are OFF unless explicitly enabled with DEMO_MODE=true.
-  const DEMO = demoEnabled();
+  // Demo sign-in follows the administrator's switch (default: DEMO_MODE variable).
+  const DEMO_NOW = () => demoActive(readState());
   let redis;
   if (process.env.REDIS_URL) {
     redis = createClient({ url: process.env.REDIS_URL });
@@ -102,10 +105,45 @@ export async function createApp() {
   function notify(state, shipment, event) {
     shipmentNotice(state, shipment, event);
   }
+  // Emails that tell each side what happened and when an operation is finished.
+  function operationEmails(s, sh, action, bidders = []) {
+    const owner = s.users.find((u) => u.id === sh.ownerId),
+      carrier = s.users.find((u) => u.id === sh.carrierId),
+      escrow = s.escrows.find((e) => e.shipmentId === sh.id);
+    const info = {
+      الشحنة: sh.title,
+      المسار: `${sh.origin} → ${sh.destination}`,
+      التاجر: owner?.name,
+      الناقل: carrier?.name,
+      المبلغ: escrow ? `${escrow.amount} USD` : "",
+    };
+    const ref = `${action}/${sh.id}`;
+    if (action === "pay_direct") {
+      queueEmail(s, sh.carrierId, "direct_payment", { shipment: sh.title }, ref);
+      queueAdminEmail(s, "direct_payment", info, ref);
+    } else if (action === "confirm_payment") {
+      queueEmail(s, sh.ownerId, "payment_confirmed", { shipment: sh.title }, ref);
+    } else if (action === "dispatch") {
+      queueEmail(s, sh.ownerId, "dispatched", { shipment: sh.title }, ref);
+      queueAdminEmail(s, "dispatched", info, ref);
+    } else if (action === "arrive") {
+      queueEmail(s, sh.ownerId, "arrived", { shipment: sh.title }, ref);
+    } else if (action === "confirm") {
+      for (const u of [sh.ownerId, sh.carrierId])
+        queueEmail(s, u, "operation_completed", { shipment: sh.title }, `${ref}/${u}`);
+      queueAdminEmail(s, "operation_completed", info, ref);
+    } else if (action === "dispute") {
+      queueAdminEmail(s, "dispute_opened", info, ref);
+    } else if (action === "cancel") {
+      for (const c of new Set([...bidders, sh.carrierId].filter(Boolean)))
+        queueEmail(s, c, "shipment_cancelled", { shipment: sh.title }, `${ref}/${c}`);
+      queueAdminEmail(s, "shipment_cancelled", info, ref);
+    }
+  }
   app.get("/api/health", (req, res) =>
     res.json({
       ok: true,
-      demo: DEMO,
+      demo: DEMO_NOW(),
       supportEmail: readState().supportEmail || process.env.MAIL_REPLY_TO || "",
       emailConfigured: mailConfigured(),
       storage: cloudEnabled() ? "netlify-blobs" : process.env.DATABASE_URL ? "postgresql" : "json",
@@ -141,15 +179,22 @@ export async function createApp() {
     const email = txt(b.email, 254).toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Invalid email");
     const credential = await hashPassword(b.password);
-    const taxId = b.accountType === "individual" ? null : txt(b.taxId, 40);
-    if (taxId && !/^[A-Za-z0-9][A-Za-z0-9 .\/-]{2,39}$/.test(taxId))
-      throw new Error("Invalid company tax number");
+    const details = readDetails(b.accountType, b);
+    const taxId = b.accountType === "individual" ? null : normalizeTaxId(txt(b.taxId, 40));
+    let taxCheck = null;
+    if (taxId) {
+      // Check digits are verified immediately; EU numbers are also checked with VIES.
+      taxCheck = await verifyTaxId(details.country, taxId);
+      if (taxCheck.status === "invalid") throw new Error("Invalid company tax number");
+    }
     const user = {
       id: id(),
       role: b.accountType === "individual" ? "merchant" : b.accountType,
       accountType: b.accountType,
       name: txt(b.name, 120),
       taxId,
+      taxCheck,
+      details,
       email,
       credential,
       verified: false,
@@ -157,6 +202,7 @@ export async function createApp() {
       verificationLevel: "none",
       plan: "free",
       demo: false,
+      createdAt: new Date().toISOString(),
     };
     await mutate((s) => {
       if (s.users.some((u) => u.email === email)) throw new Error("Email already registered");
@@ -164,6 +210,14 @@ export async function createApp() {
       queueEmail(s, user.id, "registered");
       for (const a of s.users.filter((u) => u.role === "admin" && !u.demo))
         notice(s, a.id, "account_registered");
+      queueAdminEmail(s, "account_registered", {
+        الاسم: user.name,
+        النوع: { merchant: "تاجر", carrier: "ناقل", supplier: "مورد معدات", individual: "فرد" }[user.accountType],
+        البريد: user.email,
+        الهاتف: details.phone,
+        البلد: details.country,
+        "الرقم الضريبي": taxId ? `${taxId} (${taxCheck.status} · ${taxCheck.method})` : "",
+      });
     });
     await sessionFor(user, res);
   });
@@ -185,7 +239,7 @@ export async function createApp() {
     await sessionFor(user, res);
   });
   app.post("/api/login", async (req, res) => {
-    if (!DEMO) return res.status(503).json({ error: "Demo login disabled" });
+    if (!DEMO_NOW()) return res.status(503).json({ error: "Demo login disabled" });
     const user = readState().users.find((u) => u.id === req.body.userId && u.demo);
     if (!user) return res.status(400).json({ error: "Unknown demo account" });
     await sessionFor(user, res);
@@ -224,7 +278,7 @@ export async function createApp() {
     )
       return res.status(403).json({ error: "Origin rejected" });
     req.user = readState().users.find((u) => u.id === session.userId);
-    if (!req.user || (!DEMO && req.user.demo)) return res.status(401).json({ error: "Sign in required" });
+    if (!req.user || (!DEMO_NOW() && req.user.demo)) return res.status(401).json({ error: "Sign in required" });
     // Password changes and resets end every session that was opened before them.
     if (req.user.sessionsValidAfter && (session.createdAt || 0) < req.user.sessionsValidAfter)
       return res.status(401).json({ error: "Sign in required" });
@@ -249,7 +303,7 @@ export async function createApp() {
         realtime: false,
         emailConfigured: mailConfigured(),
         supportEmail: s.supportEmail || "",
-        demo: DEMO,
+        demo: DEMO_NOW(),
         flags: s.flags,
         kyb: s.kyb.filter((d) => d.userId === req.user.id).map(({ content, encryptedContent, ...d }) => d),
         notifications: s.notifications.filter((n) => n.userId === req.user.id),
@@ -322,7 +376,7 @@ export async function createApp() {
       trackingEvents: s.trackingEvents.filter((e) => visibleShipment(e.shipmentId)),
       users: s.users.map((u) => publicUser(u)),
       user: publicUser(req.user, true),
-      demo: DEMO,
+      demo: DEMO_NOW(),
       kyb: s.kyb
         .filter((x) => mayReview(x) || x.userId === req.user.id)
         .map(({ content, encryptedContent, ...x }) => x),
@@ -422,6 +476,14 @@ export async function createApp() {
       }
       s.shipments.push(shipment);
       matchRoutes(s, shipment);
+      if (!req.user.demo)
+        queueAdminEmail(s, "shipment_created", {
+          الشحنة: shipment.title,
+          صاحبها: req.user.name,
+          المسار: `${shipment.origin} → ${shipment.destination}`,
+          "الحجم/الوزن": `${shipment.volume} m³ / ${shipment.weight} kg`,
+          التاريخ: shipment.date,
+        });
       s.trackingEvents.push({
         id: id(),
         shipmentId: shipment.id,
@@ -493,6 +555,16 @@ export async function createApp() {
         createdAt: new Date().toISOString(),
       });
       shipmentNotice(s, sh, "assigned");
+      if (!req.user.demo) {
+        const bid = s.bids.find((b) => b.id === sh.bidId);
+        queueEmail(s, sh.carrierId, "bid_accepted", { shipment: sh.title }, `accepted/${sh.id}`);
+        queueAdminEmail(s, "bid_accepted", {
+          الشحنة: sh.title,
+          التاجر: req.user.name,
+          الناقل: s.users.find((u) => u.id === sh.carrierId)?.name,
+          السعر: bid ? `${bid.price} USD` : "",
+        });
+      }
       return sh;
     });
     res.json(sh);
@@ -517,6 +589,7 @@ export async function createApp() {
         createdAt: new Date().toISOString(),
       });
       notify(s, sh, req.body.action);
+      if (!req.user.demo) operationEmails(s, sh, req.body.action, bidders);
     });
     res.json({ ok: true });
   });
@@ -535,6 +608,13 @@ export async function createApp() {
       };
       s.reservations.push(r);
       notice(s, g.carrierId, "group_reserved");
+      if (!req.user.demo)
+        queueAdminEmail(s, "group_reserved", {
+          الرحلة: `${g.origin} → ${g.destination} (${g.date})`,
+          الحاجز: req.user.name,
+          الحجم: `${r.volume} m³`,
+          المبلغ: `${r.price} USD`,
+        });
       return r;
     });
     res.status(201).json(result);
@@ -668,6 +748,13 @@ export async function createApp() {
       u.verificationLevel = "none";
       if (!person) u.taxId = details.taxId;
       queueEmail(s, u.id, "application", { name: details.fullName || details.company });
+      if (!u.demo)
+        queueAdminEmail(s, "verification_submitted", {
+          الحساب: u.name,
+          النوع: u.accountType,
+          البلد: b.country,
+          "الرقم الضريبي": details.taxId || "",
+        });
       for (const a of s.users.filter((u) => u.role === "admin" && !u.demo))
         notice(s, a.id, "account_registered");
     });
@@ -858,6 +945,15 @@ export async function createApp() {
       };
       s.orders.push(order);
       notice(s, p.supplierId, "order_received");
+      if (!req.user.demo) {
+        queueEmail(s, p.supplierId, "order_received", { product: p.title, quantity: String(quantity) });
+        queueAdminEmail(s, "order_placed", {
+          المنتج: p.title,
+          الكمية: quantity,
+          المشتري: req.user.name,
+          الإجمالي: `${order.total} USD`,
+        });
+      }
       return order;
     });
     res.json(result);

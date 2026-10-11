@@ -60,7 +60,17 @@ export function publicUser(user, own = false) {
     verificationStatus,
     verificationLevel,
     demo,
-    ...(own ? { email: user.email, taxId: user.taxId || null, profile: user.profile || {} } : {}),
+    ...(own
+      ? {
+          email: user.email,
+          taxId: user.taxId || null,
+          profile: user.profile || {},
+          details: user.details || {},
+          taxCheck: user.taxCheck || null,
+          review: user.review || null,
+          disabled: !!user.disabled,
+        }
+      : {}),
   };
 }
 export function validateDocument(body) {

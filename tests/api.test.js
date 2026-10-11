@@ -342,6 +342,15 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
         password,
         taxId: accountType === "individual" ? undefined : "TEST-TAX-123",
         name: "Test " + key,
+        phone: "+963 11 000 0000",
+        country: "SY",
+        city: "Aleppo",
+        activity: "import",
+        products: "Test goods",
+        license: "TEST-LICENSE",
+        fleetSize: 3,
+        routes: "Test route",
+        equipment: "Test equipment",
       }),
     });
     const body = await r.json();
@@ -360,7 +369,7 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
   }
   const business = await register("merchant", "business"),
     person = await register("individual", "person");
-  assert.equal(business.taxId, "TEST-TAX-123");
+  assert.equal(business.taxId, "TESTTAX123");
   assert.equal(
     (
       await call("none", "/auth/register", {
@@ -368,6 +377,11 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
         email: "taxless@test.local",
         password,
         name: "No tax",
+        phone: "+963 11 000 0000",
+        country: "SY",
+        city: "Aleppo",
+        activity: "import",
+        products: "Test goods",
       })
     ).status,
     400,
@@ -428,7 +442,7 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
   assert.equal((await call("none", "/health")).body.supportEmail, "support@test.local");
   assert.equal((await call("realAdmin", "/admin/email-status")).body.configured, false);
   const detail = (await call("realAdmin", `/admin/accounts/${business.id}`)).body;
-  assert.equal(detail.account.taxId, "TEST-TAX-123");
+  assert.equal(detail.account.taxId, "TESTTAX123");
   assert.equal(detail.account.credential, undefined);
   const companyDoc = { ...document, country: "TR", taxId: "TEST-TAX-123", registry: "Test trade registry" };
   assert.equal((await call("business", "/kyb", companyDoc)).status, 200);

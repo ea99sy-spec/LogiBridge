@@ -66,6 +66,7 @@ async function startServer(port, env) {
 }
 
 const password = "Security-test-password-2026";
+const personFields = { phone: "+90 555 000 0000", country: "TR", city: "Istanbul" };
 const shipment = {
   title: "Security test cargo",
   origin: "Gaziantep",
@@ -104,10 +105,21 @@ test("demo visitors are isolated from registered accounts", async (t) => {
         name: "Real Person",
         email: "person@test.local",
         password,
+        ...personFields,
       })
     ).status,
     200,
   );
+  // Every registered account waits for the administrator's approval.
+  assert.equal((await call("person", "/shipments", shipment)).status, 403);
+  await call("owner", "/auth/login", { email: "owner@test.local", password: "Owner-test-password-2026" });
+  const personId = (await call("person", "/state")).body.user.id;
+  assert.equal(
+    (await call("owner", `/admin/accounts/${personId}/review`, { status: "rejected" })).status,
+    400,
+    "a rejection needs a reason",
+  );
+  assert.equal((await call("owner", `/admin/accounts/${personId}/review`, { status: "approved" })).status, 200);
   const created = await call("person", "/shipments", {
     ...shipment,
     senderName: "Real Sender",
@@ -205,6 +217,7 @@ test("password change, reset links and account suspension", async (t) => {
     name: "Pass Owner",
     email: "pass@test.local",
     password,
+    ...personFields,
   });
   // A second device signed in to the same account.
   await call("laptop", "/auth/login", { email: "pass@test.local", password });
@@ -265,4 +278,55 @@ test("password change, reset links and account suspension", async (t) => {
     403,
   );
   assert.ok(cookies.owner);
+});
+
+test("tax numbers are checked and the administrator controls demo sign-in", async (t) => {
+  const { validTurkishTckn, validTurkishVkn, checkTaxFormat } = await import("../shared/tax.js");
+  assert.equal(validTurkishTckn("10000000146"), true);
+  assert.equal(validTurkishTckn("10000000147"), false);
+  // Build a valid VKN from its own check digit, then break it.
+  const base = "123456789";
+  const valid = [...Array(10).keys()].map((d) => base + d).find(validTurkishVkn);
+  assert.ok(valid);
+  assert.equal(validTurkishVkn(base + ((Number(valid[9]) + 1) % 10)), false);
+  assert.equal(checkTaxFormat("TR", "12345").status, "invalid");
+  assert.equal(checkTaxFormat("SY", "SY-778899").status, "format_ok");
+
+  const server = await startServer(3215, { DEMO_MODE: "" });
+  t.after(server.stop);
+  const { call } = server;
+  const company = {
+    accountType: "carrier",
+    name: "Tax Test Carrier",
+    password,
+    ...personFields,
+    license: "L-1",
+    fleetSize: 2,
+    routes: "Istanbul - Aleppo",
+  };
+  const wrong = valid.slice(0, 9) + ((Number(valid[9]) + 1) % 10);
+  const rejected = await call("bad2", "/auth/register", { ...company, email: "bad2@test.local", taxId: wrong });
+  assert.equal(rejected.status, 400);
+  assert.equal(rejected.body.error, "Invalid company tax number");
+  // Carriers must give their licence and fleet size.
+  assert.equal(
+    (await call("x", "/auth/register", { ...company, email: "x@test.local", taxId: valid, fleetSize: "" })).status,
+    400,
+  );
+  const ok = await call("good", "/auth/register", { ...company, email: "good@test.local", taxId: valid });
+  assert.equal(ok.status, 200);
+  assert.equal(ok.body.user.taxCheck.status, "valid");
+  assert.equal(ok.body.user.details.license, "L-1");
+
+  // Demo sign-in is hidden until the administrator turns it on.
+  assert.equal((await call("demo", "/login", { userId: "merchant" })).status, 503);
+  await call("owner", "/auth/login", { email: "owner@test.local", password: "Owner-test-password-2026" });
+  assert.equal((await call("good", "/admin/settings", { demoLogin: true }, "PUT")).status, 403);
+  assert.equal((await call("owner", "/admin/settings", { demoLogin: true }, "PUT")).status, 200);
+  assert.equal((await call("none", "/health")).body.demo, true);
+  assert.equal((await call("demo", "/login", { userId: "carrier" })).status, 200);
+  const demoUser = (await call("demo", "/state")).body.user;
+  assert.equal(demoUser.details.license.length > 0, true, "demo carrier has carrier details");
+  assert.equal((await call("owner", "/admin/settings", { demoLogin: false }, "PUT")).status, 200);
+  assert.equal((await call("demo", "/state")).status, 401, "hiding demo ends demo sessions");
 });

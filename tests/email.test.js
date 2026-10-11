@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { queueEmail, deliverEmail } from "../server/email.js";
 import { announceCompany } from "../server/profiles.js";
 import { workspaceModules } from "../shared/workspaces.js";
-test("unapproved companies have only onboarding modules; individuals keep their workspace", () => {
+test("every unapproved registered account has only onboarding modules", () => {
   assert.deepEqual(
     workspaceModules({ role: "carrier", accountType: "carrier", demo: false, verified: false }),
     ["dashboard", "profile", "kyb", "security"],
@@ -14,7 +14,9 @@ test("unapproved companies have only onboarding modules; individuals keep their 
     demo: false,
     verified: false,
   });
-  assert.ok(person.includes("newShipment") && person.includes("profile") && person.includes("directory"));
+  assert.deepEqual(person, ["dashboard", "profile", "kyb", "security"]);
+  const approved = workspaceModules({ role: "merchant", accountType: "individual", demo: false, verified: true });
+  assert.ok(approved.includes("newShipment") && approved.includes("directory"));
 });
 test("email queue deduplicates events and honors company announcement preferences", () => {
   const owner = {

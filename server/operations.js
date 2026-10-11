@@ -1,4 +1,8 @@
-import { queueEmail } from "./email.js";
+import { queueEmail, adminRecipient, mailConfigured } from "./email.js";
+import { verifyTaxId } from "./tax.js";
+import { announceCompany } from "./profiles.js";
+import { demoActive } from "./world.js";
+import { notice } from "./advanced.js";
 import { publicUser, validateDocument, encryptDocument, decryptDocument } from "./identity.js";
 import { readState, mutate, id } from "./store.js";
 const text = (value, max = 300) => {
@@ -19,6 +23,8 @@ export function operationRoutes(app) {
       if (!allowed[order.status]?.includes(req.body.status)) throw new Error("Invalid order transition");
       order.status = req.body.status;
       order.updatedAt = new Date().toISOString();
+      notice(s, order.userId, "order_update");
+      queueEmail(s, order.userId, "order_update", { product: product.title, status: order.status });
     });
     res.json({ ok: true });
   });
@@ -31,6 +37,10 @@ export function operationRoutes(app) {
         .map((u) => ({
           ...publicUser(u),
           disabled: !!u.disabled,
+          createdAt: u.createdAt || null,
+          taxId: !req.user.demo || u.demo ? u.taxId || null : null,
+          taxCheck: !req.user.demo || u.demo ? u.taxCheck || null : null,
+          details: !req.user.demo || u.demo ? u.details || {} : {},
           ...(!req.user.demo || u.demo ? { email: u.email } : {}),
           shipmentCount: s.shipments.filter((sh) => sh.ownerId === u.id || sh.carrierId === u.id).length,
           applicationCount: s.kyb.filter((d) => d.userId === u.id && (!req.user.demo || u.demo)).length,
@@ -53,6 +63,80 @@ export function operationRoutes(app) {
         .filter((sh) => [sh.ownerId, sh.carrierId].includes(account.id))
         .map(({ privateDetails, ...sh }) => sh),
     });
+  });
+  const realAdmin = (req, res) => {
+    if (req.user.role === "admin" && !req.user.demo) return true;
+    res.status(403).json({ error: "A registered administrator is required" });
+    return false;
+  };
+  // Platform settings the owner controls from the admin workspace.
+  app.get("/api/admin/settings", (req, res) => {
+    if (!realAdmin(req, res)) return;
+    const s = readState();
+    res.json({
+      demoLogin: demoActive(s),
+      activityEmails: s.settings?.activityEmails !== false,
+      notifyEmail: s.settings?.notifyEmail || "",
+      recipient: adminRecipient(s),
+      emailConfigured: mailConfigured(),
+    });
+  });
+  app.put("/api/admin/settings", async (req, res) => {
+    if (!realAdmin(req, res)) return;
+    const b = req.body;
+    for (const k of ["demoLogin", "activityEmails"])
+      if (k in b && typeof b[k] !== "boolean") throw new Error("Invalid request");
+    let notifyEmail;
+    if ("notifyEmail" in b) {
+      notifyEmail = String(b.notifyEmail || "")
+        .trim()
+        .toLowerCase();
+      if (notifyEmail && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(notifyEmail) || notifyEmail.length > 254))
+        throw new Error("Invalid email");
+    }
+    await mutate((s) => {
+      s.settings ||= {};
+      if ("demoLogin" in b) s.settings.demoLogin = b.demoLogin;
+      if ("activityEmails" in b) s.settings.activityEmails = b.activityEmails;
+      if (notifyEmail !== undefined) s.settings.notifyEmail = notifyEmail;
+    });
+    res.json({ ok: true });
+  });
+  // Approve or reject an account directly. Until approved, the account cannot use the platform.
+  app.post("/api/admin/accounts/:id/review", async (req, res) => {
+    if (!realAdmin(req, res)) return;
+    const b = req.body;
+    if (!["approved", "rejected"].includes(b.status)) throw new Error("Invalid review");
+    const reason = typeof b.reason === "string" ? b.reason.trim().slice(0, 500) : "";
+    if (b.status === "rejected" && !reason) throw new Error("Rejection reason required");
+    await mutate((s) => {
+      const u = s.users.find((x) => x.id === req.params.id && x.role !== "admin" && !x.demo);
+      if (!u) throw new Error("Account unavailable");
+      const now = new Date().toISOString();
+      u.verified = b.status === "approved";
+      u.verificationStatus = b.status;
+      u.verificationLevel = u.verified ? "admin_approval" : "none";
+      u.review = { reviewerId: req.user.id, reviewedAt: now, status: b.status, reason };
+      for (const d of s.kyb.filter((d) => d.userId === u.id && d.status === "pending")) {
+        d.status = b.status;
+        d.review = { reviewerId: req.user.id, reviewedAt: now, reason: reason || null, direct: true };
+      }
+      notice(s, u.id, "verification_" + b.status);
+      queueEmail(s, u.id, b.status, { reason }, `account-review/${u.id}/${now}`);
+      if (u.verified) announceCompany(s, u);
+    });
+    res.json({ ok: true });
+  });
+  // Run the tax number check again (check digits, and VIES for EU numbers).
+  app.post("/api/admin/accounts/:id/tax-check", async (req, res) => {
+    if (!realAdmin(req, res)) return;
+    const account = readState().users.find((u) => u.id === req.params.id && !u.demo);
+    if (!account?.taxId) throw new Error("Account has no tax number");
+    const result = await verifyTaxId(account.details?.country || "TR", account.taxId);
+    await mutate((s) => {
+      s.users.find((u) => u.id === account.id).taxCheck = result;
+    });
+    res.json(result);
   });
   // A registered administrator can suspend an abusive account and restore it later.
   app.post("/api/admin/accounts/:id/status", async (req, res) => {

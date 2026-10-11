@@ -1,6 +1,7 @@
 import { readState, mutate, id } from "./store.js";
 import { validateDocument, encryptDocument, decryptDocument } from "./identity.js";
 import { notice, shipmentNotice } from "./advanced.js";
+import { queueEmail, queueAdminEmail } from "./email.js";
 const text = (v, max = 120) => {
   if (typeof v !== "string" || !v.trim() || v.length > max) throw Error("Invalid payment details");
   return v.trim();
@@ -74,6 +75,12 @@ export function paymentRoutes(app) {
       s.payments.push(payment);
       for (const a of s.users.filter((u) => u.role === "admin" && !u.demo))
         notice(s, a.id, "payment_pending", sh.id);
+      queueAdminEmail(s, "payment_submitted", {
+        الشحنة: sh.title,
+        الدافع: req.user.name,
+        المبلغ: `${escrow.amount} ${escrow.currency}`,
+        "مرجع التحويل": reference,
+      });
     });
     res.status(201).json({ ok: true });
   });
@@ -112,7 +119,12 @@ export function paymentRoutes(app) {
         escrow.paymentId = p.id;
         escrow.status = "held";
         shipmentNotice(s, sh, "payment_approved");
-      } else notice(s, p.userId, "payment_rejected", sh.id);
+        for (const u of [sh.ownerId, sh.carrierId])
+          queueEmail(s, u, "payment_approved", { shipment: sh.title }, `payment/${p.id}/${u}`);
+      } else {
+        notice(s, p.userId, "payment_rejected", sh.id);
+        queueEmail(s, p.userId, "payment_rejected", { shipment: sh.title, reason: note }, `payment/${p.id}`);
+      }
     });
     res.json({ ok: true });
   });

@@ -2,7 +2,8 @@ import { requiresApproval } from "../shared/access.js";
 import { randomBytes, createHash } from "node:crypto";
 import { readState, mutate, id, subscribeState } from "./store.js";
 import { transitionShipment, positive } from "./domain.js";
-import { sameWorld } from "./world.js";
+import { sameWorld, demoActive } from "./world.js";
+import { queueAdminEmail } from "./email.js";
 const hash = (v) => createHash("sha256").update(v).digest("hex");
 const text = (v, max = 300) => {
   if (typeof v !== "string" || !v.trim() || v.length > max) throw new Error("Invalid text");
@@ -121,6 +122,13 @@ export function reserveEquipment(s, u, b) {
   };
   s.equipmentBookings.push(booking);
   notice(s, p.supplierId, "equipment_booking");
+  if (!u.demo && u.id !== p.supplierId)
+    queueAdminEmail(s, "booking_created", {
+      المعدات: p.title,
+      الحاجز: u.name,
+      الفترة: `${start} → ${end}`,
+      الإجمالي: `${booking.total} USD`,
+    });
   return booking;
 }
 export function advancedState(s, u) {
@@ -158,7 +166,7 @@ export function publicAdvancedRoutes(app) {
     if (
       !link ||
       !sh ||
-      (process.env.DEMO_MODE !== "true" && s.users.find((u) => u.id === link.carrierId)?.demo)
+      (!demoActive(s) && s.users.find((u) => u.id === link.carrierId)?.demo)
     )
       throw Object.assign(new Error("Driver link expired or revoked"), { status: 401 });
     return { link, sh };
@@ -288,7 +296,10 @@ export function advancedRoutes(app) {
     if (month && !/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) throw new Error("Invalid month");
     const s = readState(),
       shipments = s.shipments.filter(
-        (sh) => [sh.ownerId, sh.carrierId].includes(req.user.id) && (!month || sh.date.startsWith(month)),
+        (sh) =>
+          [sh.ownerId, sh.carrierId].includes(req.user.id) &&
+          (!month || sh.date.startsWith(month)) &&
+          (!req.query.shipment || sh.id === req.query.shipment),
       );
     const rows = shipments
       .map((sh) => {
@@ -308,6 +319,8 @@ export function advancedRoutes(app) {
           commission: escrow?.commission || 0,
           net: escrow?.carrierNet || 0,
           insurance: sh.insuranceRequested ? "requested" : "none",
+          payment: escrow?.paymentMethod === "direct" ? "direct" : escrow?.simulated === false ? "bank" : "",
+          completed: sh.completedAt ? sh.completedAt.slice(0, 10) : "",
         };
       })
       .filter((r) => req.query.kind !== "invoices" || s.escrows.some((e) => e.shipmentId === r.id));
@@ -326,6 +339,8 @@ export function advancedRoutes(app) {
         commission: 0,
         net: 0,
         insurance: 0,
+        payment: 0,
+        completed: 0,
       },
     );
     if (req.query.format === "xlsx") {
@@ -536,7 +551,7 @@ export function integrationAuth(req, res, next) {
     user = s.users.find(
       (u) => u.id === key?.userId && u.role === "merchant" && u.accountType !== "individual",
     );
-  if (!user || (process.env.DEMO_MODE !== "true" && user.demo))
+  if (!user || (!demoActive(s) && user.demo))
     return res.status(401).json({ error: "Invalid API key" });
   if (requiresApproval(user)) return res.status(403).json({ error: "Account approval required" });
   const now = Date.now(),

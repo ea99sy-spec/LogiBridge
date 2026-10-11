@@ -45,20 +45,40 @@ export function transitionShipment(state, shipment, action, actor) {
     action === "cancel" &&
     actor.id === shipment.ownerId &&
     shipment.status === "assigned" &&
-    escrow?.status === "awaiting_funding" &&
+    ["awaiting_funding", "direct_pending"].includes(escrow?.status) &&
     !(state.payments || []).some((p) => p.shipmentId === shipment.id && p.status === "pending")
   ) {
     // Nothing was paid yet, so the owner can still withdraw the request.
     shipment.status = "cancelled";
     shipment.cancelledAt = new Date().toISOString();
     escrow.status = "cancelled";
+  } else if (
+    action === "pay_direct" &&
+    actor.id === shipment.ownerId &&
+    shipment.status === "assigned" &&
+    escrow?.status === "awaiting_funding" &&
+    !(state.payments || []).some((p) => p.shipmentId === shipment.id && p.status === "pending")
+  ) {
+    // The owner pays the carrier directly (cash or transfer); the carrier must confirm receipt.
+    escrow.paymentMethod = "direct";
+    escrow.status = "direct_pending";
+    escrow.commission = 0;
+    escrow.carrierNet = escrow.amount;
+  } else if (
+    action === "confirm_payment" &&
+    actor.id === shipment.carrierId &&
+    shipment.status === "assigned" &&
+    escrow?.status === "direct_pending"
+  ) {
+    escrow.status = "direct_paid";
+    escrow.paidAt = new Date().toISOString();
   } else if (action === "fund" && actor.id === shipment.ownerId && escrow?.status === "awaiting_funding")
     escrow.status = "held";
   else if (
     action === "dispatch" &&
     actor.id === shipment.carrierId &&
     shipment.status === "assigned" &&
-    escrow?.status === "held"
+    ["held", "direct_paid"].includes(escrow?.status)
   )
     shipment.status = "transit";
   else if (action === "arrive" && actor.id === shipment.carrierId && shipment.status === "transit")
@@ -67,10 +87,12 @@ export function transitionShipment(state, shipment, action, actor) {
     action === "confirm" &&
     actor.id === shipment.ownerId &&
     shipment.status === "arrived" &&
-    escrow?.status === "held"
+    ["held", "direct_paid"].includes(escrow?.status)
   ) {
+    // Receipt confirmed: the operation is closed.
     shipment.status = "delivered";
-    escrow.status = escrow.simulated === false ? "payout_pending" : "released";
+    shipment.completedAt = new Date().toISOString();
+    if (escrow.status === "held") escrow.status = escrow.simulated === false ? "payout_pending" : "released";
   } else if (
     action === "dispute" &&
     actor.id === shipment.ownerId &&
