@@ -180,29 +180,34 @@ export function NotificationBell({ data, t, run, navigate }) {
                   run("/notifications/read", { id: n.id }, "POST", { silent: true });
                   const carrier = data.user.role === "carrier";
                   navigate(
-                    n.event.startsWith("verification_") || n.event === "account_registered"
-                      ? "kyb"
-                      : n.event === "matching_opportunity" || (carrier && n.event === "cancel")
-                        ? "jobs"
-                        : n.event === "equipment_booking"
-                          ? "calendar"
-                          : n.event === "message_received"
-                            ? "hub"
-                            : n.event === "order_received"
-                              ? "orders"
-                              : n.event === "group_reserved"
-                                ? "groups"
-                                : n.event.startsWith("payment_") && data.user.role === "admin"
-                                  ? "admin"
-                                  : n.event.startsWith("settlement_") ||
-                                      [
-                                        "dispute_escalated",
-                                        "bid_received",
-                                        "bid_withdrawn",
-                                        "cancel",
-                                      ].includes(n.event)
-                                    ? "shipments"
-                                    : "tracking",
+                    n.event === "border_notice"
+                      ? "border"
+                      : n.event === "company_joined"
+                        ? "directory"
+                        : n.event.startsWith("verification_") || n.event === "account_registered"
+                          ? "kyb"
+                          : n.event === "matching_opportunity" || (carrier && n.event === "cancel")
+                            ? "jobs"
+                            : n.event === "equipment_booking"
+                              ? "calendar"
+                              : n.event === "message_received"
+                                ? "hub"
+                                : n.event === "order_received"
+                                  ? "orders"
+                                  : n.event === "group_reserved"
+                                    ? "groups"
+                                    : n.event.startsWith("payment_") && data.user.role === "admin"
+                                      ? "admin"
+                                      : n.event.startsWith("settlement_") ||
+                                          [
+                                            "dispute_escalated",
+                                            "bid_received",
+                                            "bid_withdrawn",
+                                            "cancel",
+                                            "crossing_busy",
+                                          ].includes(n.event)
+                                        ? "shipments"
+                                        : "tracking",
                   );
                   setOpen(false);
                 }}
@@ -210,7 +215,10 @@ export function NotificationBell({ data, t, run, navigate }) {
                 <b>{t("event_" + n.event)}</b>
                 {n.detail && (
                   <small className="notice-detail">
-                    {t("rejectionReason")}: {n.detail}
+                    {n.event.startsWith("verification_") || n.event.startsWith("payment_")
+                      ? `${t("rejectionReason")}: `
+                      : ""}
+                    {n.detail}
                   </small>
                 )}
                 <small>{new Date(n.createdAt).toLocaleString(document.documentElement.lang)}</small>

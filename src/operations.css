@@ -696,3 +696,35 @@ a.whatsapp {
   color: #a26659;
   white-space: normal;
 }
+/* Crossing congestion */
+.badge.wait-0 {
+  background: #e7f6ee;
+  color: #12805c;
+}
+.badge.wait-1 {
+  background: #eef6e2;
+  color: #4f7a12;
+}
+.badge.wait-2 {
+  background: #fff4e0;
+  color: #9a6400;
+}
+.badge.wait-3,
+.badge.wait-4 {
+  background: #f8e3dd;
+  color: #a23d22;
+}
+.report-note {
+  display: block;
+  color: #50678a;
+  white-space: normal;
+}
+.border-rules th,
+.border-rules td {
+  padding: 8px 10px;
+  vertical-align: top;
+  text-align: start;
+}
+.border-rules tbody tr + tr td {
+  border-top: 1px solid #eef2f7;
+}

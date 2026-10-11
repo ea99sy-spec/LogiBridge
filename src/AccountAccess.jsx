@@ -14,7 +14,10 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
     (window.location.pathname.startsWith("/workspace/") ? window.location.pathname : "");
   const next = /^\/workspace\/[a-zA-Z]+$/.test(requestedNext) ? requestedNext : "";
   const accountUrl = (path) => (next ? `${path}?next=${encodeURIComponent(next)}` : path);
-  const register = segment[0] === "register" && type !== "admin";
+  const register = segment[0] === "register" && !!type && type !== "admin";
+  // One sign-in form for every account: the account type is chosen only once, at registration.
+  const signIn = segment[0] === "login";
+  const form = register || signIn;
   const [demo, setDemo] = useState(false),
     [error, setError] = useState(""),
     [forgot, setForgot] = useState(false),
@@ -54,7 +57,7 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
     if (result) onEntered?.(register, result.user);
   }
   return (
-    <div className={`access-page ${type ? "account-" + type : ""}`}>
+    <div className={`access-page ${register ? "account-" + type : ""}`}>
       <header className="access-header">
         <a href="/" className="brand">
           <span className="brand-icon">⇄</span>LogiBridge
@@ -66,8 +69,8 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
           <span className="access-chip">
             TÜRKİYE · SYRIA · GLOBAL <i />
           </span>
-          <h1>{type ? title(type) : t("accessWelcome")}</h1>
-          <p>{t(type ? `access_${type}` : "accessIntro")}</p>
+          <h1>{register ? title(type) : t("accessWelcome")}</h1>
+          <p>{t(register ? `access_${type}` : "accessIntro")}</p>
           <div className="bridge-illustration">
             <div className="bridge-city">
               <span>TR</span>
@@ -94,33 +97,39 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
           <p className="access-footnote">{t("manualVerificationNote")}</p>
         </section>
         <section className="access-card">
-          {!type ? (
+          {!form ? (
             <>
               <span className="eyebrow">YOUR LOGISTICS WORKSPACE</span>
-              <h2>{t("chooseAccount")}</h2>
-              <p className="muted">{t("separateAccess")}</p>
+              <h2>{t("haveAccount")}</h2>
+              <a className="button access-signin-button" href={accountUrl("/login")}>
+                {t("signIn")} ↗
+              </a>
+              <h2>{t("newHereChoose")}</h2>
+              <p className="muted">{t("chooseOnceNote")}</p>
               <div className="access-options">
-                {accounts.map((k) => (
-                  <a href={accountUrl(`/login/${k}`)} className="access-option" key={k}>
-                    <span className="access-symbol">{symbols[k]}</span>
-                    <span>
-                      <b>{title(k)}</b>
-                      <small>{t(`short_${k}`)}</small>
-                    </span>
-                    <span className="option-arrow">↗</span>
-                  </a>
-                ))}
+                {accounts
+                  .filter((k) => k !== "admin")
+                  .map((k) => (
+                    <a href={accountUrl(`/register/${k}`)} className="access-option" key={k}>
+                      <span className="access-symbol">{symbols[k]}</span>
+                      <span>
+                        <b>{title(k)}</b>
+                        <small>{t(`short_${k}`)}</small>
+                      </span>
+                      <span className="option-arrow">↗</span>
+                    </a>
+                  ))}
               </div>
             </>
           ) : (
             <>
-              <a className="access-back" href={accountUrl("/accounts")}>
-                ← {t("chooseAccount")}
-              </a>
-              <span className="access-form-icon">{symbols[type]}</span>
-              <h2>
-                {t(register ? "createAccount" : "signIn")} · {title(type)}
-              </h2>
+              {register && (
+                <a className="access-back" href={accountUrl("/accounts")}>
+                  ← {t("chooseAccount")}
+                </a>
+              )}
+              <span className="access-form-icon">{register ? symbols[type] : "⇄"}</span>
+              <h2>{register ? `${t("createAccount")} · ${title(type)}` : t("signIn")}</h2>
               <p className="muted">
                 {t(forgot ? "forgotIntro" : register ? "registrationNext" : "accountLoginNote")}
               </p>
@@ -188,8 +197,11 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
                             maxLength="30"
                             dir="ltr"
                             placeholder="+90 5xx xxx xx xx"
+                            pattern="^(\+|00)[1-9][0-9 ()\-]{7,24}$"
+                            title={t("phoneIntlHint")}
                             autoComplete="tel"
                           />
+                          <small className="muted">{t("phoneIntlHint")}</small>
                         </label>
                       </div>
                     </>
@@ -382,10 +394,10 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
                   )}
                 </form>
               )}
-              {type !== "admin" && !forgot && (
+              {!forgot && (
                 <p className="access-register-link">
                   {t(register ? "alreadyAccount" : "noAccount")}{" "}
-                  <a href={accountUrl(`/${register ? "login" : "register"}/${type}`)}>
+                  <a href={accountUrl(register ? "/login" : "/accounts")}>
                     {t(register ? "signIn" : "createAccount")}
                   </a>
                 </p>
@@ -393,16 +405,19 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
               {demo && !forgot && !register && (
                 <div className="demo-access">
                   <span>{t("demoOnly")}</span>
-                  <button
-                    className="text-button"
-                    disabled={busy}
-                    onClick={async () => {
-                      const result = await run("/login", { userId: type });
-                      if (result) onEntered?.(false, result.user);
-                    }}
-                  >
-                    {t("tryDemo")} ↗
-                  </button>
+                  {(type ? [type] : accounts).map((k) => (
+                    <button
+                      key={k}
+                      className="text-button"
+                      disabled={busy}
+                      onClick={async () => {
+                        const result = await run("/login", { userId: k });
+                        if (result) onEntered?.(false, result.user);
+                      }}
+                    >
+                      {title(k)} ↗
+                    </button>
+                  ))}
                 </div>
               )}
             </>

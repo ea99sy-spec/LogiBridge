@@ -68,11 +68,12 @@ export default function Landing({ t, langSelect, user }) {
           <span className="brand-icon">⇄</span>LogiBridge
         </a>
         <nav aria-label={t("mainNavigation")}>
+          <a href="#about">{t("aboutNav")}</a>
           <a href="#try">{t("tryNav")}</a>
           <a href="#services">{t("ourServices")}</a>
           <a href="#verification">{t("identityReview")}</a>
           <a href="/border">{t("borderNav")}</a>
-          <a href="/accounts">{t("chooseAccount")}</a>
+          <a href="/accounts">{t("createAccount")}</a>
         </nav>
         <div className="landing-header-actions">
           {langSelect}
@@ -81,7 +82,7 @@ export default function Landing({ t, langSelect, user }) {
               {t("myWorkspace")} ↗
             </a>
           ) : (
-            <a className="button" href="/accounts">
+            <a className="button" href="/login">
               {t("signIn")} ↗
             </a>
           )}
@@ -136,6 +137,7 @@ export default function Landing({ t, langSelect, user }) {
             <div className="global-art-caption">LOGIBRIDGE NETWORK</div>
           </div>
         </section>
+        <About t={t} />
         <TryPlatform t={t} />
         <section id="services" className="landing-section">
           <span className="eyebrow">ONE PLATFORM. YOUR WORKSPACE.</span>
@@ -150,7 +152,7 @@ export default function Landing({ t, langSelect, user }) {
                 <a className="button" href={`/register/${type}`}>
                   {t("createAccount")} ↗
                 </a>
-                <a className="text-button" href={`/login/${type}`}>
+                <a className="text-button" href="/login">
                   {t("signIn")}
                 </a>
               </article>
@@ -178,7 +180,7 @@ export default function Landing({ t, langSelect, user }) {
         </section>
         <section className="landing-admin">
           <span>◇ {t("administrator")}</span>
-          <a href="/login/admin">{t("administratorLogin")} ↗</a>
+          <a href="/login">{t("administratorLogin")} ↗</a>
         </section>
       </main>
       <footer className="landing-footer">
@@ -190,5 +192,47 @@ export default function Landing({ t, langSelect, user }) {
         <span>© 2026</span>
       </footer>
     </div>
+  );
+}
+
+// Who we are, vision, mission, values and how the platform works.
+function About({ t }) {
+  return (
+    <section id="about" className="landing-section landing-about">
+      <span className="eyebrow">ABOUT LOGIBRIDGE</span>
+      <h2>{t("aboutTitle")}</h2>
+      <p className="about-lead">{t("aboutText")}</p>
+      <div className="about-grid">
+        {[
+          ["◎", "visionTitle", "visionText"],
+          ["➜", "missionTitle", "missionText"],
+        ].map(([icon, title, text]) => (
+          <article key={title}>
+            <span className="access-symbol">{icon}</span>
+            <h3>{t(title)}</h3>
+            <p>{t(text)}</p>
+          </article>
+        ))}
+      </div>
+      <h3 className="about-subtitle">{t("valuesTitle")}</h3>
+      <div className="about-values">
+        {["valueTransparency", "valueTrust", "valueCompliance", "valueSpeed"].map((k) => (
+          <div key={k}>
+            <b>{t(k)}</b>
+            <small>{t(k + "Text")}</small>
+          </div>
+        ))}
+      </div>
+      <h3 className="about-subtitle">{t("howItWorks")}</h3>
+      <ol className="about-steps">
+        {["howStep1", "howStep2", "howStep3", "howStep4"].map((k, i) => (
+          <li key={k}>
+            <span>{i + 1}</span>
+            <b>{t(k)}</b>
+            <small>{t(k + "Text")}</small>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }

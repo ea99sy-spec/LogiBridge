@@ -1,3 +1,5 @@
+import { notice } from "./advanced.js";
+import { waNumber } from "../shared/wa.js";
 import { readState, mutate } from "./store.js";
 import { requiresApproval } from "../shared/access.js";
 import { queueEmail, mailConfigured, flushEmails } from "./email.js";
@@ -19,6 +21,7 @@ export function profileRoutes(app) {
       contactPhone: text(b.contactPhone || "", 30),
       companyEmails: b.companyEmails,
       whatsappNotify: b.whatsappNotify === true,
+      borderEmails: b.borderEmails !== false,
     };
     if (!profile.about || !profile.services) throw Error("Required field missing");
     if (profile.website && !/^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(profile.website))
@@ -27,8 +30,11 @@ export function profileRoutes(app) {
     if (company && !profile.contactEmail) throw Error("Contact email required");
     if (profile.contactEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.contactEmail))
       throw Error("Invalid email");
-    if (profile.contactPhone && !/^\+?[0-9 ()-]{6,30}$/.test(profile.contactPhone))
-      throw Error("Invalid phone number");
+    if (
+      profile.contactPhone &&
+      (!/^\+?[0-9 ()-]{6,30}$/.test(profile.contactPhone) || !waNumber(profile.contactPhone))
+    )
+      throw Error("Phone must be international");
     // Optional logo: a small PNG/JPEG prepared (resized) in the browser.
     let logo;
     if (b.logo === null) logo = null;
@@ -195,7 +201,8 @@ export function announceCompany(s, owner) {
   owner.announcedAt = new Date().toISOString();
   for (const u of s.users.filter(
     (u) => u.id !== owner.id && u.role !== "admin" && u.accountType !== "individual" && !requiresApproval(u),
-  ))
+  )) {
+    notice(s, u.id, "company_joined", undefined, owner.name);
     queueEmail(
       s,
       u.id,
@@ -203,4 +210,5 @@ export function announceCompany(s, owner) {
       { company: owner.name, about: owner.profile.about, services: owner.profile.services },
       `company/${owner.id}/${u.id}`,
     );
+  }
 }

@@ -634,10 +634,15 @@ function App() {
     return <ResetPassword t={t} langSelect={langSelect} run={run} busy={busy} toast={toast} />;
   if (loading) return <div className="loading">{t("loading")}</div>;
   if (window.location.pathname === "/") return <Landing t={t} langSelect={langSelect} user={data?.user} />;
+  // Signed-in visitors go straight to their own workspace instead of the sign-in pages.
+  if (data?.user && /^\/(accounts|login)(\/|$)/.test(window.location.pathname)) {
+    window.location.replace("/workspace/dashboard");
+    return <div className="loading">{t("loading")}</div>;
+  }
   if (
     !data ||
     window.location.pathname === "/accounts" ||
-    /^\/(login|register)\//.test(window.location.pathname)
+    /^\/(login|register)(\/|$)/.test(window.location.pathname)
   )
     return (
       <AccountAccess
@@ -1040,6 +1045,8 @@ function App() {
                   t={t}
                   lang={lang}
                   notices={data.borderNotices}
+                  reports={data.crossingReports || []}
+                  canReport={["carrier", "broker"].includes(user.role)}
                   admin={user.role === "admin" && !user.demo}
                   run={run}
                   busy={busy}

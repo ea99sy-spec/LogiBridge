@@ -719,3 +719,59 @@ test("border notices, WhatsApp alerts and rejection reasons", async (t) => {
   assert.equal((await call("owner", `/admin/border-notices/${id}`, {}, "DELETE")).status, 200);
   assert.equal((await call("anon", "/border")).body.notices.length, 0);
 });
+
+test("one sign-in form, international phones, border alerts and queue reports", async (t) => {
+  const server = await startServer(3220, { DEMO_MODE: "" });
+  t.after(server.stop);
+  const { call } = server;
+  const merchant = {
+    accountType: "merchant",
+    name: "Alert Trader",
+    email: "trader@test.local",
+    password,
+    ...personFields,
+    taxId: "1234567890",
+    activity: "import",
+    products: "Textiles",
+  };
+  const local = await call("m", "/auth/register", { ...merchant, phone: "0532 000 11 22" });
+  assert.equal(local.body.error, "Phone must be international");
+  const m = (await call("m", "/auth/register", merchant)).body.user;
+  const c = (
+    await call("c", "/auth/register", {
+      ...merchant,
+      accountType: "carrier",
+      email: "haul@test.local",
+      name: "Alert Haulage",
+      license: "L-9",
+      fleetSize: 3,
+      routes: "Gaziantep - Aleppo",
+    })
+  ).body.user;
+  // Sign-in needs only email and password; the account type comes from registration.
+  assert.equal(
+    (await call("c2", "/auth/login", { email: "haul@test.local", password })).body.user.role,
+    "carrier",
+  );
+  await call("owner", "/auth/login", { email: "owner@test.local", password: "Owner-test-password-2026" });
+  for (const u of [m, c])
+    assert.equal((await call("owner", `/admin/accounts/${u.id}/review`, { status: "approved" })).status, 200);
+  await call("owner", "/admin/border-notices", {
+    date: "2026-10-12",
+    title: "Eid closure",
+    body: "Crossings closed for two days",
+  });
+  const notes = (await call("m", "/state")).body.notifications;
+  assert.equal(notes.find((n) => n.event === "border_notice").detail, "Eid closure");
+  // Only carriers and brokers report queues; reports are public without the reporter.
+  assert.equal((await call("m", "/crossing-reports", { crossing: "bab", level: 2 })).status, 403);
+  assert.equal((await call("c", "/crossing-reports", { crossing: "bab", level: 9 })).status, 400);
+  assert.equal(
+    (await call("c", "/crossing-reports", { crossing: "bab", level: 3, note: "Yard full" })).status,
+    201,
+  );
+  const report = (await call("anon", "/border")).body.reports[0];
+  assert.equal(report.level, 3);
+  assert.equal(report.note, "Yard full");
+  assert.equal(report.userId, undefined);
+});

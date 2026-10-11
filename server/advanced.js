@@ -20,7 +20,7 @@ const date = (v) => {
 };
 export function notice(s, userId, event, shipmentId, detail) {
   if (!userId) return;
-  s.notifications.push({
+  (s.notifications ||= []).push({
     id: id(),
     userId,
     event,

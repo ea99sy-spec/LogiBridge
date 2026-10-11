@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { crossingKeys } from "../shared/crossings.js";
+import { crossings, crossingKeys } from "../shared/crossings.js";
 import { queueEmail, adminRecipient, mailConfigured } from "./email.js";
 import { whatsappConfigured, waNumber } from "./whatsapp.js";
 import { verifyTaxId } from "./tax.js";
@@ -9,6 +9,7 @@ import { notice } from "./advanced.js";
 import { publicUser, validateDocument, encryptDocument, decryptDocument } from "./identity.js";
 import { readPosition } from "./position.js";
 import { readState, mutate, id } from "./store.js";
+import { requiresApproval } from "../shared/access.js";
 const text = (value, max = 300) => {
   if (typeof value !== "string" || !value.trim() || value.length > max) throw new Error("Invalid text");
   return value.trim();
@@ -132,7 +133,7 @@ export function operationRoutes(app) {
       if (value.length > max) throw new Error("Text too long");
       return value;
     };
-    const notice = {
+    const item = {
       id: randomUUID(),
       date: field(b.date, 10),
       title: field(b.title, 160),
@@ -142,16 +143,37 @@ export function operationRoutes(app) {
       level: ["info", "warning"].includes(b.level) ? b.level : "info",
       createdAt: new Date().toISOString(),
     };
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(notice.date) || Number.isNaN(Date.parse(notice.date)))
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(item.date) || Number.isNaN(Date.parse(item.date)))
       throw new Error("Invalid date");
-    if (notice.crossing && !crossingKeys.includes(notice.crossing)) throw new Error("Invalid request");
-    if (notice.source && !/^https?:\/\/[^\s]+$/i.test(notice.source))
+    if (item.crossing && !crossingKeys.includes(item.crossing)) throw new Error("Invalid request");
+    if (item.source && !/^https?:\/\/[^\s]+$/i.test(item.source))
       throw new Error("Website must use https:// or http://");
     await mutate((s) => {
       s.settings ||= {};
-      s.settings.borderNotices = [notice, ...(s.settings.borderNotices || [])]
+      s.settings.borderNotices = [item, ...(s.settings.borderNotices || [])]
         .sort((a, b) => b.date.localeCompare(a.date))
         .slice(0, 50);
+      // Tell every approved member: in the notification bell, and by email/WhatsApp unless they opted out.
+      if (b.notify !== false)
+        for (const u of s.users.filter(
+          (u) => u.role !== "admin" && !u.demo && !u.disabled && !requiresApproval(u),
+        )) {
+          notice(s, u.id, "border_notice", undefined, item.title);
+          if (u.profile?.borderEmails !== false)
+            queueEmail(
+              s,
+              u.id,
+              "border_notice",
+              {
+                title: item.title,
+                body: item.body,
+                crossing: item.crossing
+                  ? `${crossings[item.crossing].sy} / ${crossings[item.crossing].tr}`
+                  : "",
+              },
+              `border/${item.id}/${u.id}`,
+            );
+        }
     });
     res.json({ ok: true });
   });
@@ -162,6 +184,55 @@ export function operationRoutes(app) {
       s.settings.borderNotices = (s.settings.borderNotices || []).filter((n) => n.id !== req.params.id);
     });
     res.json({ ok: true });
+  });
+  // Crossing congestion reports from carriers and customs brokers (crowd-sourced, expire after a day).
+  app.post("/api/crossing-reports", async (req, res) => {
+    const b = req.body;
+    if (!["carrier", "broker"].includes(req.user.role)) {
+      const e = new Error("Forbidden");
+      e.status = 403;
+      throw e;
+    }
+    if (!crossingKeys.includes(b.crossing)) throw new Error("Invalid request");
+    const level = Number(b.level);
+    if (![0, 1, 2, 3, 4].includes(level)) throw new Error("Invalid request");
+    const note = typeof b.note === "string" ? b.note.trim().slice(0, 280) : "";
+    await mutate((s) => {
+      const now = new Date().toISOString();
+      s.crossingReports = [
+        {
+          id: randomUUID(),
+          crossing: b.crossing,
+          level,
+          note,
+          userId: req.user.id,
+          role: req.user.role,
+          demo: !!req.user.demo,
+          createdAt: now,
+        },
+        ...(s.crossingReports || []).filter((r) => Date.now() - Date.parse(r.createdAt) < 86400000),
+      ].slice(0, 300);
+      // Long queues (6 hours or more): warn owners of orders still waiting to cross there.
+      if (level >= 3)
+        for (const o of s.shipments.filter(
+          (sh) =>
+            sh.isOrder &&
+            sh.crossing === b.crossing &&
+            !["delivered", "cancelled"].includes(sh.status) &&
+            !!s.users.find((u) => u.id === sh.ownerId)?.demo === !!req.user.demo,
+        ))
+          if (
+            !s.notifications.some(
+              (n) =>
+                n.userId === o.ownerId &&
+                n.event === "crossing_busy" &&
+                n.shipmentId === o.id &&
+                Date.now() - Date.parse(n.createdAt) < 6 * 3600000,
+            )
+          )
+            notice(s, o.ownerId, "crossing_busy", o.id, note);
+    });
+    res.status(201).json({ ok: true });
   });
   // Approve or reject an account directly. Until approved, the account cannot use the platform.
   app.post("/api/admin/accounts/:id/review", async (req, res) => {

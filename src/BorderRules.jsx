@@ -135,7 +135,12 @@ const host = (url) => {
   }
 };
 
-export function BorderRules({ t, lang, notices = [], admin, run, busy }) {
+// Wait levels used by congestion reports.
+const waitLevels = [0, 1, 2, 3, 4];
+const hoursAgo = (iso) => Math.max(0, Math.round((Date.now() - Date.parse(iso)) / 3600000));
+
+export function BorderRules({ t, lang, notices = [], reports = [], admin, canReport, run, busy }) {
+  const latest = (k) => reports.find((r) => r.crossing === k);
   const pick = (r) => r[lang] || r.en;
   return (
     <div className="border-rules">
@@ -189,6 +194,7 @@ export function BorderRules({ t, lang, notices = [], admin, run, busy }) {
                 <th>{t("turkishSide")}</th>
                 <th>{t("syrianSide")}</th>
                 <th>{t("status")}</th>
+                <th>{t("queueNow")}</th>
               </tr>
             </thead>
             <tbody>
@@ -201,6 +207,25 @@ export function BorderRules({ t, lang, notices = [], admin, run, busy }) {
                     <span className={`badge crossing-${crossings[k].status}`}>
                       {t("crossing_" + crossings[k].status)}
                     </span>
+                  </td>
+                  <td>
+                    {latest(k) ? (
+                      <>
+                        <span className={`badge wait-${latest(k).level}`}>
+                          {t("wait_" + latest(k).level)}
+                        </span>
+                        <small className="muted">
+                          {" "}
+                          {hoursAgo(latest(k).createdAt) < 1
+                            ? t("justNow")
+                            : t("reportedAgo").replace("{h}", hoursAgo(latest(k).createdAt))}{" "}
+                          · {t(latest(k).role)}
+                        </small>
+                        {latest(k).note && <small className="report-note">{latest(k).note}</small>}
+                      </>
+                    ) : (
+                      <small className="muted">{t("noReportsYet")}</small>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -215,6 +240,8 @@ export function BorderRules({ t, lang, notices = [], admin, run, busy }) {
             </a>
           ))}
         </p>
+        {canReport && <ReportForm t={t} run={run} busy={busy} />}
+        {!canReport && <p className="muted small">{t("reportsByProviders")}</p>}
       </section>
       <section className="panel">
         <h2>{t("customsRules")}</h2>
@@ -246,6 +273,54 @@ export function BorderRules({ t, lang, notices = [], admin, run, busy }) {
   );
 }
 
+function ReportForm({ t, run, busy }) {
+  return (
+    <form
+      className="form-stack notice-form"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const ok = await run("/crossing-reports", Object.fromEntries(new FormData(form)), "POST", {
+          success: "reportThanks",
+        });
+        if (ok) form.reset();
+      }}
+    >
+      <h3>{t("reportQueue")}</h3>
+      <p className="muted small">{t("reportQueueNote")}</p>
+      <div className="two-cols">
+        <label className="field">
+          <span>{t("crossing")}</span>
+          <select name="crossing" required>
+            {crossingKeys.map((k) => (
+              <option key={k} value={k}>
+                {t(k)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="field">
+          <span>{t("queueNow")}</span>
+          <select name="level" required>
+            {waitLevels.map((l) => (
+              <option key={l} value={l}>
+                {t("wait_" + l)}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <label className="field">
+        <span>{t("reportNote")}</span>
+        <input name="note" maxLength="280" placeholder={t("reportNotePlaceholder")} />
+      </label>
+      <button className="button" disabled={busy}>
+        {t("sendReport")}
+      </button>
+    </form>
+  );
+}
+
 function NoticeForm({ t, run, busy }) {
   return (
     <form
@@ -253,7 +328,11 @@ function NoticeForm({ t, run, busy }) {
       onSubmit={async (e) => {
         e.preventDefault();
         const form = e.currentTarget;
-        const ok = await run("/admin/border-notices", Object.fromEntries(new FormData(form)));
+        const f = new FormData(form);
+        const ok = await run("/admin/border-notices", {
+          ...Object.fromEntries(f),
+          notify: f.has("notifyMembers"),
+        });
         if (ok) form.reset();
       }}
     >
@@ -296,6 +375,10 @@ function NoticeForm({ t, run, busy }) {
           </select>
         </label>
       </div>
+      <label className="consent">
+        <input type="checkbox" name="notifyMembers" defaultChecked />
+        <span>{t("notifyMembers")}</span>
+      </label>
       <button className="button" disabled={busy}>
         {t("publishNotice")}
       </button>
@@ -305,11 +388,15 @@ function NoticeForm({ t, run, busy }) {
 
 // Public page at /border, readable before signing in.
 export default function BorderPage({ t, lang, langSelect }) {
-  const [notices, setNotices] = useState([]);
+  const [notices, setNotices] = useState([]),
+    [reports, setReports] = useState([]);
   useEffect(() => {
     fetch("/api/border")
       .then((r) => (r.ok ? r.json() : { notices: [] }))
-      .then((v) => setNotices(v.notices || []))
+      .then((v) => {
+        setNotices(v.notices || []);
+        setReports(v.reports || []);
+      })
       .catch(() => {});
   }, []);
   return (
@@ -322,7 +409,7 @@ export default function BorderPage({ t, lang, langSelect }) {
       </header>
       <main className="legal-content border-page">
         <h1>{t("borderRulesTitle")}</h1>
-        <BorderRules t={t} lang={lang} notices={notices} />
+        <BorderRules t={t} lang={lang} notices={notices} reports={reports} />
         <p className="legal-links">
           <a href="/accounts">{t("borderStart")}</a>
           {" · "}

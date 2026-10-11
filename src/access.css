@@ -783,3 +783,12 @@ a:focus-visible {
 .consent a {
   text-decoration: underline;
 }
+.access-signin-button {
+  display: block;
+  text-align: center;
+  margin: 10px 0 26px;
+  text-decoration: none;
+}
+.demo-access {
+  flex-wrap: wrap;
+}

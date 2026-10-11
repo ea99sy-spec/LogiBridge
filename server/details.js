@@ -1,5 +1,6 @@
 import { validCountry } from "../shared/countries.js";
 import { crossingKeys } from "../shared/crossings.js";
+import { waNumber } from "../shared/wa.js";
 
 const text = (v, max, label, optional = false) => {
   const value = typeof v === "string" ? v.trim() : "";
@@ -14,7 +15,8 @@ const text = (v, max, label, optional = false) => {
 // Registration details that differ by account type.
 export function readDetails(accountType, b) {
   const phone = text(b.phone, 30);
-  if (!/^\+?[0-9 ()-]{6,30}$/.test(phone)) throw new Error("Invalid phone number");
+  // International form (+90…, +963…, 00…) so WhatsApp and calls work from any country.
+  if (!/^\+?[0-9 ()-]{6,30}$/.test(phone) || !waNumber(phone)) throw new Error("Phone must be international");
   if (!validCountry(b.country)) throw new Error("Valid country required");
   const details = { phone, country: b.country, city: text(b.city, 80) };
   if (accountType === "merchant") {

@@ -88,6 +88,7 @@ export function Profile({ data, t, run, busy, navigate }) {
             {
               ...Object.fromEntries(f),
               companyEmails: f.has("companyEmails"),
+              borderEmails: f.has("borderEmails"),
               whatsappNotify: f.has("whatsappNotify"),
               logo: logo || null,
             },
@@ -178,6 +179,9 @@ export function Profile({ data, t, run, busy, navigate }) {
               name="contactPhone"
               type="tel"
               maxLength="30"
+              pattern="^(\+|00)[1-9][0-9 ()\-]{7,24}$"
+              title={t("phoneIntlHint")}
+              placeholder="+90 5xx xxx xx xx"
               dir="ltr"
               defaultValue={p.contactPhone || ""}
             />
@@ -186,6 +190,10 @@ export function Profile({ data, t, run, busy, navigate }) {
         <label className="consent">
           <input type="checkbox" name="companyEmails" defaultChecked={p.companyEmails !== false} />
           <span>{t("companyEmailPreference")}</span>
+        </label>
+        <label className="consent">
+          <input type="checkbox" name="borderEmails" defaultChecked={p.borderEmails !== false} />
+          <span>{t("borderEmailPreference")}</span>
         </label>
         <label className="consent">
           <input

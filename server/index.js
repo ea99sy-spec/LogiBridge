@@ -54,6 +54,19 @@ import { readDetails } from "./details.js";
 import { verifyTaxId } from "./tax.js";
 import { normalizeTaxId } from "../shared/tax.js";
 import { demoEnabled, demoActive, sameWorld, shipmentWorld, isDemoUser } from "./world.js";
+// Recent congestion reports, without who sent them (demo reports stay in the demo world).
+function crossingReports(s, demo) {
+  return (s.crossingReports || [])
+    .filter((r) => !!r.demo === demo && Date.now() - Date.parse(r.createdAt) < 86400000)
+    .map(({ id, crossing, level, note, role, createdAt }) => ({
+      id,
+      crossing,
+      level,
+      note,
+      role,
+      createdAt,
+    }));
+}
 export async function createApp() {
   await initialize();
   const app = express();
@@ -162,7 +175,10 @@ export async function createApp() {
     }),
   );
   // Border and customs notices posted by the administration (public, like the rules page).
-  app.get("/api/border", (req, res) => res.json({ notices: readState().settings?.borderNotices || [] }));
+  app.get("/api/border", (req, res) => {
+    const s = readState();
+    res.json({ notices: s.settings?.borderNotices || [], reports: crossingReports(s, false) });
+  });
   async function sessionFor(user, res, respond = true) {
     const token = randomBytes(32).toString("hex"),
       expiry = Date.now() + 86400000;
@@ -401,6 +417,7 @@ export async function createApp() {
     const {
       emailOutbox,
       whatsappOutbox: _whatsapp,
+      crossingReports: _reports,
       settings: _settings,
       stagedDemoSeeded: _staged,
       passwordResets,
@@ -415,6 +432,7 @@ export async function createApp() {
       emailConfigured: mailConfigured(),
       whatsappConfigured: whatsappConfigured(),
       borderNotices: s.settings?.borderNotices || [],
+      crossingReports: crossingReports(s, !!req.user.demo),
       supportEmail: s.supportEmail || "",
       realtime: !cloudEnabled(),
       ...advancedState(s, req.user),

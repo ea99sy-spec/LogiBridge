@@ -24,6 +24,7 @@ const subjects = {
   order_update: "تحديث على طلب الشراء في LogiBridge",
   order_received: "وصلك طلب شراء جديد في LogiBridge",
   verify_email: "أكّد بريدك الإلكتروني في LogiBridge",
+  border_notice: "تنبيه جديد عن الحدود والجمارك — LogiBridge",
 };
 // Security emails also reach administrators; everything else is for platform accounts.
 const securityEvents = new Set(["password_reset", "password_changed", "login", "verify_email"]);
@@ -32,6 +33,7 @@ export function queueEmail(s, userId, event, details = {}, key) {
   if (!u || u.demo || !u.email || !subjects[event]) return;
   if (u.role === "admin" && !securityEvents.has(event)) return;
   if (event === "company_joined" && u.profile?.companyEmails === false) return;
+  if (event === "border_notice" && u.profile?.borderEmails === false) return;
   s.emailOutbox ||= [];
   if (key && s.emailOutbox.some((x) => x.key === key)) return;
   const url = (process.env.URL || process.env.SITE_URL || "https://logibridge-ea99sy.netlify.app").replace(
@@ -64,6 +66,8 @@ export function queueEmail(s, userId, event, details = {}, key) {
     shipment_cancelled: "أُلغيت الشحنة من صاحبها. لم يعد مطلوبًا أي إجراء منك.",
     order_update: "تغيّرت حالة طلب الشراء الخاص بك. افتح الموقع للتفاصيل.",
     order_received: "وصلك طلب شراء جديد لأحد منتجاتك. افتح قسم الطلبات للتأكيد.",
+    border_notice:
+      "نشرت إدارة LogiBridge تنبيهًا جديدًا عن المعابر أو الجمارك بين تركيا وسوريا. التفاصيل وكل القوانين المحدّثة في صفحة الحدود:",
     verify_email: "شكرًا لتسجيلك. اضغط الرابط التالي خلال 3 أيام لتأكيد بريدك الإلكتروني:",
     password_reset:
       "طلب أحدهم إعادة تعيين كلمة مرور حسابك. افتح الرابط التالي خلال ساعة لاختيار كلمة مرور جديدة. إذا لم تطلب ذلك فتجاهل هذه الرسالة وستبقى كلمة مرورك كما هي.",
@@ -87,6 +91,7 @@ export function queueEmail(s, userId, event, details = {}, key) {
   ]);
   const link =
     details.url ||
+    (event === "border_notice" ? `${url}/border` : "") ||
     (shipmentEvents.has(event) ? `${url}/workspace/tracking` : "") ||
     (event.startsWith("order_")
       ? `${url}/workspace/${event === "order_received" ? "orders" : "marketplace"}`
