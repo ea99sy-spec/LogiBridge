@@ -1,5 +1,8 @@
 apply plugin: 'com.android.application'
 
+// Build number from GitHub Actions (-PversionCode=…), so every new APK installs over the old one.
+def ciVersion = (project.findProperty("versionCode") ?: "1").toString().toInteger()
+
 android {
     namespace = "com.logibridge.driver"
     compileSdk = rootProject.ext.compileSdkVersion
@@ -7,8 +10,8 @@ android {
         applicationId "com.logibridge.driver"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode (project.findProperty("versionCode") ?: "1").toInteger()
-        versionName "1.0." + (project.findProperty("versionCode") ?: "1")
+        versionCode ciVersion
+        versionName "1.0." + ciVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
