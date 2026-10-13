@@ -1,6 +1,9 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  # Save deploy credits: skip the deploy when a push changes nothing the website uses
+  # (tests, notes, the Android project or GitHub workflows). Exit code 0 = skip.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- src server shared netlify netlify.toml package.json package-lock.json index.html vite.config.js scripts mobile/www public"
 
 [build.environment]
   NODE_VERSION = "22"
@@ -10,8 +13,10 @@
   node_bundler = "esbuild"
   external_node_modules = ["express", "exceljs", "pg", "redis", "@netlify/blobs", "qrcode"]
 
+# Emails, WhatsApp and late-truck checks. Every 10 minutes instead of every minute:
+# the minute schedule alone used a large share of the monthly compute credits.
 [functions.emails]
-  schedule = "* * * * *"
+  schedule = "*/10 * * * *"
 
 [[redirects]]
   from = "/api/*"
