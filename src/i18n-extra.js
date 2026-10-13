@@ -1318,4 +1318,35 @@ export const extraRows = {
     "Wrong delivery code. Check it with the receiver.",
     "Teslim kodu yanlış. Alıcıyla kontrol edin.",
   ],
+  // Driver mobile app
+  downloadDriverApp: [
+    "تحميل تطبيق السائق (أندرويد)",
+    "Download the driver app (Android)",
+    "Sürücü uygulamasını indir (Android)",
+  ],
+  driverAppBanner: [
+    "للتتبع حتى لو انطفت الشاشة، نزّل تطبيق السائق والصق فيه هذا الرابط.",
+    "To keep tracking with the screen off, install the driver app and paste this link into it.",
+    "Ekran kapalıyken de takip için sürücü uygulamasını kurun ve bu bağlantıyı yapıştırın.",
+  ],
+  driverAppNote: [
+    "تطبيق السائق يرسل الموقع بالخلفية حتى لو انطفت الشاشة، ويحفظ المواقع وقت انقطاع التغطية. السائق يلصق رابط السائق فيه مرة واحدة.",
+    "The driver app sends the position in the background even with the screen off and keeps points when there is no signal. The driver pastes the driver link into it once.",
+    "Sürücü uygulaması ekran kapalıyken bile konumu arka planda gönderir, sinyal yokken konumları saklar. Sürücü bağlantıyı bir kez yapıştırır.",
+  ],
+  sendToDriverWhatsapp: [
+    "إرسال للسائق على واتساب",
+    "Send to the driver on WhatsApp",
+    "Sürücüye WhatsApp'tan gönder",
+  ],
+  driverLinkMessage: [
+    "رابط مهمتك على LogiBridge (افتحه أو الصقه في تطبيق السائق):",
+    "Your LogiBridge job link (open it or paste it into the driver app):",
+    "LogiBridge iş bağlantınız (açın veya sürücü uygulamasına yapıştırın):",
+  ],
+  driverAppMessage: [
+    "تطبيق السائق لأندرويد (للتتبع والشاشة مطفأة):",
+    "Driver app for Android (tracking with the screen off):",
+    "Android sürücü uygulaması (ekran kapalıyken takip):",
+  ],
 };

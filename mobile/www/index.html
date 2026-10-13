@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <title>LogiBridge Driver</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand"><span>⇄</span> LogiBridge <small data-t="driverApp"></small></div>
+      <select id="lang" aria-label="Language">
+        <option value="ar">العربية</option>
+        <option value="en">English</option>
+        <option value="tr">Türkçe</option>
+      </select>
+    </header>
+
+    <main>
+      <!-- Step 1: connect with the link the carrier sent -->
+      <section id="setup" class="card" hidden>
+        <h1 data-t="connectTitle"></h1>
+        <p class="muted" data-t="connectHelp"></p>
+        <label class="field">
+          <span data-t="linkLabel"></span>
+          <textarea id="link" rows="3" dir="ltr" placeholder="https://logibridge-app.netlify.app/driver#…"></textarea>
+        </label>
+        <div class="row">
+          <button id="paste" class="button ghost" type="button" data-t="paste"></button>
+          <button id="connect" class="button" type="button" data-t="connect"></button>
+        </div>
+        <p id="setupError" class="error" role="alert"></p>
+      </section>
+
+      <!-- Step 2: the job and tracking -->
+      <section id="job" hidden>
+        <div class="card">
+          <p class="muted" id="driverName"></p>
+          <h1 id="title"></h1>
+          <p id="route"></p>
+          <span id="status" class="badge"></span>
+        </div>
+
+        <div class="card tracking">
+          <div class="big-status" id="trackState"></div>
+          <button id="toggle" class="button huge" type="button"></button>
+          <p class="muted small" data-t="backgroundNote"></p>
+          <dl class="facts">
+            <div><dt data-t="lastPoint"></dt><dd id="lastPoint">—</dd></div>
+            <div><dt data-t="lastSent"></dt><dd id="lastSent">—</dd></div>
+            <div><dt data-t="waiting"></dt><dd id="queued">0</dd></div>
+          </dl>
+          <button id="sendNow" class="button ghost" type="button" data-t="sendNow"></button>
+          <p id="jobError" class="error" role="alert"></p>
+        </div>
+
+        <div class="card">
+          <h2 data-t="stageActions"></h2>
+          <div class="row">
+            <button id="dispatch" class="button" type="button" data-t="dispatch" hidden></button>
+            <button id="arrive" class="button" type="button" data-t="arrive" hidden></button>
+          </div>
+          <a id="fullPage" class="button ghost block" target="_blank" rel="noopener" data-t="fullPage"></a>
+          <p class="muted small" data-t="fullPageNote"></p>
+        </div>
+
+        <button id="logout" class="text-button" type="button" data-t="changeLink"></button>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">LogiBridge Driver</string>
+    <string name="title_activity_main">LogiBridge Driver</string>
+    <string name="package_name">com.logibridge.driver</string>
+    <string name="custom_url_scheme">com.logibridge.driver</string>
+    <string name="capacitor_background_geolocation_notification_channel_name">LogiBridge tracking</string>
+    <string name="capacitor_background_geolocation_notification_icon">drawable/ic_tracking</string>
+    <string name="capacitor_background_geolocation_notification_color">#102A56</string>
+</resources>

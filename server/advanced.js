@@ -150,12 +150,21 @@ export function advancedState(s, u) {
   };
 }
 export function publicAdvancedRoutes(app) {
+  // The driver mobile app (Capacitor) calls these endpoints from its own origin with a Bearer token;
+  // no cookies are involved, so allowing that origin is safe.
+  const appOrigins = new Set(["https://localhost", "http://localhost", "capacitor://localhost"]);
   app.use("/driver-api", (req, res, next) => {
-    if (
-      req.method !== "GET" &&
-      req.headers.origin &&
-      req.headers.origin !== `${req.protocol}://${req.get("host")}`
-    )
+    const origin = req.headers.origin;
+    if (origin && appOrigins.has(origin)) {
+      res.set("Access-Control-Allow-Origin", origin);
+      res.set("Vary", "Origin");
+      res.set("Access-Control-Allow-Headers", "Authorization, Content-Type");
+      res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+      res.set("Access-Control-Max-Age", "86400");
+      if (req.method === "OPTIONS") return res.sendStatus(204);
+      return next();
+    }
+    if (req.method !== "GET" && origin && origin !== `${req.protocol}://${req.get("host")}`)
       return res.status(403).json({ error: "Origin rejected" });
     next();
   });

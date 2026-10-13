@@ -1,0 +1,13 @@
+{
+  "appId": "com.logibridge.driver",
+  "appName": "LogiBridge Driver",
+  "webDir": "www",
+  "android": {
+    "useLegacyBridge": true
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}

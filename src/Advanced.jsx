@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { waLink } from "../shared/wa";
+// Android driver app, rebuilt by GitHub Actions on every change in mobile/.
+export const DRIVER_APP_URL =
+  "https://github.com/ea99sy-spec/LogiBridge/releases/download/driver-app/logibridge-driver.apk";
 import { GpsShare } from "./Gps";
 import { TrackMap, TrackFacts, LiveShare, PhotoUpload, ProofForm, targetOf, legColors } from "./Tracking";
 const request = async (path, body, method = "POST") => {
@@ -36,6 +40,9 @@ export function DriverPortal({ t }) {
       </a>
       <h1>{t("driverPortal")}</h1>
       <p>{t("driverPrivacy")}</p>
+      <p className="notice small">
+        📱 {t("driverAppBanner")} <a href={DRIVER_APP_URL}>{t("downloadDriverApp")} ↓</a>
+      </p>
       {error && <p role="alert">{error}</p>}
       {task && (
         <div className="panel">
@@ -339,8 +346,22 @@ export function DriverManager({ data, t, run, busy }) {
           <p>
             {t("expires")}: {new Date(link.expiresAt).toLocaleString()}
           </p>
+          <a
+            className="button ghost small-button whatsapp"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={waLink(
+              "",
+              `${t("driverLinkMessage")}\n${window.location.origin + link.url}\n\n${t("driverAppMessage")}\n${DRIVER_APP_URL}`,
+            )}
+          >
+            {t("sendToDriverWhatsapp")}
+          </a>
         </div>
       )}
+      <p className="muted small">
+        📱 {t("driverAppNote")} <a href={DRIVER_APP_URL}>{t("downloadDriverApp")} ↓</a>
+      </p>
       {data.driverLinks.map((l) => (
         <div className="list-row" key={l.id}>
           <b>{l.name}</b>
