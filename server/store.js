@@ -308,6 +308,21 @@ export async function initialize() {
       verificationLevel: "none",
       plan: "pro",
     });
+  // Changing ADMIN_EMAIL in the hosting settings moves the administrator's sign-in email.
+  // (The password stays as set on the site; it is not overwritten from the settings.)
+  const owner = state.users.find((u) => u.id === "platform-admin");
+  const wanted = String(process.env.ADMIN_EMAIL || "")
+    .trim()
+    .toLowerCase();
+  if (
+    owner &&
+    wanted &&
+    owner.email !== wanted &&
+    !state.users.some((u) => u.id !== owner.id && u.email === wanted)
+  ) {
+    owner.email = wanted;
+    delete owner.emailVerified;
+  }
   // Demo-only sample records; invisible to registered accounts.
   if (!state.operationsDemoSeeded) {
     state.operationsDemoSeeded = true;

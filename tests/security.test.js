@@ -900,3 +900,19 @@ test("truck tracking: crossing detection, receiver link, photos and proof of del
   await call("merchant", `/shipments/${order.id}/public-link`, { enabled: false });
   assert.equal((await call("anon", `/public/track/${token}`)).status, 404);
 });
+
+test("changing ADMIN_EMAIL moves the administrator's sign-in email", async (t) => {
+  const first = await startServer(3222, { DEMO_MODE: "" });
+  const login = (server, email, pass = "Owner-test-password-2026") =>
+    server.call("o", "/auth/login", { email, password: pass });
+  assert.equal((await login(first, "owner@test.local")).status, 200);
+  await first.stop();
+  const second = await startServer(3222, {
+    DEMO_MODE: "",
+    DATA_DIR: first.directory,
+    ADMIN_EMAIL: "new-owner@test.local",
+  });
+  t.after(second.stop);
+  assert.equal((await login(second, "new-owner@test.local")).status, 200);
+  assert.notEqual((await login(second, "owner@test.local")).status, 200);
+});
