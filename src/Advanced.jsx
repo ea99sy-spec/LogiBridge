@@ -41,7 +41,10 @@ export function DriverPortal({ t }) {
       <h1>{t("driverPortal")}</h1>
       <p>{t("driverPrivacy")}</p>
       <p className="notice small">
-        📱 {t("driverAppBanner")} <a href={DRIVER_APP_URL}>{t("downloadDriverApp")} ↓</a>
+        📱 {t("driverAppBanner")} <a href={DRIVER_APP_URL}>{t("downloadDriverApp")} ↓</a> ·{" "}
+        <a href="/driver-app/" target="_blank" rel="noopener noreferrer">
+          {t("tryDriverAppBrowser")} ↗
+        </a>
       </p>
       {error && <p role="alert">{error}</p>}
       {task && (
@@ -360,7 +363,10 @@ export function DriverManager({ data, t, run, busy }) {
         </div>
       )}
       <p className="muted small">
-        📱 {t("driverAppNote")} <a href={DRIVER_APP_URL}>{t("downloadDriverApp")} ↓</a>
+        📱 {t("driverAppNote")} <a href={DRIVER_APP_URL}>{t("downloadDriverApp")} ↓</a> ·{" "}
+        <a href="/driver-app/" target="_blank" rel="noopener noreferrer">
+          {t("tryDriverAppBrowser")} ↗
+        </a>
       </p>
       {data.driverLinks.map((l) => (
         <div className="list-row" key={l.id}>

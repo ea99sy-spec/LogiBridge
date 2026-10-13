@@ -1319,6 +1319,7 @@ export const extraRows = {
     "Teslim kodu yanlış. Alıcıyla kontrol edin.",
   ],
   // Driver mobile app
+  tryDriverAppBrowser: ["افتح التطبيق بالمتصفح", "Open the app in the browser", "Uygulamayı tarayıcıda aç"],
   downloadDriverApp: [
     "تحميل تطبيق السائق (أندرويد)",
     "Download the driver app (Android)",

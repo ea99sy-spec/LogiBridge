@@ -1145,6 +1145,12 @@ export async function createApp() {
   } else if (process.argv.includes("--production")) {
     const root = process.cwd().replace(/\\/g, "/") + "/dist/";
     app.use(express.static(root, { index: false }));
+    // Browser version of the driver app (copied from mobile/www at build time).
+    app.get(["/driver-app", "/driver-app/"], (req, res) => {
+      const path = req.originalUrl.split("?")[0];
+      if (path === "/driver-app") return res.redirect(301, "/driver-app/");
+      res.sendFile(root + "driver-app/index.html");
+    });
     // Every page of the single-page application (/, /reset-password, /workspace/...).
     app.use((req, res, next) => {
       if (req.method !== "GET" && req.method !== "HEAD") return next();

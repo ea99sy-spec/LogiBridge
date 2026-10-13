@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light" />
     <title>LogiBridge Driver</title>
+    <script>
+      // Opened as /driver-app (no slash) on the website: add it so style.css and app.js load.
+      if (location.pathname === "/driver-app") location.replace("/driver-app/" + location.search + location.hash);
+    </script>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -18,6 +22,10 @@
     </header>
 
     <main>
+      <p id="webBanner" class="web-banner" hidden>
+        <span data-t="webPreview"></span>
+        <a href="https://github.com/ea99sy-spec/LogiBridge/releases/download/driver-app/logibridge-driver.apk" data-t="downloadApk"></a>
+      </p>
       <!-- Step 1: connect with the link the carrier sent -->
       <section id="setup" class="card" hidden>
         <h1 data-t="connectTitle"></h1>

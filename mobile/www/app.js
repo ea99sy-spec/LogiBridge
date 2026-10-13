@@ -1,7 +1,10 @@
 // LogiBridge Driver: sends the truck's GPS position in the background (screen off, other apps open)
 // using the driver link the carrier created on the website. Points are kept on the phone when there
 // is no signal and sent together when the connection returns.
-const BASE = "https://logibridge-app.netlify.app";
+const SITE = "https://logibridge-app.netlify.app";
+// Inside the phone app the site is remote; opened from the website (/driver-app/) it is the same site.
+const BASE =
+  !window.Capacitor?.isNativePlatform?.() && /^https?:$/.test(location.protocol) ? location.origin : SITE;
 const SEND_EVERY_MS = 60000; // try to send queued points every minute
 const HEARTBEAT_MS = 10 * 60000; // repeat the last point while standing still, so the site knows the phone is alive
 const MAX_QUEUE = 3000;
@@ -46,6 +49,12 @@ const texts = {
     "Opens the driver page in the browser for photos and the receiver's signature.",
     "Fotoğraf ve alıcı imzası için sürücü sayfasını tarayıcıda açar.",
   ],
+  webPreview: [
+    "هاي نسخة تجربة بالمتصفح. بتشتغل وهي مفتوحة بس؛ التتبع والشاشة مطفأة بيحتاج تطبيق أندرويد.",
+    "Browser preview: works only while open. Tracking with the screen off needs the Android app.",
+    "Tarayıcı önizlemesi: yalnızca açıkken çalışır. Ekran kapalıyken takip için Android uygulaması gerekir.",
+  ],
+  downloadApk: ["تحميل تطبيق أندرويد", "Download the Android app", "Android uygulamasını indir"],
   changeLink: ["تغيير المهمة / الرابط", "Change job / link", "İşi / bağlantıyı değiştir"],
   confirmStop: ["أوقف التتبع؟", "Stop tracking?", "Takip durdurulsun mu?"],
   noPermission: [
@@ -98,6 +107,7 @@ let task = null,
   lastPoint = store.get("lastPoint", null);
 
 function applyLanguage() {
+  $("webBanner").hidden = native;
   document.documentElement.lang = lang;
   document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
   $("lang").value = lang;
@@ -208,7 +218,13 @@ async function startTracking() {
   } else if (navigator.geolocation) {
     // Browser preview (for testing only; phones stop this when the screen is off).
     watcherId = navigator.geolocation.watchPosition(
-      (p) => onLocation({ ...p.coords, time: p.timestamp }),
+      (p) =>
+        onLocation({
+          latitude: p.coords.latitude,
+          longitude: p.coords.longitude,
+          accuracy: p.coords.accuracy,
+          time: p.timestamp,
+        }),
       () => ($("jobError").textContent = t("noPermission")),
       { enableHighAccuracy: true, maximumAge: 30000 },
     );
