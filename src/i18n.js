@@ -634,9 +634,9 @@ const rows = {
   internationalAccounts: ["حسابات دولية", "International accounts", "Uluslararası hesaplar"],
   globalHero: ["جسور تتجاوز الحدود.", "Bridges beyond borders.", "Sınırları aşan köprüler."],
   globalHeroAccent: [
-    "وشحنتك تعبرها بثقة.",
-    "Your cargo crosses them with confidence.",
-    "Yükünüz onları güvenle geçer.",
+    "وكل أطراف شحنتك في مكان واحد.",
+    "Everyone in your shipment, in one place.",
+    "Sevkiyatınızın tüm tarafları tek yerde.",
   ],
   globalIntro: [
     "ابدأ من الممر التجاري بين تركيا وسوريا، مع حسابات للشركات والأفراد دوليًا. قارن عروض الشحن وأدر المستندات والتواصل من مساحة واحدة.",

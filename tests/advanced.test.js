@@ -222,8 +222,8 @@ test("driver links, booking permissions, negotiations, exports and integration k
   state = (await call("merchant", "/api/state")).body;
   const escrow = state.escrows.find((e) => e.shipmentId === sh.id);
   assert.equal(escrow.refundAmount, 20);
-  assert.equal(escrow.carrierNet, 77.6);
-  assert.equal(escrow.commission, 2.4);
+  assert.equal(escrow.carrierNet, 80);
+  assert.equal(escrow.commission, 0);
   const key = (await call("merchant", "/api/integrations/keys", { name: "ERP test" })).body;
   assert.ok(key.token);
   assert.equal((await call("supplier", "/api/integrations/keys", { name: "Wrong" })).status, 403);

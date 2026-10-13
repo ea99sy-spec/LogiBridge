@@ -916,3 +916,70 @@ test("changing ADMIN_EMAIL moves the administrator's sign-in email", async (t) =
   assert.equal((await login(second, "new-owner@test.local")).status, 200);
   assert.notEqual((await login(second, "owner@test.local")).status, 200);
 });
+
+test("free months, the 7-operation bonus and paid months", async (t) => {
+  const { subscriptionOf, addMonths } = await import("../shared/subscription.js");
+  const start = "2026-01-10T00:00:00.000Z";
+  const user = { id: "u", role: "merchant", subscription: { startedAt: start } };
+  const delivered = (n, at) =>
+    Array.from({ length: n }, (_, i) => ({
+      id: "s" + i,
+      ownerId: "u",
+      status: "delivered",
+      completedAt: at,
+    }));
+  const base = { shipments: [], orders: [], products: [] };
+  let sub = subscriptionOf(
+    { ...base, shipments: delivered(6, "2026-02-01T00:00:00Z") },
+    user,
+    Date.parse("2026-02-02"),
+  );
+  assert.equal(sub.status, "trial");
+  assert.equal(sub.endsAt, addMonths(start, 3));
+  assert.equal(sub.operations, 6);
+  sub = subscriptionOf(
+    { ...base, shipments: delivered(7, "2026-02-01T00:00:00Z") },
+    user,
+    Date.parse("2026-05-01"),
+  );
+  assert.equal(sub.bonus, true);
+  assert.equal(sub.endsAt, addMonths(start, 6));
+  // Operations after the first 3 months do not count toward the bonus.
+  sub = subscriptionOf(
+    { ...base, shipments: delivered(7, "2026-05-01T00:00:00Z") },
+    user,
+    Date.parse("2026-05-02"),
+  );
+  assert.equal(sub.status, "expired");
+
+  const server = await startServer(3223, { DEMO_MODE: "" });
+  t.after(server.stop);
+  const { call } = server;
+  const m = (
+    await call("m", "/auth/register", {
+      accountType: "merchant",
+      name: "Sub Trader",
+      email: "sub@test.local",
+      password,
+      ...personFields,
+      taxId: "1234567890",
+      activity: "import",
+      products: "Textiles",
+    })
+  ).body.user;
+  assert.equal((await call("m", "/state")).body.subscription?.status ?? "pending", "pending");
+  await call("owner", "/auth/login", { email: "owner@test.local", password: "Owner-test-password-2026" });
+  await call("owner", `/admin/accounts/${m.id}/review`, { status: "approved" });
+  sub = (await call("m", "/state")).body.subscription;
+  assert.equal(sub.status, "trial");
+  assert.ok(sub.daysLeft >= 89 && sub.daysLeft <= 93);
+  assert.equal((await call("m", `/admin/accounts/${m.id}/subscription`, { months: 1 })).status, 403);
+  assert.equal((await call("owner", `/admin/accounts/${m.id}/subscription`, { months: 2 })).status, 200);
+  sub = (await call("m", "/state")).body.subscription;
+  assert.equal(sub.paidUntil, addMonths(sub.freeUntil, 2));
+  const listed = (await call("owner", "/admin/accounts")).body.find((a) => a.id === m.id);
+  assert.equal(listed.subscription.status, "trial");
+  // No commission on accepted offers.
+  assert.equal((await call("owner", "/admin/settings", { enforceSubscription: true }, "PUT")).status, 200);
+  assert.equal((await call("m", "/shipments", shipment)).status, 201, "active subscription can post");
+});

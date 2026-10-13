@@ -21,8 +21,9 @@ export function acceptBid(state, shipmentId, bidId, ownerId) {
     id: `escrow-${shipment.id}`,
     shipmentId,
     amount: bid.price,
-    commission: Math.round(bid.price * 0.03 * 100) / 100,
-    carrierNet: Math.round(bid.price * 0.97 * 100) / 100,
+    // No commission: the platform earns from the monthly subscription, the carrier gets the full price.
+    commission: 0,
+    carrierNet: bid.price,
     currency: "USD",
     status: "awaiting_funding",
     simulated: true,

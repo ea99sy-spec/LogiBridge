@@ -1,6 +1,7 @@
 import { requiresApproval } from "../shared/access";
 import BorderPage, { BorderRules } from "./BorderRules";
 import { PublicTracking } from "./Tracking";
+import { SubscriptionBanner } from "./Subscription";
 import { waLink } from "../shared/wa";
 import { PendingAccount, Profile, Directory, AccountSecurity, CompanyProfile } from "./Profiles";
 import { ShipmentPayment } from "./Payments";
@@ -326,8 +327,7 @@ function ShipmentCard({ s, compact = false }) {
                 escrow.simulated === false && escrow.status === "held" ? "bank_received" : escrow.status,
               )}
               <small>
-                {t("commission")}: {money(escrow.commission || 0)} · {t("carrierNet")}:{" "}
-                {money(escrow.carrierNet || escrow.amount)}
+                {t("noCommission")} · {t("carrierNet")}: {money(escrow.carrierNet || escrow.amount)}
               </small>
             </div>
           )}
@@ -818,6 +818,7 @@ function App() {
             </div>
           )}
           {user.disabled && <p className="notice">{t("err_Account disabled")}</p>}
+          <SubscriptionBanner sub={data.subscription} t={t} onOpen={() => setTab("dashboard")} />
           {!user.demo && user.emailVerified === false && (
             <div className={`notice email-verify ${data.emailVerificationRequired ? "blocking" : ""}`}>
               <span>{t(data.emailVerificationRequired ? "emailVerifyRequired" : "emailVerifyPending")}</span>

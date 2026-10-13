@@ -26,8 +26,8 @@ const content = {
           "عند قبول صاحب الشحنة عرض ناقل يصبح الاتفاق بينهما مباشرة بالسعر والمدة المذكورين. يستطيع صاحب الشحنة إلغاءها قبل الدفع، ويستطيع الناقل سحب عرضه قبل قبوله.",
         ],
         [
-          "الدفع والعمولة",
-          "استخدام المنصة باشتراك شهري، وأول 3 أشهر مجانية لكل حساب جديد، وتمتد إلى 6 أشهر للحسابات النشيطة. يُعلن سعر الاشتراك في الموقع قبل انتهاء الفترة المجانية. يتم الدفع إما بتحويل بنكي إلى حساب المنصة ليُحفظ كضمان حتى تأكيد الاستلام، أو مباشرة للناقل. تقتطع المنصة عمولة 3٪ من المبالغ المدفوعة عبرها. في الدفع المباشر لا تحفظ المنصة أي مبلغ ولا تتحمّل مسؤولية تحصيله أو استرداده.",
+          "الاشتراك والدفع",
+          "استخدام المنصة باشتراك شهري، وأول 3 أشهر مجانية لكل حساب جديد، تبدأ من تاريخ الموافقة على الحساب، وتمتد إلى 6 أشهر للحسابات التي تكمل 7 عمليات خلال الأشهر الثلاثة الأولى. يُعلن سعر الاشتراك في الموقع قبل انتهاء الفترة المجانية. يتم الدفع إما بتحويل بنكي إلى حساب المنصة ليُحفظ كضمان حتى تأكيد الاستلام، أو مباشرة للناقل. لا تأخذ المنصة أي عمولة على الشحنات، ويصل المبلغ المتفق عليه كاملًا للناقل. في الدفع المباشر لا تحفظ المنصة أي مبلغ ولا تتحمّل مسؤولية تحصيله أو استرداده.",
         ],
         [
           "إغلاق العملية والنزاعات",
@@ -67,8 +67,8 @@ const content = {
           "When a shipment owner accepts a carrier's offer, the two parties agree directly on the stated price and time. The owner may cancel before payment, and a carrier may withdraw an offer before it is accepted.",
         ],
         [
-          "Payment and commission",
-          "The platform is used with a monthly subscription; the first 3 months are free for every new account and extend to 6 months for active accounts. The subscription price is announced on the site before the free period ends. Payment is made either by bank transfer to the platform, held as escrow until delivery is confirmed, or directly to the carrier. The platform keeps a 3% commission on amounts paid through it. With direct payment the platform holds no money and is not responsible for collecting or refunding it.",
+          "Subscription and payment",
+          "The platform is used with a monthly subscription; the first 3 months are free for every new account starting on the account's approval date, and extend to 6 months for accounts that complete 7 operations in the first 3 months. The subscription price is announced on the site before the free period ends. Payment is made either by bank transfer to the platform, held as escrow until delivery is confirmed, or directly to the carrier. The platform takes no commission on shipments; the agreed amount reaches the carrier in full. With direct payment the platform holds no money and is not responsible for collecting or refunding it.",
         ],
         [
           "Closing operations and disputes",
@@ -108,8 +108,8 @@ const content = {
           "Sevkiyat sahibi bir taşıyıcının teklifini kabul ettiğinde taraflar belirtilen fiyat ve süre üzerinde doğrudan anlaşmış olur. Sevkiyat sahibi ödemeden önce iptal edebilir; taşıyıcı teklifini kabul edilmeden önce geri çekebilir.",
         ],
         [
-          "Ödeme ve komisyon",
-          "Platform aylık abonelikle kullanılır; her yeni hesap için ilk 3 ay ücretsizdir ve aktif hesaplarda 6 aya uzar. Abonelik ücreti ücretsiz dönem bitmeden sitede duyurulur. Ödeme, teslim onayına kadar emanette tutulmak üzere platforma banka havalesiyle veya doğrudan taşıyıcıya yapılır. Platform üzerinden ödenen tutarlardan %3 komisyon alınır. Doğrudan ödemede platform para tutmaz ve tahsilat veya iadeden sorumlu değildir.",
+          "Abonelik ve ödeme",
+          "Platform aylık abonelikle kullanılır; her yeni hesap için ilk 3 ay ücretsizdir hesap onay tarihinden başlar ve ilk 3 ayda 7 işlem tamamlayan hesaplarda 6 aya uzar. Abonelik ücreti ücretsiz dönem bitmeden sitede duyurulur. Ödeme, teslim onayına kadar emanette tutulmak üzere platforma banka havalesiyle veya doğrudan taşıyıcıya yapılır. Platform sevkiyatlardan komisyon almaz; anlaşılan tutar taşıyıcıya eksiksiz ulaşır. Doğrudan ödemede platform para tutmaz ve tahsilat veya iadeden sorumlu değildir.",
         ],
         [
           "İşlemin kapanması ve ihtilaflar",

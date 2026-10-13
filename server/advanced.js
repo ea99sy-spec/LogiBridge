@@ -541,8 +541,8 @@ export function advancedRoutes(app) {
         const escrow = s.escrows.find((e) => e.shipmentId === sh.id && e.status === "disputed");
         if (!escrow) throw new Error("Disputed escrow required");
         escrow.refundAmount = Math.round(escrow.amount * x.refundPercent) / 100;
-        escrow.commission = Math.round((escrow.amount - escrow.refundAmount) * 0.03 * 100) / 100;
-        escrow.carrierNet = Math.round((escrow.amount - escrow.refundAmount - escrow.commission) * 100) / 100;
+        escrow.commission = 0;
+        escrow.carrierNet = Math.round((escrow.amount - escrow.refundAmount) * 100) / 100;
         escrow.status = "settled";
         sh.status = "delivered";
       }

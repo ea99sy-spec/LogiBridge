@@ -527,6 +527,19 @@ export function AdminSiteSettings({ data, t, run, busy }) {
       <label className="consent">
         <input
           type="checkbox"
+          checked={settings.enforceSubscription}
+          disabled={busy}
+          onChange={(e) => save({ enforceSubscription: e.target.checked })}
+        />
+        <span>
+          <b>{t("enforceSubscription")}</b>
+          <br />
+          <small>{t("enforceSubscriptionNote")}</small>
+        </span>
+      </label>
+      <label className="consent">
+        <input
+          type="checkbox"
           checked={settings.activityEmails}
           disabled={busy}
           onChange={(e) => save({ activityEmails: e.target.checked })}

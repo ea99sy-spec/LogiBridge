@@ -1,3 +1,4 @@
+import { SubscriptionAdminCell } from "./Subscription";
 import {
   TrackMap,
   FleetMap,
@@ -680,6 +681,17 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
                     </span>
                     {a.disabled && <span className="badge rejected">{t("suspended")}</span>}
                     {a.taxCheck && <TaxBadge check={a.taxCheck} t={t} />}
+                    <SubscriptionAdminCell
+                      account={a}
+                      t={t}
+                      lang={document.documentElement.lang}
+                      run={async (path, body) => {
+                        const ok = await run(path, body);
+                        if (ok) setAccounts(await (await fetch("/api/admin/accounts")).json());
+                        return ok;
+                      }}
+                      busy={busy}
+                    />
                   </td>
                   <td>{t(a.plan)}</td>
                   <td>{a.shipmentCount}</td>

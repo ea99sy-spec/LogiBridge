@@ -109,6 +109,7 @@ export default function Landing({ t, langSelect, user }) {
               <span>✓ {t("benefitVerified")}</span>
               <span>✓ {t("benefitProtected")}</span>
               <span>✓ {t("benefitTracking")}</span>
+              <span>✓ {t("benefitNoCommission")}</span>
               <span>✓ AR / EN / TR</span>
             </div>
           </div>

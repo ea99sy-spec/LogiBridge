@@ -11,6 +11,7 @@ import { readPosition } from "./position.js";
 import { recordPosition } from "./tracking.js";
 import { readState, mutate, id } from "./store.js";
 import { requiresApproval } from "../shared/access.js";
+import { subscriptionOf, addMonths } from "../shared/subscription.js";
 const text = (value, max = 300) => {
   if (typeof value !== "string" || !value.trim() || value.length > max) throw new Error("Invalid text");
   return value.trim();
@@ -50,6 +51,7 @@ export function operationRoutes(app) {
           ...(!req.user.demo || u.demo ? { email: u.email } : {}),
           shipmentCount: s.shipments.filter((sh) => sh.ownerId === u.id || sh.carrierId === u.id).length,
           applicationCount: s.kyb.filter((d) => d.userId === u.id && (!req.user.demo || u.demo)).length,
+          subscription: subscriptionOf(s, u),
           rejectionReason:
             u.verificationStatus === "rejected" && (!req.user.demo || u.demo)
               ? u.review?.reason ||
@@ -91,6 +93,7 @@ export function operationRoutes(app) {
       activityEmails: s.settings?.activityEmails !== false,
       notifyEmail: s.settings?.notifyEmail || "",
       adminWhatsapp: s.settings?.adminWhatsapp || "",
+      enforceSubscription: s.settings?.enforceSubscription === true,
       whatsappConfigured: whatsappConfigured(),
       recipient: adminRecipient(s),
       emailConfigured: mailConfigured(),
@@ -99,7 +102,7 @@ export function operationRoutes(app) {
   app.put("/api/admin/settings", async (req, res) => {
     if (!realAdmin(req, res)) return;
     const b = req.body;
-    for (const k of ["demoLogin", "activityEmails", "requireEmailVerification"])
+    for (const k of ["demoLogin", "activityEmails", "requireEmailVerification", "enforceSubscription"])
       if (k in b && typeof b[k] !== "boolean") throw new Error("Invalid request");
     let notifyEmail;
     if ("notifyEmail" in b) {
@@ -120,7 +123,27 @@ export function operationRoutes(app) {
       if ("demoLogin" in b) s.settings.demoLogin = b.demoLogin;
       if ("activityEmails" in b) s.settings.activityEmails = b.activityEmails;
       if ("requireEmailVerification" in b) s.settings.requireEmailVerification = b.requireEmailVerification;
+      if ("enforceSubscription" in b) s.settings.enforceSubscription = b.enforceSubscription;
       if (notifyEmail !== undefined) s.settings.notifyEmail = notifyEmail;
+    });
+    res.json({ ok: true });
+  });
+  // Record paid subscription months (manual payment until online payment is added).
+  app.post("/api/admin/accounts/:id/subscription", async (req, res) => {
+    if (!realAdmin(req, res)) return;
+    const months = Number(req.body.months);
+    if (!Number.isInteger(months) || months < 1 || months > 24) throw new Error("Invalid request");
+    await mutate((s) => {
+      const u = s.users.find((x) => x.id === req.params.id && x.role !== "admin" && !x.demo);
+      if (!u) throw new Error("Account unavailable");
+      const now = new Date().toISOString();
+      u.subscription ||= { startedAt: now };
+      u.subscription.startedAt ||= now;
+      const current = subscriptionOf(s, u);
+      const from = current.endsAt && current.endsAt > now ? current.endsAt : now;
+      u.subscription.paidUntil = addMonths(from, months);
+      (u.subscription.payments ||= []).push({ months, at: now, by: req.user.id });
+      notice(s, u.id, "subscription_paid", undefined, u.subscription.paidUntil.slice(0, 10));
     });
     res.json({ ok: true });
   });
@@ -247,6 +270,8 @@ export function operationRoutes(app) {
       if (!u) throw new Error("Account unavailable");
       const now = new Date().toISOString();
       u.verified = b.status === "approved";
+      // The free months start counting when the account is approved.
+      if (u.verified && !u.subscription?.startedAt) u.subscription = { ...u.subscription, startedAt: now };
       u.verificationStatus = b.status;
       u.verificationLevel = u.verified ? "admin_approval" : "none";
       u.review = { reviewerId: req.user.id, reviewedAt: now, status: b.status, reason };

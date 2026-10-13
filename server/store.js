@@ -308,6 +308,10 @@ export async function initialize() {
       verificationLevel: "none",
       plan: "pro",
     });
+  // Accounts approved before subscriptions existed start their free months from today.
+  for (const u of state.users)
+    if (u.role !== "admin" && !u.demo && u.verified && !u.subscription?.startedAt)
+      u.subscription = { ...u.subscription, startedAt: new Date().toISOString() };
   // Changing ADMIN_EMAIL in the hosting settings moves the administrator's sign-in email.
   // (The password stays as set on the site; it is not overwritten from the settings.)
   const owner = state.users.find((u) => u.id === "platform-admin");
@@ -375,8 +379,8 @@ export async function initialize() {
       id: "demo-tracking-escrow",
       shipmentId: "demo-tracking",
       amount: 450,
-      commission: 13.5,
-      carrierNet: 436.5,
+      commission: 0,
+      carrierNet: 450,
       status: "held",
       simulated: true,
       currency: "USD",

@@ -6,6 +6,8 @@ import { readPosition, requirePosition } from "./position.js";
 import { validateDocument, encryptDocument } from "./identity.js";
 import { transitionShipment, syncOrder } from "./domain.js";
 import { readState, mutate } from "./store.js";
+import { subscriptionOf } from "../shared/subscription.js";
+import { queueEmail } from "./email.js";
 
 const TRACK_LIMIT = 400,
   PHOTO_LIMIT = 15,
@@ -114,11 +116,35 @@ export function trackingWatch(s, now = Date.now()) {
   }
   return changed;
 }
-// Runs the watch from a timer (local server) or the scheduled Netlify function.
+// Subscription reminders: bonus months earned, a week before the end, and when it ends.
+export function subscriptionWatch(s, now = Date.now()) {
+  let changed = false;
+  for (const u of s.users.filter((x) => x.role !== "admin" && !x.demo && x.subscription?.startedAt)) {
+    const sub = subscriptionOf(s, u, now);
+    const sent = (u.subscription.sent ||= {});
+    const once = (key, event, details) => {
+      if (sent[key]) return;
+      sent[key] = new Date(now).toISOString();
+      notice(s, u.id, event, undefined, sub.endsAt.slice(0, 10));
+      queueEmail(s, u.id, event, { until: sub.endsAt.slice(0, 10), ...details }, `${event}/${u.id}/${key}`);
+      changed = true;
+    };
+    if (sub.bonus) once("bonus", "subscription_bonus", {});
+    if (sub.status !== "expired" && sub.daysLeft <= 7)
+      once("ending/" + sub.endsAt, "subscription_ending", {});
+    if (sub.status === "expired") once("expired/" + sub.endsAt, "subscription_expired", {});
+  }
+  return changed;
+}
+// Runs the watches from a timer (local server) or the scheduled Netlify function.
 export async function runTrackingWatch() {
   const copy = JSON.parse(JSON.stringify(readState()));
-  if (!trackingWatch(copy)) return false;
-  await mutate((s) => trackingWatch(s));
+  const due = trackingWatch(copy) | subscriptionWatch(copy);
+  if (!due) return false;
+  await mutate((s) => {
+    trackingWatch(s);
+    subscriptionWatch(s);
+  });
   return true;
 }
 

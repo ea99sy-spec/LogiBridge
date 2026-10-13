@@ -25,6 +25,9 @@ const subjects = {
   order_received: "وصلك طلب شراء جديد في LogiBridge",
   verify_email: "أكّد بريدك الإلكتروني في LogiBridge",
   border_notice: "تنبيه جديد عن الحدود والجمارك — LogiBridge",
+  subscription_bonus: "حصلت على 3 شهور مجانية إضافية في LogiBridge",
+  subscription_ending: "اشتراكك المجاني في LogiBridge ينتهي قريبًا",
+  subscription_expired: "انتهت الفترة المجانية لاشتراكك في LogiBridge",
 };
 // Security emails also reach administrators; everything else is for platform accounts.
 const securityEvents = new Set(["password_reset", "password_changed", "login", "verify_email"]);
@@ -66,6 +69,12 @@ export function queueEmail(s, userId, event, details = {}, key) {
     shipment_cancelled: "أُلغيت الشحنة من صاحبها. لم يعد مطلوبًا أي إجراء منك.",
     order_update: "تغيّرت حالة طلب الشراء الخاص بك. افتح الموقع للتفاصيل.",
     order_received: "وصلك طلب شراء جديد لأحد منتجاتك. افتح قسم الطلبات للتأكيد.",
+    subscription_bonus:
+      "شكرًا لاستخدامك المنصة! أكملت 7 عمليات خلال أول 3 شهور، فحصلت على 3 شهور مجانية إضافية. اشتراكك المجاني مستمر حتى:",
+    subscription_ending:
+      "تنتهي الفترة المجانية لاشتراكك خلال أيام. للاستمرار بدون انقطاع تواصل مع إدارة المنصة لتفعيل الاشتراك الشهري. تاريخ الانتهاء:",
+    subscription_expired:
+      "انتهت الفترة المجانية لاشتراكك. يمكنك الاطلاع على حسابك وإكمال الشحنات الحالية، وللاستمرار بشحنات وعروض جديدة تواصل مع إدارة المنصة لتفعيل الاشتراك.",
     border_notice:
       "نشرت إدارة LogiBridge تنبيهًا جديدًا عن المعابر أو الجمارك بين تركيا وسوريا. التفاصيل وكل القوانين المحدّثة في صفحة الحدود:",
     verify_email: "شكرًا لتسجيلك. اضغط الرابط التالي خلال 3 أيام لتأكيد بريدك الإلكتروني:",

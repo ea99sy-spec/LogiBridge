@@ -1,3 +1,4 @@
+import { SubscriptionCard } from "./Subscription";
 import React, { useState } from "react";
 import { accountKind, workspaceModules } from "../shared/workspaces";
 export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }) {
@@ -120,6 +121,7 @@ export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }
         </div>
         <span className="role-tag">{user.name}</span>
       </div>
+      <SubscriptionCard sub={data.subscription} t={t} lang={document.documentElement.lang} />
       <div className="operation-shortcuts">
         {actions[kind]
           .filter(([path]) => allowed.includes(path))

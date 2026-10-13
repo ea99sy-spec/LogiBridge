@@ -41,6 +41,7 @@ import { paymentRoutes, paymentState } from "./payments.js";
 import { requiresApproval } from "../shared/access.js";
 import { queueEmail, queueAdminEmail, mailConfigured, flushEmails } from "./email.js";
 import { whatsappConfigured, flushWhatsApp } from "./whatsapp.js";
+import { subscriptionOf } from "../shared/subscription.js";
 import { trackingRoutes, publicTrackingRoutes, newDeliveryCode, runTrackingWatch } from "./tracking.js";
 import { profileRoutes, announceCompany } from "./profiles.js";
 import {
@@ -357,6 +358,18 @@ export async function createApp() {
       ].includes(req.path)
     )
       return res.status(403).json({ error: "Email verification required" });
+    // Expired subscriptions can still read and finish current work, but not start new business,
+    // when the administrator turns this on.
+    if (
+      req.method === "POST" &&
+      /^\/(shipments|bids|groups|products|orders)$|^\/shipments\/[^/]+\/accept$|^\/groups\/[^/]+\/reserve$/.test(
+        req.path,
+      )
+    ) {
+      const s = readState();
+      if (s.settings?.enforceSubscription && subscriptionOf(s, req.user).status === "expired")
+        return res.status(402).json({ error: "Subscription expired" });
+    }
     next();
   });
   app.get("/api/state", (req, res) => {
@@ -433,6 +446,7 @@ export async function createApp() {
       ...shared,
       emailConfigured: mailConfigured(),
       whatsappConfigured: whatsappConfigured(),
+      subscription: subscriptionOf(readState(), req.user),
       borderNotices: s.settings?.borderNotices || [],
       crossingReports: crossingReports(s, !!req.user.demo),
       supportEmail: s.supportEmail || "",
@@ -968,6 +982,8 @@ export async function createApp() {
       };
       notice(s, owner.id, "verification_" + b.status, undefined, doc.review.reason);
       owner.verified = b.status === "approved";
+      if (owner.verified && !owner.demo && !owner.subscription?.startedAt)
+        owner.subscription = { ...owner.subscription, startedAt: new Date().toISOString() };
       owner.verificationStatus = b.status;
       owner.verificationLevel = owner.verified ? (owner.demo ? "demo" : "manual_review") : "none";
       queueEmail(

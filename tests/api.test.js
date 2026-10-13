@@ -199,8 +199,8 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
   );
   const escrow = state.escrows.find((e) => e.shipmentId === shipment.id);
   assert.equal(escrow.status, "released");
-  assert.equal(escrow.commission, 12);
-  assert.equal(escrow.carrierNet, 388);
+  assert.equal(escrow.commission, 0);
+  assert.equal(escrow.carrierNet, 400);
   const rating = { shipmentId: shipment.id, score: 5, comment: "Delivered safely" };
   assert.equal((await call("merchant", "/ratings", rating)).status, 200);
   assert.equal((await call("merchant", "/ratings", rating)).status, 400);
@@ -676,7 +676,7 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
     200,
   );
   const finalPayment = (await call("business", "/state")).body.payments[0];
-  assert.equal(finalPayment.transfer.amount, 74.69);
+  assert.equal(finalPayment.transfer.amount, 77, "no commission: the carrier gets the full price");
   assert.equal(finalPayment.transferContent, undefined);
   assert.equal(
     (
