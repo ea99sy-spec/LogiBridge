@@ -6,11 +6,13 @@ const symbols = { merchant: "▤", carrier: "⇄", broker: "⚖", supplier: "▧
 
 // Public facts the page needs: whether demo accounts are on, and the support email.
 function useHealth() {
-  const [health, setHealth] = useState({ demo: false, supportEmail: "" });
+  const [health, setHealth] = useState({ demo: false, supportEmail: "", pricing: null });
   useEffect(() => {
     fetch("/api/health")
       .then((r) => r.json())
-      .then((r) => setHealth({ demo: !!r.demo, supportEmail: r.supportEmail || "" }))
+      .then((r) =>
+        setHealth({ demo: !!r.demo, supportEmail: r.supportEmail || "", pricing: r.pricing || null }),
+      )
       .catch(() => {});
   }, []);
   return health;
@@ -273,6 +275,28 @@ export default function Landing({ t, langSelect, user }) {
               <li>✓ {t("pricingProtected")}</li>
               <li>✓ {t("pricingDirect")}</li>
             </ul>
+            {health.pricing && (
+              <>
+                <div className="price-grid">
+                  {types.map((type) => (
+                    <div key={type} className="price-item">
+                      <span>{t(type)}</span>
+                      <b>
+                        {health.pricing.prices[type] > 0 ? (
+                          <>
+                            <bdi dir="ltr">${health.pricing.prices[type]}</bdi>{" "}
+                            <small>/ {t("perMonth")}</small>
+                          </>
+                        ) : (
+                          t("freePrice")
+                        )}
+                      </b>
+                    </div>
+                  ))}
+                </div>
+                <p className="price-note">{t("yearlyNote")}</p>
+              </>
+            )}
           </div>
           <h2>{t("faqTitle")}</h2>
           <div className="faq">

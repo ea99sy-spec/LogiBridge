@@ -524,6 +524,7 @@ export function AdminSiteSettings({ data, t, run, busy }) {
           </small>
         </span>
       </label>
+      <PricingSettings settings={settings} save={save} t={t} busy={busy} />
       <label className="consent">
         <input
           type="checkbox"
@@ -966,5 +967,64 @@ export function CompanyProfile({ id, t, data, navigate, money }) {
         )}
       </section>
     </div>
+  );
+}
+
+// Subscription prices shown on the home page: edit them or hide them.
+function PricingSettings({ settings, save, t, busy }) {
+  const pricing = settings.pricing;
+  if (!pricing) return null;
+  const kinds = ["merchant", "carrier", "broker", "supplier", "individual"];
+  return (
+    <form
+      className="form-stack pricing-settings"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const f = new FormData(e.currentTarget);
+        save({
+          pricing: {
+            visible: f.has("visible"),
+            prices: Object.fromEntries(kinds.map((k) => [k, Number(f.get(k) || 0)])),
+          },
+        });
+      }}
+    >
+      <h3>{t("pricingSettings")}</h3>
+      <label className="consent">
+        <input
+          type="checkbox"
+          name="visible"
+          defaultChecked={pricing.visible}
+          key={String(pricing.visible)}
+        />
+        <span>
+          <b>{t("showPrices")}</b>
+          <br />
+          <small>{t("showPricesNote")}</small>
+        </span>
+      </label>
+      <div className="price-inputs">
+        {kinds.map((k) => (
+          <label className="field" key={k}>
+            <span>
+              {t(k)} ($ / {t("perMonth")})
+            </span>
+            <input
+              name={k}
+              type="number"
+              min="0"
+              max="10000"
+              step="1"
+              dir="ltr"
+              defaultValue={pricing.prices[k]}
+              key={k + pricing.prices[k]}
+            />
+          </label>
+        ))}
+      </div>
+      <button className="button" disabled={busy}>
+        {t("save")}
+      </button>
+    </form>
   );
 }

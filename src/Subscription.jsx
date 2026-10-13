@@ -3,8 +3,9 @@ import React from "react";
 const date = (iso, lang) => (iso ? new Date(iso).toLocaleDateString(lang, { dateStyle: "medium" }) : "—");
 
 // Free months counter and progress toward the 3 bonus months (dashboard and profile).
-export function SubscriptionCard({ sub, t, lang }) {
+export function SubscriptionCard({ sub, t, lang, pricing, accountType }) {
   if (!sub || ["none", "pending"].includes(sub.status)) return null;
+  const price = pricing?.prices?.[accountType];
   const pct = Math.round((sub.operations / sub.target) * 100);
   return (
     <section className={`panel subscription-card ${sub.status}`}>
@@ -17,6 +18,11 @@ export function SubscriptionCard({ sub, t, lang }) {
       ) : (
         <p className="subscription-days">
           <b>{sub.daysLeft}</b> {t("daysLeft")} · {t("until")} {date(sub.endsAt, lang)}
+        </p>
+      )}
+      {price > 0 && (
+        <p className="muted small">
+          {t("afterFreePeriod")} <bdi dir="ltr">${price}</bdi> / {t("perMonth")} · {t("noCommission")}
         </p>
       )}
       {sub.bonus ? (

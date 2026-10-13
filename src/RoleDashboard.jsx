@@ -121,7 +121,13 @@ export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }
         </div>
         <span className="role-tag">{user.name}</span>
       </div>
-      <SubscriptionCard sub={data.subscription} t={t} lang={document.documentElement.lang} />
+      <SubscriptionCard
+        sub={data.subscription}
+        t={t}
+        lang={document.documentElement.lang}
+        pricing={data.pricing}
+        accountType={user.accountType}
+      />
       <div className="operation-shortcuts">
         {actions[kind]
           .filter(([path]) => allowed.includes(path))

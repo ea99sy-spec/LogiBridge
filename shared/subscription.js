@@ -62,3 +62,18 @@ export function subscriptionOf(state, user, now = Date.now()) {
     daysLeft: Math.max(0, Math.ceil((Date.parse(endsAt) - now) / 86400000)),
   };
 }
+
+// Monthly prices in USD shown on the home page (the administrator can change or hide them).
+export const defaultPricing = {
+  visible: true,
+  currency: "USD",
+  prices: { merchant: 29, carrier: 19, broker: 19, supplier: 15, individual: 0 },
+};
+export function pricingOf(state) {
+  const p = state.settings?.pricing || {};
+  return {
+    visible: p.visible ?? defaultPricing.visible,
+    currency: defaultPricing.currency,
+    prices: { ...defaultPricing.prices, ...(p.prices || {}) },
+  };
+}

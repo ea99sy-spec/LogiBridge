@@ -41,7 +41,7 @@ import { paymentRoutes, paymentState } from "./payments.js";
 import { requiresApproval } from "../shared/access.js";
 import { queueEmail, queueAdminEmail, mailConfigured, flushEmails } from "./email.js";
 import { whatsappConfigured, flushWhatsApp } from "./whatsapp.js";
-import { subscriptionOf } from "../shared/subscription.js";
+import { subscriptionOf, pricingOf } from "../shared/subscription.js";
 import { trackingRoutes, publicTrackingRoutes, newDeliveryCode, runTrackingWatch } from "./tracking.js";
 import { profileRoutes, announceCompany } from "./profiles.js";
 import {
@@ -172,6 +172,8 @@ export async function createApp() {
       demo: DEMO_NOW(),
       supportEmail: readState().supportEmail || process.env.MAIL_REPLY_TO || "",
       emailConfigured: mailConfigured(),
+      // Subscription prices for the home page, unless the administrator hid them.
+      pricing: pricingOf(readState()).visible ? pricingOf(readState()) : null,
       storage: cloudEnabled() ? "netlify-blobs" : process.env.DATABASE_URL ? "postgresql" : "json",
       redis: !!redis,
     }),
@@ -447,6 +449,7 @@ export async function createApp() {
       emailConfigured: mailConfigured(),
       whatsappConfigured: whatsappConfigured(),
       subscription: subscriptionOf(readState(), req.user),
+      pricing: pricingOf(readState()).visible ? pricingOf(readState()) : null,
       borderNotices: s.settings?.borderNotices || [],
       crossingReports: crossingReports(s, !!req.user.demo),
       supportEmail: s.supportEmail || "",

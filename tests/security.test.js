@@ -982,4 +982,19 @@ test("free months, the 7-operation bonus and paid months", async (t) => {
   // No commission on accepted offers.
   assert.equal((await call("owner", "/admin/settings", { enforceSubscription: true }, "PUT")).status, 200);
   assert.equal((await call("m", "/shipments", shipment)).status, 201, "active subscription can post");
+  // Prices are public by default; the administrator can change or hide them.
+  assert.equal((await call("anon", "/health")).body.pricing.prices.merchant, 29);
+  const prices = { merchant: 25, carrier: 15, broker: 15, supplier: 10, individual: 0 };
+  assert.equal(
+    (await call("owner", "/admin/settings", { pricing: { visible: true, prices } }, "PUT")).status,
+    200,
+  );
+  assert.equal((await call("anon", "/health")).body.pricing.prices.merchant, 25);
+  await call("owner", "/admin/settings", { pricing: { visible: false, prices } }, "PUT");
+  assert.equal((await call("anon", "/health")).body.pricing, null);
+  assert.equal(
+    (await call("owner", "/admin/settings", { pricing: { visible: true, prices: { merchant: -1 } } }, "PUT"))
+      .status,
+    400,
+  );
 });

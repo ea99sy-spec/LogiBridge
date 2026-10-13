@@ -11,7 +11,7 @@ import { readPosition } from "./position.js";
 import { recordPosition } from "./tracking.js";
 import { readState, mutate, id } from "./store.js";
 import { requiresApproval } from "../shared/access.js";
-import { subscriptionOf, addMonths } from "../shared/subscription.js";
+import { subscriptionOf, addMonths, pricingOf } from "../shared/subscription.js";
 const text = (value, max = 300) => {
   if (typeof value !== "string" || !value.trim() || value.length > max) throw new Error("Invalid text");
   return value.trim();
@@ -94,6 +94,7 @@ export function operationRoutes(app) {
       notifyEmail: s.settings?.notifyEmail || "",
       adminWhatsapp: s.settings?.adminWhatsapp || "",
       enforceSubscription: s.settings?.enforceSubscription === true,
+      pricing: pricingOf(s),
       whatsappConfigured: whatsappConfigured(),
       recipient: adminRecipient(s),
       emailConfigured: mailConfigured(),
@@ -112,6 +113,18 @@ export function operationRoutes(app) {
       if (notifyEmail && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(notifyEmail) || notifyEmail.length > 254))
         throw new Error("Invalid email");
     }
+    let pricing;
+    if ("pricing" in b) {
+      const p = b.pricing || {};
+      if (typeof p.visible !== "boolean") throw new Error("Invalid request");
+      const prices = {};
+      for (const k of ["merchant", "carrier", "broker", "supplier", "individual"]) {
+        const v = Number(p.prices?.[k]);
+        if (!Number.isFinite(v) || v < 0 || v > 10000) throw new Error("Invalid request");
+        prices[k] = Math.round(v * 100) / 100;
+      }
+      pricing = { visible: p.visible, prices };
+    }
     let adminWhatsapp;
     if ("adminWhatsapp" in b) {
       adminWhatsapp = String(b.adminWhatsapp || "").trim();
@@ -120,6 +133,7 @@ export function operationRoutes(app) {
     await mutate((s) => {
       s.settings ||= {};
       if (adminWhatsapp !== undefined) s.settings.adminWhatsapp = adminWhatsapp;
+      if (pricing) s.settings.pricing = pricing;
       if ("demoLogin" in b) s.settings.demoLogin = b.demoLogin;
       if ("activityEmails" in b) s.settings.activityEmails = b.activityEmails;
       if ("requireEmailVerification" in b) s.settings.requireEmailVerification = b.requireEmailVerification;

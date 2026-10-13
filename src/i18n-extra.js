@@ -1651,4 +1651,24 @@ export const extraRows = {
     "Your subscription is active until",
     "Aboneliğiniz şu tarihe kadar aktif",
   ],
+  // Subscription prices
+  perMonth: ["شهر", "month", "ay"],
+  freePrice: ["مجانًا", "Free", "Ücretsiz"],
+  yearlyNote: [
+    "الاشتراك السنوي بسعر 10 أشهر فقط. الأسعار بعد انتهاء الفترة المجانية.",
+    "Yearly subscription for the price of 10 months. Prices apply after the free period.",
+    "Yıllık abonelik 10 ay fiyatına. Fiyatlar ücretsiz dönemden sonra geçerlidir.",
+  ],
+  afterFreePeriod: ["بعد الفترة المجانية:", "After the free period:", "Ücretsiz dönemden sonra:"],
+  pricingSettings: ["أسعار الاشتراك", "Subscription prices", "Abonelik fiyatları"],
+  showPrices: [
+    "إظهار الأسعار في الصفحة الرئيسية",
+    "Show prices on the home page",
+    "Fiyatları ana sayfada göster",
+  ],
+  showPricesNote: [
+    "إذا أطفأتها، يبقى قسم «كم تكلّف المنصة» بدون أرقام.",
+    "If turned off, the pricing section stays without numbers.",
+    "Kapalıysa fiyat bölümü rakamsız kalır.",
+  ],
 };
