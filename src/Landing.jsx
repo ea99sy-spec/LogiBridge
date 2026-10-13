@@ -1,26 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { LegalLinks } from "./Legal";
-// "Try it" area: opens a demo account of each type without registering.
-function TryPlatform({ t }) {
-  const [demo, setDemo] = useState(false),
-    [busy, setBusy] = useState(""),
-    [error, setError] = useState("");
+
+const types = ["merchant", "carrier", "broker", "supplier", "individual"];
+const symbols = { merchant: "▤", carrier: "⇄", broker: "⚖", supplier: "▧", individual: "◉", admin: "◇" };
+
+// Public facts the page needs: whether demo accounts are on, and the support email.
+function useHealth() {
+  const [health, setHealth] = useState({ demo: false, supportEmail: "" });
   useEffect(() => {
     fetch("/api/health")
       .then((r) => r.json())
-      .then((r) => setDemo(!!r.demo))
+      .then((r) => setHealth({ demo: !!r.demo, supportEmail: r.supportEmail || "" }))
       .catch(() => {});
   }, []);
-  if (!demo) return null;
-  const kinds = [
-    ["merchant", "▤"],
-    ["carrier", "⇄"],
-    ["broker", "⚖"],
-    ["supplier", "▧"],
-    ["individual", "◉"],
-    ["admin", "◇"],
-  ];
-  async function open(kind) {
+  return health;
+}
+
+export default function Landing({ t, langSelect, user }) {
+  const health = useHealth();
+  const [menu, setMenu] = useState(false),
+    [busy, setBusy] = useState(""),
+    [error, setError] = useState("");
+  // Opens a demo account without registering (only when the administrator turned demos on).
+  async function tryAs(kind) {
     setBusy(kind);
     setError("");
     try {
@@ -36,44 +38,35 @@ function TryPlatform({ t }) {
       setBusy("");
     }
   }
-  return (
-    <section id="try" className="landing-section try-platform">
-      <span className="eyebrow">TRY IT · NO SIGN-UP</span>
-      <h2>{t("tryPlatformTitle")}</h2>
-      <p>{t("tryPlatformIntro")}</p>
-      <div className="landing-account-cards">
-        {kinds.map(([kind, symbol]) => (
-          <article key={kind}>
-            <span className="access-symbol">{symbol}</span>
-            <h3>{t(kind === "admin" ? "administrator" : kind)}</h3>
-            <p>{t("tryAs_" + kind)}</p>
-            <button className="button yellow-button" disabled={!!busy} onClick={() => open(kind)}>
-              {busy === kind ? t("loading") : t("tryDemo")} ↗
-            </button>
-          </article>
-        ))}
-      </div>
-      {error && <p role="alert">{error}</p>}
-      <p className="muted small">{t("tryPlatformNote")}</p>
-    </section>
-  );
-}
-export default function Landing({ t, langSelect, user }) {
-  const types = ["merchant", "carrier", "broker", "supplier", "individual"];
-  const symbols = { merchant: "▤", carrier: "⇄", broker: "⚖", supplier: "▧", individual: "◉" };
+  const links = [
+    ["#why", "navWhy"],
+    ["#how", "navHow"],
+    ["#features", "navFeatures"],
+    ["#accounts", "navAccounts"],
+    ["#faq", "navFaq"],
+    ["/border", "borderNav"],
+  ];
   return (
     <div className="landing">
       <header className="landing-header">
         <a className="brand" href="/">
           <span className="brand-icon">⇄</span>LogiBridge
         </a>
-        <nav aria-label={t("mainNavigation")}>
-          <a href="#about">{t("aboutNav")}</a>
-          <a href="#try">{t("tryNav")}</a>
-          <a href="#services">{t("ourServices")}</a>
-          <a href="#verification">{t("identityReview")}</a>
-          <a href="/border">{t("borderNav")}</a>
-          <a href="/accounts">{t("createAccount")}</a>
+        <button
+          type="button"
+          className="menu-toggle"
+          aria-expanded={menu}
+          aria-controls="landing-nav"
+          onClick={() => setMenu(!menu)}
+        >
+          {menu ? "✕" : "☰"} <span>{t("menu")}</span>
+        </button>
+        <nav id="landing-nav" className={menu ? "open" : ""} aria-label={t("mainNavigation")}>
+          {links.map(([href, key]) => (
+            <a key={key} href={href} onClick={() => setMenu(false)}>
+              {t(key)}
+            </a>
+          ))}
         </nav>
         <div className="landing-header-actions">
           {langSelect}
@@ -88,34 +81,35 @@ export default function Landing({ t, langSelect, user }) {
           )}
         </div>
       </header>
+
       <main className="landing-main">
+        {/* 1. What the site does, in one look */}
         <section className="landing-hero">
           <div>
             <span className="access-chip">
-              TÜRKİYE · SYRIA · GLOBAL <i />
+              {t("heroChip")} <i />
             </span>
             <h1>
               {t("globalHero")}
               <span>{t("globalHeroAccent")}</span>
             </h1>
-            <p>{t("globalIntro")}</p>
+            <p className="hero-value">{t("heroValue")}</p>
             <div className="landing-cta">
-              <a className="button yellow-button" href="/accounts">
-                {t("startAccount")} ↗
+              <a
+                className="button yellow-button"
+                href={user ? "/workspace/newShipment" : "/register/merchant"}
+              >
+                {t("heroPostShipment")} ↗
               </a>
-              <a className="button ghost" href="#services">
-                {t("exploreServices")}
+              <a className="button ghost" href={health.demo ? "#accounts" : "#how"}>
+                {t(health.demo ? "heroTry" : "navHow")}
               </a>
-            </div>
-            <div className="landing-direct-actions">
-              <a href="/workspace/newShipment">＋ {t("enterShipment")}</a>
-              <a href="/workspace/documents">⇧ {t("uploadDocuments")}</a>
-              <a href="/workspace/tracking">◎ {t("tracking")}</a>
             </div>
             <div className="access-benefits">
-              <span>✓ {t("identityReview")}</span>
+              <span>✓ {t("benefitVerified")}</span>
+              <span>✓ {t("benefitProtected")}</span>
+              <span>✓ {t("benefitTracking")}</span>
               <span>✓ AR / EN / TR</span>
-              <span>✓ {t("internationalAccounts")}</span>
             </div>
           </div>
           <div className="global-art" aria-hidden="true">
@@ -137,12 +131,88 @@ export default function Landing({ t, langSelect, user }) {
             <div className="global-art-caption">LOGIBRIDGE NETWORK</div>
           </div>
         </section>
-        <About t={t} />
-        <TryPlatform t={t} />
-        <section id="services" className="landing-section">
-          <span className="eyebrow">ONE PLATFORM. YOUR WORKSPACE.</span>
-          <h2>{t("accountForEveryone")}</h2>
-          <p>{t("accountForEveryoneDesc")}</p>
+
+        {/* 2. Why use the platform */}
+        <section id="why" className="landing-section">
+          <h2>{t("whyTitle")}</h2>
+          <p className="section-lead">{t("whyLead")}</p>
+          <div className="compare">
+            <div className="compare-head">
+              <span />
+              <b>{t("compareUsual")}</b>
+              <b className="ours">{t("compareOurs")}</b>
+            </div>
+            {["Offers", "Price", "Visibility", "Rules", "Payment"].map((k) => (
+              <div className="compare-row" key={k}>
+                <span className="compare-topic">{t("compareTopic" + k)}</span>
+                <span className="compare-usual">{t("compareUsual" + k)}</span>
+                <span className="compare-ours">✓ {t("compareOurs" + k)}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 3. How a shipment to Syria runs */}
+        <section id="how" className="landing-section">
+          <h2>{t("howTitle")}</h2>
+          <p className="section-lead">{t("howLead")}</p>
+          <ol className="about-steps">
+            {["howStep1", "howStep2", "howStep3", "howStep4"].map((k, i) => (
+              <li key={k}>
+                <span>{i + 1}</span>
+                <b>{t(k)}</b>
+                <small>{t(k + "Text")}</small>
+              </li>
+            ))}
+          </ol>
+          <div className="corridor">
+            <h3>{t("corridorTitle")}</h3>
+            <div className="corridor-steps">
+              {[
+                ["🚚", "leg_origin_leg", "corridorLeg1"],
+                ["⚖", "leg_clearance", "corridorLeg2"],
+                ["🚚", "leg_destination_leg", "corridorLeg3"],
+              ].map(([icon, title, text], i) => (
+                <div key={title} className="corridor-step">
+                  <span className="corridor-icon">{icon}</span>
+                  <b>
+                    {i + 1}. {t(title)}
+                  </b>
+                  <small>{t(text)}</small>
+                </div>
+              ))}
+            </div>
+            <p className="muted">
+              {t("corridorNote")} <a href="/border">{t("borderRulesTitle")} ↗</a>
+            </p>
+          </div>
+        </section>
+
+        {/* 4. What you get */}
+        <section id="features" className="landing-section">
+          <h2>{t("featuresTitle")}</h2>
+          <div className="feature-grid">
+            {[
+              ["📍", "featTracking"],
+              ["⏳", "featCrossing"],
+              ["🔒", "featPayment"],
+              ["📄", "featDocs"],
+              ["💬", "featAlerts"],
+              ["📱", "featDriverApp"],
+            ].map(([icon, k]) => (
+              <article key={k}>
+                <span className="feature-icon">{icon}</span>
+                <h3>{t(k)}</h3>
+                <p>{t(k + "Text")}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* 5. Who it is for: register, or try a demo account */}
+        <section id="accounts" className="landing-section">
+          <h2>{t("accountsTitle")}</h2>
+          <p className="section-lead">{t(health.demo ? "accountsLeadDemo" : "accountsLead")}</p>
           <div className="landing-account-cards">
             {types.map((type) => (
               <article key={type}>
@@ -152,16 +222,31 @@ export default function Landing({ t, langSelect, user }) {
                 <a className="button" href={`/register/${type}`}>
                   {t("createAccount")} ↗
                 </a>
-                <a className="text-button" href="/login">
-                  {t("signIn")}
-                </a>
+                {health.demo && (
+                  <button className="button ghost" disabled={!!busy} onClick={() => tryAs(type)}>
+                    {busy === type ? t("loading") : t("tryDemo")}
+                  </button>
+                )}
               </article>
             ))}
           </div>
+          {health.demo && (
+            <p className="muted small">
+              {t("tryPlatformNote")}{" "}
+              <button className="text-button" disabled={!!busy} onClick={() => tryAs("admin")}>
+                {t("tryAdminDemo")}
+              </button>
+            </p>
+          )}
+          {error && <p role="alert">{error}</p>}
+          <p className="muted small">
+            {t("haveAccount")} <a href="/login">{t("signIn")}</a>
+          </p>
         </section>
+
+        {/* 6. Trust */}
         <section id="verification" className="landing-verification">
           <div>
-            <span className="eyebrow">TRUST STARTS WITH A REVIEW.</span>
             <h2>{t("globalVerification")}</h2>
             <p>{t("globalVerificationDesc")}</p>
             <a className="button yellow-button" href={user ? "/workspace/kyb" : "/accounts"}>
@@ -175,31 +260,62 @@ export default function Landing({ t, langSelect, user }) {
                 <b>{t(key)}</b>
               </div>
             ))}
-            <p>{t("manualVerificationNote")}</p>
           </div>
         </section>
-        <section className="landing-admin">
-          <span>◇ {t("administrator")}</span>
-          <a href="/login">{t("administratorLogin")} ↗</a>
+
+        {/* 7. Cost and questions */}
+        <section id="faq" className="landing-section">
+          <div className="pricing-card">
+            <h2>{t("pricingTitle")}</h2>
+            <ul>
+              <li>✓ {t("pricingFree")}</li>
+              <li>✓ {t("pricingProtected")}</li>
+              <li>✓ {t("pricingDirect")}</li>
+            </ul>
+          </div>
+          <h2>{t("faqTitle")}</h2>
+          <div className="faq">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <details key={n}>
+                <summary>{t("faqQ" + n)}</summary>
+                <p>{t("faqA" + n)}</p>
+              </details>
+            ))}
+          </div>
         </section>
+
+        {/* 8. Who we are */}
+        <About t={t} />
       </main>
+
       <footer className="landing-footer">
+        <div className="footer-brand">
+          <a className="brand" href="/">
+            LogiBridge
+          </a>
+          <span>{t("tagline")}</span>
+        </div>
+        <div className="footer-contact">
+          <b>{t("contactUs")}</b>
+          {health.supportEmail ? (
+            <a href={`mailto:${health.supportEmail}`} dir="ltr">
+              {health.supportEmail}
+            </a>
+          ) : (
+            <span>{t("contactViaAccount")}</span>
+          )}
+        </div>
         <LegalLinks t={t} />
-        <a className="brand" href="/">
-          LogiBridge
-        </a>
-        <span>{t("tagline")} · AR / EN / TR</span>
-        <span>© 2026</span>
+        <span>© 2026 · AR / EN / TR</span>
       </footer>
     </div>
   );
 }
 
-// Who we are, vision, mission, values and how the platform works.
+// Who we are, vision, mission and values.
 function About({ t }) {
   return (
     <section id="about" className="landing-section landing-about">
-      <span className="eyebrow">ABOUT LOGIBRIDGE</span>
       <h2>{t("aboutTitle")}</h2>
       <p className="about-lead">{t("aboutText")}</p>
       <div className="about-grid">
@@ -223,16 +339,6 @@ function About({ t }) {
           </div>
         ))}
       </div>
-      <h3 className="about-subtitle">{t("howItWorks")}</h3>
-      <ol className="about-steps">
-        {["howStep1", "howStep2", "howStep3", "howStep4"].map((k, i) => (
-          <li key={k}>
-            <span>{i + 1}</span>
-            <b>{t(k)}</b>
-            <small>{t(k + "Text")}</small>
-          </li>
-        ))}
-      </ol>
     </section>
   );
 }

@@ -311,7 +311,7 @@ function ReportForm({ t, run, busy }) {
         </label>
       </div>
       <label className="field">
-        <span>{t("reportNote")}</span>
+        <span>{t("queueReportNote")}</span>
         <input name="note" maxLength="280" placeholder={t("reportNotePlaceholder")} />
       </label>
       <button className="button" disabled={busy}>

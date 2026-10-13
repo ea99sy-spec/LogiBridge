@@ -1,0 +1,129 @@
+/* Brand yellow accents (logo colour) across the site. Loaded last so it can refine earlier styles. */
+:root {
+  --brand-yellow: #facc15;
+  --brand-yellow-soft: #fff6cc;
+  --brand-yellow-deep: #a57f00;
+}
+
+/* ---- Landing page ---- */
+.landing {
+  border-top: 5px solid var(--brand-yellow);
+}
+.landing-header nav a:hover,
+.landing-header nav a:focus-visible {
+  color: #173a6c;
+  text-decoration: underline;
+  text-decoration-color: var(--brand-yellow);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 7px;
+}
+.landing-section > h2::after,
+.landing-verification h2::after {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--brand-yellow);
+  margin-top: 10px;
+}
+.landing-hero .access-benefits span {
+  background: var(--brand-yellow-soft);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+.compare-head .ours,
+.compare-ours {
+  background: #fffbea;
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+.compare-head .ours {
+  color: #173a6c;
+  border-bottom: 3px solid var(--brand-yellow);
+}
+.feature-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--brand-yellow-soft);
+}
+.feature-grid article,
+.landing-account-cards article {
+  border-top: 4px solid var(--brand-yellow);
+}
+.feature-grid article:hover {
+  box-shadow: 0 8px 26px #eac41f30;
+}
+.pricing-card {
+  border-inline-start: 8px solid var(--brand-yellow);
+}
+.pricing-card li::first-letter {
+  color: var(--brand-yellow);
+}
+.faq details[open] {
+  border-inline-start: 4px solid var(--brand-yellow);
+}
+.faq summary::marker {
+  color: var(--brand-yellow-deep);
+}
+.about-grid .access-symbol {
+  background: var(--brand-yellow-soft);
+  color: var(--brand-yellow-deep);
+}
+.about-values div {
+  border-top: 3px solid var(--brand-yellow);
+}
+.landing-footer {
+  border-top: 3px solid var(--brand-yellow);
+  padding-top: 22px;
+}
+
+/* ---- Sign-in and register pages ---- */
+.access-option:hover .access-symbol,
+.access-form-icon {
+  background: var(--brand-yellow);
+  color: #102a56;
+}
+
+/* ---- Workspace ---- */
+.topbar {
+  border-bottom: 3px solid var(--brand-yellow);
+}
+.sidebar nav button.active {
+  color: #fff;
+  box-shadow: inset 4px 0 var(--brand-yellow);
+}
+[dir="rtl"] .sidebar nav button.active {
+  box-shadow: inset -4px 0 var(--brand-yellow);
+}
+.sidebar nav button.active .nav-icon {
+  color: var(--brand-yellow);
+}
+.section-heading h1::after {
+  content: "";
+  display: block;
+  width: 46px;
+  height: 4px;
+  border-radius: 3px;
+  background: var(--brand-yellow);
+  margin-top: 8px;
+}
+.counter {
+  background: var(--brand-yellow);
+  color: #102a56;
+}
+.badge.open {
+  background: var(--brand-yellow-soft);
+  color: #7a5c00;
+}
+.stage-step b,
+.about-steps span {
+  background: var(--brand-yellow);
+  color: #102a56;
+}
+.notice {
+  border-inline-start: 4px solid var(--brand-yellow);
+}

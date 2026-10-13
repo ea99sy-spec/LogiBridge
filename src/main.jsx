@@ -19,6 +19,7 @@ import RoleDashboard, { CarrierJobs, SupplierInventory, SupplierOrders } from ".
 import { workspaceModules, accountKind } from "../shared/workspaces";
 import "./roles.css";
 import "./advanced.css";
+import "./accent.css";
 import ShipmentRoute from "./ShipmentRoute";
 import { crossingKeys } from "../shared/crossings";
 import {

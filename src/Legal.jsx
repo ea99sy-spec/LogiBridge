@@ -2,7 +2,7 @@ import React from "react";
 
 // Terms of use and privacy policy in the three interface languages.
 // Last updated date is shown on the page; update it whenever the text changes.
-const UPDATED = "2026-10-11";
+const UPDATED = "2026-10-14";
 
 const content = {
   terms: {
@@ -27,7 +27,7 @@ const content = {
         ],
         [
           "الدفع والعمولة",
-          "يتم الدفع إما بتحويل بنكي إلى حساب المنصة ليُحفظ كضمان حتى تأكيد الاستلام، أو مباشرة للناقل. تقتطع المنصة عمولة 3٪ من المبالغ المدفوعة عبرها. في الدفع المباشر لا تحفظ المنصة أي مبلغ ولا تتحمّل مسؤولية تحصيله أو استرداده.",
+          "استخدام المنصة باشتراك شهري، وأول 3 أشهر مجانية لكل حساب جديد، وتمتد إلى 6 أشهر للحسابات النشيطة. يُعلن سعر الاشتراك في الموقع قبل انتهاء الفترة المجانية. يتم الدفع إما بتحويل بنكي إلى حساب المنصة ليُحفظ كضمان حتى تأكيد الاستلام، أو مباشرة للناقل. تقتطع المنصة عمولة 3٪ من المبالغ المدفوعة عبرها. في الدفع المباشر لا تحفظ المنصة أي مبلغ ولا تتحمّل مسؤولية تحصيله أو استرداده.",
         ],
         [
           "إغلاق العملية والنزاعات",
@@ -68,7 +68,7 @@ const content = {
         ],
         [
           "Payment and commission",
-          "Payment is made either by bank transfer to the platform, held as escrow until delivery is confirmed, or directly to the carrier. The platform keeps a 3% commission on amounts paid through it. With direct payment the platform holds no money and is not responsible for collecting or refunding it.",
+          "The platform is used with a monthly subscription; the first 3 months are free for every new account and extend to 6 months for active accounts. The subscription price is announced on the site before the free period ends. Payment is made either by bank transfer to the platform, held as escrow until delivery is confirmed, or directly to the carrier. The platform keeps a 3% commission on amounts paid through it. With direct payment the platform holds no money and is not responsible for collecting or refunding it.",
         ],
         [
           "Closing operations and disputes",
@@ -109,7 +109,7 @@ const content = {
         ],
         [
           "Ödeme ve komisyon",
-          "Ödeme, teslim onayına kadar emanette tutulmak üzere platforma banka havalesiyle veya doğrudan taşıyıcıya yapılır. Platform üzerinden ödenen tutarlardan %3 komisyon alınır. Doğrudan ödemede platform para tutmaz ve tahsilat veya iadeden sorumlu değildir.",
+          "Platform aylık abonelikle kullanılır; her yeni hesap için ilk 3 ay ücretsizdir ve aktif hesaplarda 6 aya uzar. Abonelik ücreti ücretsiz dönem bitmeden sitede duyurulur. Ödeme, teslim onayına kadar emanette tutulmak üzere platforma banka havalesiyle veya doğrudan taşıyıcıya yapılır. Platform üzerinden ödenen tutarlardan %3 komisyon alınır. Doğrudan ödemede platform para tutmaz ve tahsilat veya iadeden sorumlu değildir.",
         ],
         [
           "İşlemin kapanması ve ihtilaflar",
