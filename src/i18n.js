@@ -632,12 +632,8 @@ const rows = {
     "Türkiye, Suriye ve listelenen tüm ülkeler ve bölgeler",
   ],
   internationalAccounts: ["حسابات دولية", "International accounts", "Uluslararası hesaplar"],
-  globalHero: ["جسور تتجاوز الحدود.", "Bridges beyond borders.", "Sınırları aşan köprüler."],
-  globalHeroAccent: [
-    "سعرك واضح، وشحنتك أمام عينيك.",
-    "Your price is clear, your cargo in plain sight.",
-    "Fiyatınız net, yükünüz gözünüzün önünde.",
-  ],
+  globalHero: ["جسور تعبر الحدود…", "Bridges across borders…", "Sınırları aşan köprüler…"],
+  globalHeroAccent: ["وتسهّل عليك الإجراءات والقيود.", "making procedures and restrictions easier for you.", "işlemleri ve kısıtlamaları sizin için kolaylaştırır."],
   globalIntro: [
     "ابدأ من الممر التجاري بين تركيا وسوريا، مع حسابات للشركات والأفراد دوليًا. قارن عروض الشحن وأدر المستندات والتواصل من مساحة واحدة.",
     "Start with the Türkiye–Syria trade corridor, with company and individual accounts worldwide. Compare shipping offers and manage documents and communication in one workspace.",
