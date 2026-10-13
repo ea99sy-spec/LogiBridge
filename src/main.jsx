@@ -1,5 +1,6 @@
 import { requiresApproval } from "../shared/access";
 import BorderPage, { BorderRules } from "./BorderRules";
+import { PublicTracking } from "./Tracking";
 import { waLink } from "../shared/wa";
 import { PendingAccount, Profile, Directory, AccountSecurity, CompanyProfile } from "./Profiles";
 import { ShipmentPayment } from "./Payments";
@@ -626,6 +627,8 @@ function App() {
   );
   if (window.location.pathname === "/driver") return <DriverPortal t={t} />;
   if (window.location.pathname === "/border") return <BorderPage t={t} lang={lang} langSelect={langSelect} />;
+  if (/^\/t\/[a-f0-9]{40}$/.test(window.location.pathname))
+    return <PublicTracking t={t} lang={lang} langSelect={langSelect} />;
   if (["/terms", "/privacy"].includes(window.location.pathname))
     return <Legal page={window.location.pathname.slice(1)} t={t} lang={lang} langSelect={langSelect} />;
   if (window.location.pathname === "/verify-email")

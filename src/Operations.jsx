@@ -1,7 +1,20 @@
+import {
+  TrackMap,
+  FleetMap,
+  TrackFacts,
+  PhotoStrip,
+  PhotoUpload,
+  ProofForm,
+  LiveShare,
+  OwnerTrackingTools,
+  DeliveryPointForm,
+  targetOf,
+  legColors,
+} from "./Tracking";
 import { waLink } from "../shared/wa.js";
 import { AdminEmailSettings, AdminSiteSettings, AccountDetails, TaxBadge } from "./Profiles";
 import { officialTaxLink } from "../shared/tax";
-import { GpsShare, PositionMap } from "./Gps";
+import { GpsShare } from "./Gps";
 import { AdminPayments, BankTransfers } from "./Payments";
 import React, { useEffect, useState } from "react";
 import { countryName } from "../shared/countries";
@@ -276,8 +289,35 @@ export function TrackingPanel({ data, user, t, run, busy, refresh, navigate, Shi
     `${s.title} ${s.id} ${s.origin} ${s.destination}`.toLowerCase().includes(query.toLowerCase()),
   );
   const shipment = own.find((s) => s.id === selected) || matches[0];
-  const stages = ["open", "assigned", "transit", "arrived", "delivered"],
-    events = shipment ? data.trackingEvents.filter((e) => e.shipmentId === shipment.id) : [];
+  const stages = ["open", "assigned", "transit", "arrived", "delivered"];
+  // An order shows its three stages together: one coloured line per stage on the map.
+  const legs = shipment?.isOrder
+    ? data.shipments.filter((x) => x.parentId === shipment.id).sort((a, b) => a.legIndex - b.legIndex)
+    : [];
+  const parts = shipment ? (shipment.isOrder ? legs : [shipment]) : [];
+  const ids = parts.map((p) => p.id).concat(shipment ? [shipment.id] : []);
+  const events = shipment
+    ? data.trackingEvents
+        .filter((e) => ids.includes(e.shipmentId))
+        .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    : [];
+  const moving =
+    parts.find((p) => p.status === "transit") ||
+    parts
+      .filter((p) => p.lastPosition)
+      .sort((a, b) => b.lastPosition.at.localeCompare(a.lastPosition.at))[0] ||
+    shipment;
+  const segments = parts.map((p) => ({
+    points: p.track || [],
+    last: p.lastPosition,
+    color: legColors[p.legType] || "#2563eb",
+    label: p.legType ? t("leg_" + p.legType) : p.title,
+  }));
+  const root = shipment?.parentId
+    ? data.shipments.find((x) => x.id === shipment.parentId) || shipment
+    : shipment;
+  const isOwner = shipment && root?.ownerId === user.id;
+  const isCarrier = shipment && user.id === shipment.carrierId;
   return (
     <>
       <div className="section-heading">
@@ -290,6 +330,9 @@ export function TrackingPanel({ data, user, t, run, busy, refresh, navigate, Shi
         </button>
       </div>
       <p className="notice">{t("gpsIntro")}</p>
+      {["carrier", "admin"].includes(user.role) && (
+        <FleetMap shipments={own} t={t} onSelect={(id) => setSelected(id)} />
+      )}
       <div className="filters">
         <input
           aria-label={t("trackingSearch")}
@@ -333,10 +376,33 @@ export function TrackingPanel({ data, user, t, run, busy, refresh, navigate, Shi
                 ))}
               </div>
               <p>
-                <b>{t("lastKnownLocation")}:</b> {shipment.lastLocation || t("notReported")}
+                <b>{t("lastKnownLocation")}:</b> {(moving || shipment).lastLocation || t("notReported")}
               </p>
-              <PositionMap position={shipment.lastPosition} t={t} lang={document.documentElement.lang} />
+              <TrackMap
+                segments={segments}
+                crossing={shipment.crossing}
+                target={targetOf(moving || shipment)}
+                t={t}
+              />
+              <TrackFacts sh={moving} t={t} lang={document.documentElement.lang} />
               <p className="muted small">{t("updatedByCarrier")}</p>
+              <PhotoStrip
+                docs={data.shipmentDocuments.filter((d) => ids.includes(d.shipmentId))}
+                t={t}
+                lang={document.documentElement.lang}
+              />
+              {isOwner && root && <OwnerTrackingTools sh={root} t={t} run={run} busy={busy} />}
+              {(isOwner || isCarrier) &&
+                !shipment.isOrder &&
+                !["delivered", "cancelled"].includes(shipment.status) && (
+                  <DeliveryPointForm sh={shipment} t={t} run={run} busy={busy} />
+                )}
+              {isOwner &&
+                shipment.isOrder &&
+                legs[2] &&
+                !["delivered", "cancelled"].includes(legs[2].status) && (
+                  <DeliveryPointForm sh={legs[2]} t={t} run={run} busy={busy} />
+                )}
               {user.id === shipment.carrierId &&
                 ["assigned", "transit", "arrived"].includes(shipment.status) && (
                   <form
@@ -359,6 +425,15 @@ export function TrackingPanel({ data, user, t, run, busy, refresh, navigate, Shi
                         )
                       }
                     />
+                    <LiveShare
+                      t={t}
+                      storageKey={`lb_track_${shipment.id}`}
+                      sendBatch={(positions) =>
+                        run(`/shipments/${shipment.id}/positions`, { positions }, "POST", {
+                          silent: true,
+                        }).then(Boolean)
+                      }
+                    />
                     <label className="field">
                       <span>{t("currentLocation")}</span>
                       <input name="location" required maxLength="120" />
@@ -372,6 +447,20 @@ export function TrackingPanel({ data, user, t, run, busy, refresh, navigate, Shi
                     </button>
                   </form>
                 )}
+              {isCarrier && ["assigned", "transit", "arrived", "delivered"].includes(shipment.status) && (
+                <PhotoUpload
+                  t={t}
+                  send={(body) =>
+                    run(`/shipments/${shipment.id}/photos`, body, "POST", { silent: true }).then(Boolean)
+                  }
+                />
+              )}
+              {isCarrier && ["transit", "arrived"].includes(shipment.status) && !shipment.pod && (
+                <ProofForm
+                  t={t}
+                  send={(body) => run(`/shipments/${shipment.id}/proof`, body, "POST").then(Boolean)}
+                />
+              )}
               <h3 className="events-title">{t("shipmentHistory")}</h3>
               <div className="tracking-history">
                 {events.length ? (
@@ -383,8 +472,19 @@ export function TrackingPanel({ data, user, t, run, busy, refresh, navigate, Shi
                         <span className="event-dot" />
                         <div>
                           <b>{t(e.event)}</b>
-                          {e.location && <p>{e.location}</p>}
-                          {e.note && <p>{e.note}</p>}
+                          {e.location && (
+                            <p>{e.event.startsWith("crossing_") ? t(e.location) : e.location}</p>
+                          )}
+                          {e.note && (
+                            <p>
+                              {e.event === "crossing_left"
+                                ? t("timeAtCrossing").replace(
+                                    "{h}",
+                                    Math.round((Number(e.note) / 60) * 10) / 10,
+                                  )
+                                : e.note}
+                            </p>
+                          )}
                           <small>
                             {new Date(e.createdAt).toLocaleString(document.documentElement.lang)} ·{" "}
                             {t(

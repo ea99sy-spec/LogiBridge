@@ -775,3 +775,128 @@ test("one sign-in form, international phones, border alerts and queue reports", 
   assert.equal(report.note, "Yard full");
   assert.equal(report.userId, undefined);
 });
+
+test("truck tracking: crossing detection, receiver link, photos and proof of delivery", async (t) => {
+  const { trackingWatch } = await import("../server/tracking.js");
+  const { estimateArrival, parsePoint } = await import("../shared/geo.js");
+  // Silent trucks raise one alert for the owner and the carrier.
+  const old = new Date(Date.now() - 7 * 3600000).toISOString();
+  const fake = {
+    users: [],
+    notifications: [],
+    trackingEvents: [],
+    shipments: [
+      { id: "x", ownerId: "o", carrierId: "c", status: "transit", lastPosition: { lat: 1, lng: 1, at: old } },
+    ],
+  };
+  assert.equal(trackingWatch(fake), true);
+  assert.equal(trackingWatch(fake), false, "no repeated alert");
+  assert.deepEqual(fake.notifications.map((n) => n.userId).sort(), ["c", "o"]);
+  assert.ok(
+    estimateArrival({ lat: 37.06, lng: 37.38, at: new Date().toISOString() }, { lat: 36.64, lng: 37.08 }).km >
+      50,
+  );
+  assert.deepEqual(parsePoint("https://www.google.com/maps/@36.2,37.1,14z"), { lat: 36.2, lng: 37.1 });
+
+  const server = await startServer(3221, { DEMO_MODE: "true" });
+  t.after(server.stop);
+  const { call } = server;
+  for (const who of ["merchant", "carrier"]) await call(who, "/login", { userId: who });
+  const order = (
+    await call("merchant", "/shipments", {
+      ...shipment,
+      destination: "Aleppo",
+      originCountry: "TR",
+      destinationCountry: "SY",
+      transportType: "crossBorder",
+      crossing: "salameh",
+    })
+  ).body;
+  const legId = order.legs[0];
+  await call("carrier", "/bids", { shipmentId: legId, price: 150, days: 1 });
+  const bid = (await call("merchant", "/state")).body.bids.find((b) => b.shipmentId === legId);
+  await call("merchant", `/shipments/${legId}/accept`, { bidId: bid.id });
+  await call("merchant", `/shipments/${legId}/action`, { action: "pay_direct" });
+  await call("carrier", `/shipments/${legId}/action`, { action: "confirm_payment" });
+  assert.equal((await call("carrier", `/shipments/${legId}/action`, { action: "dispatch" })).status, 200);
+  const ago = (h) => new Date(Date.now() - h * 3600000).toISOString();
+  // Gaziantep → Öncüpınar gate (wait two hours) → away from the crossing.
+  const sent = await call("carrier", `/shipments/${legId}/positions`, {
+    positions: [
+      { lat: 37.06, lng: 37.38, at: ago(3) },
+      { lat: 36.645, lng: 37.08, at: ago(2) },
+      { lat: 36.642, lng: 37.084, at: ago(1) },
+      { lat: 36.7, lng: 37.2, at: ago(0) },
+    ],
+  });
+  assert.equal(sent.status, 200);
+  assert.equal(
+    (await call("carrier", `/shipments/${legId}/positions`, { positions: [{ lat: 500 }] })).status,
+    400,
+  );
+  let mine = (await call("merchant", "/state")).body;
+  const leg = mine.shipments.find((s) => s.id === legId);
+  assert.equal(leg.track.length, 4);
+  assert.ok(leg.crossingArrivedAt && leg.crossingLeftAt);
+  assert.ok(mine.notifications.some((n) => n.event === "crossing_arrived"));
+  assert.ok(mine.crossingReports.some((r) => r.role === "gps" && r.crossing === "salameh" && r.level === 2));
+  // The delivery code and receiver link stay with the owner.
+  const carrierView = (await call("carrier", "/state")).body.shipments.find((s) => s.id === legId);
+  assert.equal(carrierView.deliveryCode, undefined);
+  assert.match(leg.deliveryCode, /^\d{6}$/);
+  assert.equal((await call("carrier", `/shipments/${order.id}/public-link`, {})).status, 403);
+  const { token } = (await call("merchant", `/shipments/${order.id}/public-link`, {})).body;
+  const view = (await call("anon", `/public/track/${token}`)).body;
+  assert.equal(view.isOrder, true);
+  assert.equal(view.position.lat, 36.7);
+  assert.equal(JSON.stringify(view).includes(leg.deliveryCode), false);
+  assert.ok(view.events.some((e) => e.event === "crossing_left"));
+  // Photos and proof of delivery.
+  const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 4, 5, 6, 7, 8]).toString("base64");
+  const png = Buffer.from("89504e470d0a1a0a0102030405", "hex").toString("base64");
+  assert.equal(
+    (
+      await call("carrier", `/shipments/${legId}/photos`, {
+        stage: "sealed",
+        mime: "image/jpeg",
+        content: jpeg,
+      })
+    ).status,
+    201,
+  );
+  assert.equal(
+    (
+      await call("carrier", `/shipments/${legId}/photos`, {
+        stage: "selfie",
+        mime: "image/jpeg",
+        content: jpeg,
+      })
+    ).status,
+    400,
+  );
+  const proof = { recipient: "Border Clearance Co.", mime: "image/png", content: png };
+  assert.equal(
+    (
+      await call("carrier", `/shipments/${legId}/proof`, {
+        ...proof,
+        code: "000000" === leg.deliveryCode ? "111111" : "000000",
+      })
+    ).body.error,
+    "Wrong delivery code",
+  );
+  assert.equal(
+    (await call("carrier", `/shipments/${legId}/proof`, { ...proof, code: leg.deliveryCode })).status,
+    201,
+  );
+  mine = (await call("merchant", "/state")).body;
+  const done = mine.shipments.find((s) => s.id === legId);
+  assert.equal(done.status, "arrived");
+  assert.equal(done.pod.codeVerified, true);
+  assert.equal(
+    mine.shipmentDocuments.filter((d) => d.shipmentId === legId && d.kind.startsWith("photo_")).length,
+    2,
+  );
+  // Turning the link off hides the page.
+  await call("merchant", `/shipments/${order.id}/public-link`, { enabled: false });
+  assert.equal((await call("anon", `/public/track/${token}`)).status, 404);
+});

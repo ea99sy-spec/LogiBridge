@@ -1,6 +1,7 @@
 import { requiresApproval } from "../shared/access.js";
 import { randomBytes, createHash } from "node:crypto";
-import { readPosition } from "./position.js";
+import { readPosition, requirePosition } from "./position.js";
+import { recordPosition, savePhoto, saveProof } from "./tracking.js";
 import { readState, mutate, id, subscribeState } from "./store.js";
 import { transitionShipment, positive, syncOrder } from "./domain.js";
 import { sameWorld, demoActive } from "./world.js";
@@ -181,8 +182,43 @@ export function publicAdvancedRoutes(app) {
         status: sh.status,
         lastLocation: sh.lastLocation,
         lastPosition: sh.lastPosition || null,
+        track: sh.track || [],
+        crossing: sh.crossing || null,
+        legType: sh.legType || null,
+        destinationPoint: sh.destinationPoint || null,
+        pod: sh.pod || null,
+        photos: readState()
+          .shipmentDocuments.filter((d) => d.shipmentId === sh.id && d.kind?.startsWith("photo_"))
+          .map((d) => ({ kind: d.kind, createdAt: d.createdAt })),
       },
     });
+  });
+  const driverShipment = (s, link) => {
+    const sh = s.shipments.find((x) => x.id === link.shipmentId && x.carrierId === link.carrierId);
+    if (!sh) throw new Error("Assignment changed");
+    return sh;
+  };
+  // Points saved on the phone while there was no signal, sent together.
+  app.post("/driver-api/positions", async (req, res) => {
+    const { link } = driver(req);
+    const list = Array.isArray(req.body.positions) ? req.body.positions.slice(0, 200) : [];
+    if (!list.length) throw new Error("Invalid location");
+    await mutate((s) => {
+      const sh = driverShipment(s, link);
+      if (!["assigned", "transit", "arrived"].includes(sh.status)) throw new Error("Assignment changed");
+      for (const p of list) recordPosition(s, sh, requirePosition(p), p.at, link.id, "driver_gps");
+    });
+    res.json({ ok: true, saved: list.length });
+  });
+  app.post("/driver-api/photo", async (req, res) => {
+    const { link } = driver(req);
+    await mutate((s) => savePhoto(s, driverShipment(s, link), req.body, link.carrierId, true));
+    res.status(201).json({ ok: true });
+  });
+  app.post("/driver-api/proof", async (req, res) => {
+    const { link } = driver(req);
+    await mutate((s) => saveProof(s, driverShipment(s, link), req.body, link.carrierId, true));
+    res.status(201).json({ ok: true });
   });
   app.post("/driver-api/update", async (req, res) => {
     const { link } = driver(req);
@@ -199,7 +235,7 @@ export function publicAdvancedRoutes(app) {
             ? `GPS ${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`
             : text(req.body.location, 120),
         note = req.body.note ? text(req.body.note, 500) : "";
-      if (position) sh.lastPosition = { ...position, at: new Date().toISOString() };
+      if (position) recordPosition(s, sh, position, req.body.at, link.id, "driver_gps");
       if (req.body.action) {
         transitionShipment(s, sh, req.body.action, { id: link.carrierId, role: "carrier" });
         if (sh.parentId) syncOrder(s, sh.parentId);

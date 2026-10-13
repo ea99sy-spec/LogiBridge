@@ -41,6 +41,7 @@ import { paymentRoutes, paymentState } from "./payments.js";
 import { requiresApproval } from "../shared/access.js";
 import { queueEmail, queueAdminEmail, mailConfigured, flushEmails } from "./email.js";
 import { whatsappConfigured, flushWhatsApp } from "./whatsapp.js";
+import { trackingRoutes, publicTrackingRoutes, newDeliveryCode, runTrackingWatch } from "./tracking.js";
 import { profileRoutes, announceCompany } from "./profiles.js";
 import {
   publicAccountRoutes,
@@ -299,6 +300,7 @@ export async function createApp() {
   });
   publicAccountRoutes(app, { authLimit, txt });
   publicAdvancedRoutes(app);
+  publicTrackingRoutes(app);
   app.use("/api", async (req, res, next) => {
     if (req.path === "/v1/shipments") return integrationAuth(req, res, next);
     const token = req.headers.cookie
@@ -439,8 +441,23 @@ export async function createApp() {
       ...paymentState(s, req.user),
       fleets: (s.fleets || []).filter((f) => f.userId === req.user.id),
       shipments: visibleShipments(s, req.user).map((sh) => {
-        const { privateDetails, lastPosition, ...publicShipment } = sh;
-        return admin || [sh.ownerId, sh.carrierId].includes(req.user.id) ? sh : publicShipment;
+        const {
+          privateDetails,
+          lastPosition,
+          track,
+          publicToken,
+          deliveryCode,
+          pod,
+          destinationPoint,
+          ...publicShipment
+        } = sh;
+        // The delivery code and the receiver's link belong to the owner only.
+        if (admin || sh.ownerId === req.user.id) return sh;
+        if (sh.carrierId === req.user.id) {
+          const { publicToken: _p, deliveryCode: _d, ...carrierView } = sh;
+          return carrierView;
+        }
+        return publicShipment;
       }),
       shipmentDocuments: s.shipmentDocuments
         .filter(
@@ -493,6 +510,7 @@ export async function createApp() {
   privateAccountRoutes(app, { sessionFor });
   twoFactorRoutes(app);
   operationRoutes(app);
+  trackingRoutes(app);
   paymentRoutes(app);
   advancedRoutes(app);
   app.post(["/api/shipments", "/api/v1/shipments"], async (req, res) => {
@@ -539,6 +557,7 @@ export async function createApp() {
       weight: positive(b.weight, "weight"),
       date: b.date,
       status: "open",
+      deliveryCode: newDeliveryCode(),
       createdAt: new Date().toISOString(),
     };
     const created = await mutate((s) => {
@@ -1152,6 +1171,14 @@ export async function createApp() {
   // Outside Netlify there is no scheduled function, so deliver queued emails here.
   if (process.env.LOGIBRIDGE_SERVERLESS !== "true" && mailConfigured() && !process.env.NODE_TEST_CONTEXT) {
     const timer = setInterval(() => flushEmails(5).catch((e) => console.error("Email:", e.message)), 30000);
+    timer.unref();
+  }
+  // Late or stopped trucks are checked every five minutes (on Netlify by the scheduled function).
+  if (process.env.LOGIBRIDGE_SERVERLESS !== "true" && !process.env.NODE_TEST_CONTEXT) {
+    const timer = setInterval(
+      () => runTrackingWatch().catch((e) => console.error("Tracking:", e.message)),
+      300000,
+    );
     timer.unref();
   }
   if (

@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { mkdir, readFile, writeFile, rename } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import pg from "pg";
@@ -6,6 +7,8 @@ import { resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { initializeVault, encryptDocument, hashPassword } from "./identity.js";
 import { cloudEnabled, readCloudState, writeCloudState } from "./cloud-store.js";
+// Demo dates stay in the future so the try-it accounts always have upcoming trips.
+const daysFromNow = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 const directory = process.env.DATA_DIR
   ? pathToFileURL(resolve(process.env.DATA_DIR) + "/")
   : pathToFileURL(resolve("data") + "/");
@@ -29,7 +32,7 @@ const initial = () => ({
       volume: 18,
       weight: 2400,
       crossing: "bab",
-      date: "2026-10-12",
+      date: daysFromNow(3),
       status: "open",
       createdAt: new Date().toISOString(),
     },
@@ -43,7 +46,7 @@ const initial = () => ({
       volume: 8,
       weight: 850,
       crossing: "rai",
-      date: "2026-10-15",
+      date: daysFromNow(6),
       status: "open",
       createdAt: new Date().toISOString(),
     },
@@ -67,7 +70,7 @@ const initial = () => ({
       capacity: 60,
       booked: 32,
       pricePerM3: 38,
-      date: "2026-10-12",
+      date: daysFromNow(3),
     },
     {
       id: "g2",
@@ -76,7 +79,7 @@ const initial = () => ({
       capacity: 70,
       booked: 21,
       pricePerM3: 45,
-      date: "2026-10-15",
+      date: daysFromNow(6),
     },
   ],
   reservations: [],
@@ -132,6 +135,16 @@ export async function initialize() {
   state.fleets ||= [];
   state.shipmentDocuments ||= [];
   state.trackingEvents ||= [];
+  // Every active shipment has a delivery code (older shipments got one after the feature arrived).
+  for (const sh of state.shipments || [])
+    if (!sh.deliveryCode && !["delivered", "cancelled"].includes(sh.status))
+      sh.deliveryCode = String(100000 + (randomBytes(4).readUInt32BE() % 900000));
+  // Move past demo departures forward so the demo never shows only expired trips.
+  const today = daysFromNow(0),
+    demoIds = new Set(state.users.filter((u) => u.demo).map((u) => u.id));
+  for (const g of state.groups || []) if (demoIds.has(g.carrierId) && g.date < today) g.date = daysFromNow(3);
+  for (const sh of state.shipments || [])
+    if (demoIds.has(sh.ownerId) && sh.status === "open" && sh.date < today) sh.date = daysFromNow(3);
   for (const p of state.products) if (["p1", "p2", "p3"].includes(p.id)) p.supplierId ||= "supplier";
   for (const g of state.groups) if (["g1", "g2"].includes(g.id)) g.carrierId ||= "carrier";
   if (!state.users.some((u) => u.id === "supplier"))
@@ -337,7 +350,7 @@ export async function initialize() {
       volume: 5,
       weight: 300,
       crossing: "bab",
-      date: "2026-10-12",
+      date: daysFromNow(3),
       status: "transit",
       lastLocation: "Gaziantep",
       createdAt: now,

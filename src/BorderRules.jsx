@@ -219,7 +219,7 @@ export function BorderRules({ t, lang, notices = [], reports = [], admin, canRep
                           {hoursAgo(latest(k).createdAt) < 1
                             ? t("justNow")
                             : t("reportedAgo").replace("{h}", hoursAgo(latest(k).createdAt))}{" "}
-                          · {t(latest(k).role)}
+                          · {t(latest(k).role === "gps" ? "autoGps" : latest(k).role)}
                         </small>
                         {latest(k).note && <small className="report-note">{latest(k).note}</small>}
                       </>

@@ -728,3 +728,108 @@ a.whatsapp {
 .border-rules tbody tr + tr td {
   border-top: 1px solid #eef2f7;
 }
+/* Truck tracking */
+.track-map {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #dfe5ee;
+  margin: 10px 0;
+  z-index: 0;
+}
+.track-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+.fact {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef3fb;
+  color: #315f9a;
+  font-size: 12px;
+}
+.fact.warn {
+  background: #fff4e0;
+  color: #9a6400;
+}
+.fact.bad {
+  background: #f8e3dd;
+  color: #a23d22;
+}
+.fact.good {
+  background: #e7f6ee;
+  color: #12805c;
+}
+.photo-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 6px 0 10px;
+}
+.photo-strip a {
+  flex: 0 0 120px;
+  display: grid;
+  gap: 4px;
+  text-decoration: none;
+  color: inherit;
+}
+.photo-strip img {
+  width: 120px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #dfe5ee;
+  background: #f4f7fc;
+}
+.photo-strip small {
+  font-size: 11px;
+  color: #6b778c;
+}
+.photo-upload,
+.proof-form,
+.owner-tools,
+.live-share {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed #d6dde8;
+}
+.signature-pad {
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 3 / 1;
+  border: 1px dashed #9fb0c8;
+  border-radius: 10px;
+  background: #fff;
+  touch-action: none;
+}
+.field-label {
+  font-size: 12px;
+  color: #6b778c;
+}
+.delivery-code b {
+  font-size: 18px;
+  letter-spacing: 3px;
+}
+.share-link {
+  display: grid;
+  gap: 8px;
+}
+.share-link input {
+  width: 100%;
+}
+.public-tracking {
+  max-width: 860px;
+}
+.public-events {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.public-events li {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f4f7fc;
+}

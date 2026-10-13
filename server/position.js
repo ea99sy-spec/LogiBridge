@@ -12,3 +12,8 @@ export function readPosition(body) {
     accuracy: Number.isFinite(accuracy) && accuracy >= 0 ? Math.round(accuracy) : null,
   };
 }
+export function requirePosition(body) {
+  const position = readPosition(body || {});
+  if (!position) throw new Error("Invalid location");
+  return position;
+}

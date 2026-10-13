@@ -8,6 +8,7 @@ import { demoActive } from "./world.js";
 import { notice } from "./advanced.js";
 import { publicUser, validateDocument, encryptDocument, decryptDocument } from "./identity.js";
 import { readPosition } from "./position.js";
+import { recordPosition } from "./tracking.js";
 import { readState, mutate, id } from "./store.js";
 import { requiresApproval } from "../shared/access.js";
 const text = (value, max = 300) => {
@@ -337,7 +338,7 @@ export function operationRoutes(app) {
             ? `GPS ${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`
             : text(req.body.location, 120),
         note = req.body.note ? text(req.body.note, 500) : "";
-      if (position) sh.lastPosition = { ...position, at: new Date().toISOString() };
+      if (position) recordPosition(s, sh, position, req.body.at, req.user.id, "carrier_gps");
       s.trackingEvents.push({
         id: id(),
         shipmentId: sh.id,

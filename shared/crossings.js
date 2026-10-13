@@ -1,12 +1,13 @@
 // Türkiye–Syria border crossings used on the platform.
 // Status notes are summaries of public reports; the border page shows dates and sources.
+// lat/lng: approximate gate position, used to detect when a truck reaches or leaves the crossing.
 export const crossings = {
-  bab: { tr: "Cilvegözü (Reyhanlı)", sy: "Bab al-Hawa", status: "open" },
-  salameh: { tr: "Öncüpınar (Kilis)", sy: "Bab al-Salama (Azaz)", status: "open" },
-  rai: { tr: "Çobanbey", sy: "Al-Rai", status: "open" },
-  jarablus: { tr: "Karkamış", sy: "Jarablus", status: "upgrading" },
-  tal_abyad: { tr: "Akçakale", sy: "Tal Abyad", status: "upgrading" },
-  kasab: { tr: "Yayladağı", sy: "Kasab", status: "check" },
+  bab: { tr: "Cilvegözü (Reyhanlı)", sy: "Bab al-Hawa", status: "open", lat: 36.222, lng: 36.665 },
+  salameh: { tr: "Öncüpınar (Kilis)", sy: "Bab al-Salama (Azaz)", status: "open", lat: 36.641, lng: 37.083 },
+  rai: { tr: "Çobanbey", sy: "Al-Rai", status: "open", lat: 36.664, lng: 37.476 },
+  jarablus: { tr: "Karkamış", sy: "Jarablus", status: "upgrading", lat: 36.828, lng: 38.006 },
+  tal_abyad: { tr: "Akçakale", sy: "Tal Abyad", status: "upgrading", lat: 36.704, lng: 38.951 },
+  kasab: { tr: "Yayladağı", sy: "Kasab", status: "check", lat: 35.913, lng: 35.978 },
 };
 export const crossingKeys = Object.keys(crossings);
 

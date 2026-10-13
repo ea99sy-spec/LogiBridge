@@ -13,10 +13,13 @@ export async function handler(event) {
   });
   const { mailConfigured, flushEmails } = await import("../../server/email.js");
   const { whatsappConfigured, flushWhatsApp } = await import("../../server/whatsapp.js");
-  if (!mailConfigured() && !whatsappConfigured())
-    return { statusCode: 200, body: JSON.stringify({ configured: false, sent: 0 }) };
   const { initialize } = await import("../../server/store.js");
   await initialize();
+  // Late or stopped trucks: checked every minute with the email queue.
+  const { runTrackingWatch } = await import("../../server/tracking.js");
+  await runTrackingWatch().catch(() => false);
+  if (!mailConfigured() && !whatsappConfigured())
+    return { statusCode: 200, body: JSON.stringify({ configured: false, sent: 0 }) };
   const email = await flushEmails(1);
   const whatsapp = await flushWhatsApp(2);
   return { statusCode: 200, body: JSON.stringify({ email, whatsapp }) };

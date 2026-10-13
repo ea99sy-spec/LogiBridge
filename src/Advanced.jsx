@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { GpsShare, PositionMap } from "./Gps";
+import { GpsShare } from "./Gps";
+import { TrackMap, TrackFacts, LiveShare, PhotoUpload, ProofForm, targetOf, legColors } from "./Tracking";
 const request = async (path, body, method = "POST") => {
   const r = await fetch("/api" + path, {
     method: body === undefined ? "GET" : method,
@@ -45,7 +46,36 @@ export function DriverPortal({ t }) {
           </p>
           <b>{t(task.shipment.status)}</b>
           <p>{task.shipment.lastLocation}</p>
-          <PositionMap position={task.shipment.lastPosition} t={t} lang={document.documentElement.lang} />
+          <TrackMap
+            segments={[
+              {
+                points: task.shipment.track,
+                last: task.shipment.lastPosition,
+                label: task.shipment.title,
+                color: legColors[task.shipment.legType],
+              },
+            ]}
+            crossing={task.shipment.crossing}
+            target={targetOf(task.shipment)}
+            t={t}
+            height={240}
+          />
+          <TrackFacts sh={task.shipment} t={t} lang={document.documentElement.lang} />
+          {["assigned", "transit", "arrived"].includes(task.shipment.status) && (
+            <LiveShare
+              t={t}
+              storageKey={`lb_driver_${task.shipment.id}`}
+              sendBatch={async (positions) => {
+                const r = await fetch("/driver-api/positions", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+                  body: JSON.stringify({ positions }),
+                });
+                if (r.ok) load();
+                return r.ok;
+              }}
+            />
+          )}
           <GpsShare
             t={t}
             disabled={busy}
@@ -100,6 +130,39 @@ export function DriverPortal({ t }) {
               {t("saveUpdate")}
             </button>
           </form>
+          <PhotoUpload
+            t={t}
+            send={async (body) => {
+              const r = await fetch("/driver-api/photo", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+                body: JSON.stringify(body),
+              });
+              if (!r.ok) setError((await r.json()).error);
+              else load();
+              return r.ok;
+            }}
+          />
+          {task.shipment.photos?.length > 0 && (
+            <p className="muted small">
+              {t("photosTaken")}: {task.shipment.photos.map((p) => t(p.kind)).join("، ")}
+            </p>
+          )}
+          {["transit", "arrived"].includes(task.shipment.status) && !task.shipment.pod && (
+            <ProofForm
+              t={t}
+              send={async (body) => {
+                const r = await fetch("/driver-api/proof", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+                  body: JSON.stringify(body),
+                });
+                if (!r.ok) setError((await r.json()).error);
+                else load();
+                return r.ok;
+              }}
+            />
+          )}
         </div>
       )}
     </main>
