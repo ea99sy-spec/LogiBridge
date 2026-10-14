@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { waLink } from "../shared/wa";
+import { crossingKeys } from "../shared/crossings";
 export function PendingAccount({ data, t, navigate }) {
   const status = data.user.verificationStatus;
   return (
@@ -224,6 +225,8 @@ export function Profile({ data, t, run, busy, navigate }) {
 export function Directory({ t, data, navigate }) {
   const [items, setItems] = useState([]),
     [query, setQuery] = useState(""),
+    [kind, setKind] = useState(""),
+    [crossing, setCrossing] = useState(""),
     [error, setError] = useState("");
   useEffect(() => {
     let active = true;
@@ -248,10 +251,30 @@ export function Directory({ t, data, navigate }) {
       <p>{t("directoryIntro")}</p>
       <div className="filters">
         <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("searchServices")} />
+        <select value={kind} aria-label={t("accountCategory")} onChange={(e) => setKind(e.target.value)}>
+          <option value="">{t("allAccountTypes")}</option>
+          {["merchant", "carrier", "broker", "supplier", "individual"].map((k) => (
+            <option key={k} value={k}>
+              {t(k)}
+            </option>
+          ))}
+        </select>
+        {kind === "broker" && (
+          <select value={crossing} aria-label={t("crossing")} onChange={(e) => setCrossing(e.target.value)}>
+            <option value="">{t("allCrossings")}</option>
+            {crossingKeys.map((k) => (
+              <option key={k} value={k}>
+                {t(k)}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
       {error && <p role="alert">{error}</p>}
       <div className="cards">
         {items
+          .filter((u) => !kind || u.accountType === kind)
+          .filter((u) => kind !== "broker" || !crossing || (u.crossings || []).includes(crossing))
           .filter((u) =>
             `${u.name} ${u.profile.services} ${u.profile.location} ${u.routes || ""}`
               .toLowerCase()
@@ -287,6 +310,11 @@ export function Directory({ t, data, navigate }) {
                 <p className="small">
                   <b>{t("serviceRoutes")}:</b> {u.routes}
                   {u.fleetSize ? ` · ${u.fleetSize} ${t("trucks")}` : ""}
+                </p>
+              )}
+              {u.crossings?.length > 0 && (
+                <p className="small">
+                  <b>{t("brokerCrossings")}:</b> {u.crossings.map((c) => t(c)).join("، ")}
                 </p>
               )}
               <h3>{t("aboutUs")}</h3>

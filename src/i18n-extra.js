@@ -1672,6 +1672,7 @@ export const extraRows = {
     "Kapalıysa fiyat bölümü rakamsız kalır.",
   ],
   // Audit additions
+  allAccountTypes: ["كل أنواع الحسابات", "All account types", "Tüm hesap türleri"],
   location: ["الموقع", "Location", "Konum"],
   amount: ["المبلغ", "Amount", "Tutar"],
   createResetLink: ["رابط إعادة تعيين كلمة المرور", "Password reset link", "Şifre sıfırlama bağlantısı"],

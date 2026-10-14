@@ -83,6 +83,7 @@ export function profileRoutes(app) {
           ...reputation(u.id),
           routes: u.accountType === "carrier" ? u.details?.routes || "" : "",
           fleetSize: u.accountType === "carrier" ? u.details?.fleetSize || null : null,
+          crossings: u.accountType === "broker" ? u.details?.crossings || [] : [],
           logo: u.profile?.logo || null,
           profile: {
             about: u.profile?.about || "",
