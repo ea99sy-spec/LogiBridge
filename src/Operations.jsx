@@ -1,3 +1,4 @@
+import { FormHolidayWarning } from "./Holidays";
 import { SubscriptionAdminCell } from "./Subscription";
 import {
   TrackMap,
@@ -123,6 +124,7 @@ export function ShipmentEntry({ t, run, busy, onCreated }) {
           {field("origin", "origin", { maxLength: 80 })}
           {field("destination", "destination", { maxLength: 80 })}
           {field("date", "date", { type: "date", min: new Date().toISOString().slice(0, 10) })}
+          <FormHolidayWarning t={t} lang={document.documentElement.lang} />
         </div>
         <PriceEstimate t={t} />
         <label className="insurance-choice">

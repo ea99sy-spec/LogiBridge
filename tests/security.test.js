@@ -1030,3 +1030,27 @@ test("administrator reset links and backups", async (t) => {
   assert.equal(backup.status, 200);
   assert.ok(backup.body.state.users.some((x) => x.email === "forget@test.local"));
 });
+
+test("holiday calendar: upcoming list, countdown data and shipping-date warnings", async () => {
+  const { upcomingHolidays, holidaysNear, holidaysCoverUntil } = await import("../shared/holidays.js");
+  const now = Date.parse("2026-10-15T00:00:00+03:00");
+  const next = upcomingHolidays(now);
+  assert.equal(next[0].date, "2026-10-28", "Republic Day eve is next in Türkiye");
+  assert.equal(next[0].half, true);
+  assert.ok(
+    next.some((h) => h.country === "SY" && h.date === "2026-12-08"),
+    "Syrian Liberation Day",
+  );
+  assert.ok(
+    next.every((h, i) => i === 0 || next[i - 1].start <= h.start),
+    "sorted by start",
+  );
+  // A shipping date on Eid al-Adha 2027 warns for both countries; a quiet day does not.
+  assert.deepEqual([...new Set(holidaysNear("2027-05-17").map((h) => h.country))].sort(), ["SY", "TR"]);
+  assert.equal(holidaysNear("2026-11-11").length, 0);
+  assert.equal(
+    holidaysNear("2027-05-17", ["SY"]).every((h) => h.country === "SY"),
+    true,
+  );
+  assert.ok(holidaysCoverUntil >= "2027-12-25");
+});

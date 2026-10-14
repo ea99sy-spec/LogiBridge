@@ -1,3 +1,4 @@
+import { HolidayCard } from "./Holidays";
 import { SubscriptionCard } from "./Subscription";
 import React, { useState } from "react";
 import { accountKind, workspaceModules } from "../shared/workspaces";
@@ -127,6 +128,11 @@ export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }
         lang={document.documentElement.lang}
         pricing={data.pricing}
         accountType={user.accountType}
+      />
+      <HolidayCard
+        t={t}
+        lang={document.documentElement.lang}
+        navigate={allowed.includes("border") ? navigate : null}
       />
       <div className="operation-shortcuts">
         {actions[kind]

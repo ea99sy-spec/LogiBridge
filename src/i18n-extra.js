@@ -1759,4 +1759,32 @@ export const extraRows = {
   sort_completed: ["الأكثر عمليات", "Most operations", "En çok işlem"],
   sort_name: ["حسب الاسم", "By name", "Ada göre"],
   allStatuses: ["كل الحالات", "All statuses", "Tüm durumlar"],
+  // Holidays countdown
+  holidaysTitle: ["العطل الرسمية القادمة", "Upcoming official holidays", "Yaklaşan resmi tatiller"],
+  holidaysIntro: [
+    "عطل تركيا وسوريا التي قد تبطئ الجمارك والمعابر. خطط شحنتك قبلها أو بعدها.",
+    "Türkiye and Syria holidays that can slow customs and crossings. Plan your shipment around them.",
+    "Gümrük ve kapıları yavaşlatabilecek Türkiye ve Suriye tatilleri. Sevkiyatınızı buna göre planlayın.",
+  ],
+  turkey: ["تركيا", "Türkiye", "Türkiye"],
+  daysWord: ["أيام", "days", "gün"],
+  inDays: ["بعد {n} يوم", "in {n} days", "{n} gün sonra"],
+  lunarNote: ["حسب رؤية الهلال (±يوم)", "moon sighting (±1 day)", "hilal gözlemine göre (±1 gün)"],
+  holidayImpact: [
+    "في العطل قد تعمل الجمارك والمعابر بدوام مخفّض أو تتوقف حركة الشحن التجاري. تأكد من المخلّص وتابع تنبيهات الإدارة. المصادر: مرسوم العطل السوري رقم 188 لعام 2025، وقائمة العطل الرسمية التركية.",
+    "On holidays customs and crossings may work reduced hours or stop commercial traffic. Check with your broker and follow administration notices. Sources: Syrian holidays Decree No. 188 of 2025 and Türkiye's official holiday list.",
+    "Tatillerde gümrük ve kapılar kısıtlı çalışabilir veya ticari geçişler durabilir. Müşavirinize danışın ve yönetim duyurularını izleyin. Kaynaklar: Suriye'nin 2025/188 sayılı tatil kararnamesi ve Türkiye resmi tatil listesi.",
+  ],
+  nextHoliday: ["أقرب عطلة رسمية", "Next official holiday", "Sıradaki resmi tatil"],
+  allHolidays: ["كل العطل", "All holidays", "Tüm tatiller"],
+  holidayStartsIn: ["تبدأ بعد", "Starts in", "Başlamasına"],
+  holidayEndsIn: ["جارية الآن، تنتهي بعد", "On now, ends in", "Şu an sürüyor, bitmesine"],
+  cdDays: ["يوم", "days", "gün"],
+  cdHours: ["ساعة", "hours", "saat"],
+  cdMinutes: ["دقيقة", "min", "dk"],
+  holidayWarning: [
+    "تاريخ الشحن يصادف عطلة رسمية أو يقع بجانبها، وقد تتأخر الجمارك أو المعابر:",
+    "The shipping date falls on or next to an official holiday; customs or crossings may be slower:",
+    "Sevkiyat tarihi resmi tatile denk geliyor veya yakın; gümrük veya kapılar yavaşlayabilir:",
+  ],
 };

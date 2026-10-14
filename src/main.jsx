@@ -2,6 +2,7 @@ import { requiresApproval } from "../shared/access";
 import BorderPage, { BorderRules } from "./BorderRules";
 import { PublicTracking } from "./Tracking";
 import { GuidePage, StartHereCard } from "./Guide";
+import { FormHolidayWarning } from "./Holidays";
 import { SubscriptionBanner } from "./Subscription";
 import { waLink } from "../shared/wa";
 import { PendingAccount, Profile, Directory, AccountSecurity, CompanyProfile } from "./Profiles";
@@ -985,6 +986,7 @@ function App() {
                     <Field label="capacity" name="capacity" type="number" min="0.01" step="0.01" />
                     <Field label="pricePerM3" name="pricePerM3" type="number" min="0.01" step="0.01" />
                     <Field label="date" name="date" type="date" min={new Date().toISOString().slice(0, 10)} />
+                    <FormHolidayWarning t={t} lang={lang} />
                     <button className="button" disabled={busy}>
                       {t("publish")}
                     </button>
@@ -1336,6 +1338,7 @@ function App() {
                     maxLength="12"
                   />
                   <Field label="date" name="date" type="date" min={new Date().toISOString().slice(0, 10)} />
+                  <FormHolidayWarning t={t} lang={lang} />
                   <ShipmentRoute t={t} />
                 </div>
                 <div className="modal-actions">
