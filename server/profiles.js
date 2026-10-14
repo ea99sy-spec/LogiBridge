@@ -84,6 +84,8 @@ export function profileRoutes(app) {
           routes: u.accountType === "carrier" ? u.details?.routes || "" : "",
           fleetSize: u.accountType === "carrier" ? u.details?.fleetSize || null : null,
           crossings: u.accountType === "broker" ? u.details?.crossings || [] : [],
+          country: u.details?.country || "",
+          activity: u.accountType === "merchant" ? u.details?.activity || "" : "",
           logo: u.profile?.logo || null,
           profile: {
             about: u.profile?.about || "",

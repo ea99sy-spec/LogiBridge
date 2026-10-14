@@ -526,6 +526,7 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
   const [accounts, setAccounts] = useState([]),
     [query, setQuery] = useState(""),
     [kind, setKind] = useState("all"),
+    [accountStatus, setAccountStatus] = useState("all"),
     [reviewStatus, setReviewStatus] = useState("pending"),
     [error, setError] = useState(""),
     [selected, setSelected] = useState(""),
@@ -573,8 +574,15 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
     (a) =>
       (kind === "all" ||
         (kind === "companies" && a.accountType !== "individual") ||
-        (kind === "individuals" && a.accountType === "individual")) &&
-      `${a.name} ${a.email || ""}`.toLowerCase().includes(query.toLowerCase()),
+        (kind === "individuals" && a.accountType === "individual") ||
+        a.accountType === kind) &&
+      (accountStatus === "all" ||
+        (accountStatus === "suspended"
+          ? a.disabled
+          : (a.verificationStatus || "not_submitted") === accountStatus)) &&
+      `${a.name} ${a.email || ""} ${a.details?.city || ""} ${a.taxId || ""}`
+        .toLowerCase()
+        .includes(query.toLowerCase()),
   );
   const pending = data.kyb.filter((d) => d.status === "pending").length;
   return (
@@ -642,9 +650,20 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
             onChange={(e) => setQuery(e.target.value)}
           />
           <select value={kind} aria-label={t("accountCategory")} onChange={(e) => setKind(e.target.value)}>
-            {["all", "companies", "individuals"].map((k) => (
+            {["all", "companies", "individuals", "merchant", "carrier", "broker", "supplier"].map((k) => (
               <option key={k} value={k}>
                 {t(k)}
+              </option>
+            ))}
+          </select>
+          <select
+            value={accountStatus}
+            aria-label={t("status")}
+            onChange={(e) => setAccountStatus(e.target.value)}
+          >
+            {["all", "pending", "approved", "rejected", "not_submitted", "suspended"].map((k) => (
+              <option key={k} value={k}>
+                {t(k === "all" ? "allStatuses" : k)}
               </option>
             ))}
           </select>

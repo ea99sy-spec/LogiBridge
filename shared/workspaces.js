@@ -2,6 +2,7 @@ import { requiresApproval } from "./access.js";
 const modules = {
   merchant: [
     "dashboard",
+    "guide",
     "profile",
     "directory",
     "newShipment",
@@ -22,6 +23,7 @@ const modules = {
   ],
   individual: [
     "dashboard",
+    "guide",
     "profile",
     "directory",
     "newShipment",
@@ -40,6 +42,7 @@ const modules = {
   ],
   carrier: [
     "dashboard",
+    "guide",
     "profile",
     "directory",
     "jobs",
@@ -59,6 +62,7 @@ const modules = {
   ],
   broker: [
     "dashboard",
+    "guide",
     "profile",
     "directory",
     "jobs",
@@ -73,6 +77,7 @@ const modules = {
   ],
   supplier: [
     "dashboard",
+    "guide",
     "profile",
     "directory",
     "inventory",
@@ -84,6 +89,7 @@ const modules = {
   ],
   admin: [
     "dashboard",
+    "guide",
     "admin",
     "companies",
     "kyb",
@@ -99,7 +105,7 @@ export function accountKind(user) {
   return user.role === "admin" ? "admin" : user.accountType === "individual" ? "individual" : user.role;
 }
 export function workspaceModules(user, flags = {}) {
-  if (requiresApproval(user)) return ["dashboard", "profile", "kyb", "security"];
+  if (requiresApproval(user)) return ["dashboard", "guide", "profile", "kyb", "security"];
   return (modules[accountKind(user)] || [])
     .filter((key) => !["ratings", "marketplace", "contracts"].includes(key) || flags[key])
     .filter((key) => !["inventory", "orders"].includes(key) || flags.marketplace);

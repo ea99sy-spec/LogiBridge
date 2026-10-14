@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { waLink } from "../shared/wa";
 import { crossingKeys } from "../shared/crossings";
+import { countryName } from "../shared/countries";
 export function PendingAccount({ data, t, navigate }) {
   const status = data.user.verificationStatus;
   return (
@@ -227,6 +228,10 @@ export function Directory({ t, data, navigate }) {
     [query, setQuery] = useState(""),
     [kind, setKind] = useState(""),
     [crossing, setCrossing] = useState(""),
+    [activity, setActivity] = useState(""),
+    [country, setCountry] = useState(""),
+    [minRating, setMinRating] = useState(""),
+    [sort, setSort] = useState("rating"),
     [error, setError] = useState("");
   useEffect(() => {
     let active = true;
@@ -269,12 +274,55 @@ export function Directory({ t, data, navigate }) {
             ))}
           </select>
         )}
+        {kind === "merchant" && (
+          <select value={activity} aria-label={t("activity")} onChange={(e) => setActivity(e.target.value)}>
+            <option value="">{t("allActivities")}</option>
+            {["import", "export", "both"].map((k) => (
+              <option key={k} value={k}>
+                {t("activity_" + k)}
+              </option>
+            ))}
+          </select>
+        )}
+        <select value={country} aria-label={t("country")} onChange={(e) => setCountry(e.target.value)}>
+          <option value="">{t("allCountries")}</option>
+          {[...new Set(items.map((u) => u.country).filter(Boolean))].map((c) => (
+            <option key={c} value={c}>
+              {countryName(c, document.documentElement.lang)}
+            </option>
+          ))}
+        </select>
+        <select value={minRating} aria-label={t("minRating")} onChange={(e) => setMinRating(e.target.value)}>
+          <option value="">{t("anyRating")}</option>
+          {[4, 3].map((r) => (
+            <option key={r} value={r}>
+              {"★".repeat(r)} {t("andAbove")}
+            </option>
+          ))}
+        </select>
+        <select value={sort} aria-label={t("sortBy")} onChange={(e) => setSort(e.target.value)}>
+          {["rating", "completed", "name"].map((k) => (
+            <option key={k} value={k}>
+              {t("sort_" + k)}
+            </option>
+          ))}
+        </select>
       </div>
       {error && <p role="alert">{error}</p>}
       <div className="cards">
         {items
           .filter((u) => !kind || u.accountType === kind)
           .filter((u) => kind !== "broker" || !crossing || (u.crossings || []).includes(crossing))
+          .filter((u) => kind !== "merchant" || !activity || u.activity === activity)
+          .filter((u) => !country || u.country === country)
+          .filter((u) => !minRating || (u.rating || 0) >= Number(minRating))
+          .sort((a, b) =>
+            sort === "name"
+              ? a.name.localeCompare(b.name)
+              : sort === "completed"
+                ? (b.completed || 0) - (a.completed || 0)
+                : (b.rating || 0) - (a.rating || 0) || (b.completed || 0) - (a.completed || 0),
+          )
           .filter((u) =>
             `${u.name} ${u.profile.services} ${u.profile.location} ${u.routes || ""}`
               .toLowerCase()

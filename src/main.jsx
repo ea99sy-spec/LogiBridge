@@ -1,6 +1,7 @@
 import { requiresApproval } from "../shared/access";
 import BorderPage, { BorderRules } from "./BorderRules";
 import { PublicTracking } from "./Tracking";
+import { GuidePage, StartHereCard } from "./Guide";
 import { SubscriptionBanner } from "./Subscription";
 import { waLink } from "../shared/wa";
 import { PendingAccount, Profile, Directory, AccountSecurity, CompanyProfile } from "./Profiles";
@@ -458,6 +459,7 @@ const icons = {
   newShipment: "＋",
   companies: "▦",
   jobs: "▤",
+  guide: "?",
   inventory: "▧",
   orders: "▤",
   security: "⚿",
@@ -835,7 +837,19 @@ function App() {
           )}
           <div className="content">
             {activeTab === "dashboard" && data.approvalRequired && (
-              <PendingAccount data={data} t={t} navigate={setTab} />
+              <>
+                <PendingAccount data={data} t={t} navigate={setTab} />
+                <StartHereCard
+                  kind={accountKind(user)}
+                  t={t}
+                  lang={lang}
+                  navigate={setTab}
+                  userId={user.id}
+                />
+              </>
+            )}
+            {activeTab === "guide" && (
+              <GuidePage kind={accountKind(user)} t={t} lang={lang} navigate={setTab} modules={modules} />
             )}
             {activeTab === "profile" && <Profile data={data} t={t} run={run} busy={busy} navigate={setTab} />}
             {activeTab === "company" && (
@@ -850,7 +864,22 @@ function App() {
             {activeTab === "security" && <AccountSecurity data={data} t={t} run={run} busy={busy} />}
             {activeTab === "directory" && <Directory data={data} t={t} navigate={setTab} />}
             {activeTab === "dashboard" && !data.approvalRequired && (
-              <RoleDashboard data={data} t={t} navigate={setTab} money={money} ShipmentCard={ShipmentCard} />
+              <>
+                <StartHereCard
+                  kind={accountKind(user)}
+                  t={t}
+                  lang={lang}
+                  navigate={setTab}
+                  userId={user.id}
+                />
+                <RoleDashboard
+                  data={data}
+                  t={t}
+                  navigate={setTab}
+                  money={money}
+                  ShipmentCard={ShipmentCard}
+                />
+              </>
             )}
             {activeTab === "jobs" && (carrier || user.role === "broker") && (
               <CarrierJobs data={data} t={t} ShipmentCard={ShipmentCard} />

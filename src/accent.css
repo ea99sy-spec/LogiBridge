@@ -293,3 +293,63 @@ main textarea {
 .reset-link-tool input {
   width: 100%;
 }
+
+/* ---- User guide ---- */
+.guide-steps {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0;
+  display: grid;
+  gap: 12px;
+}
+.guide-step {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 14px;
+  align-items: start;
+  border-inline-start: 4px solid var(--brand-yellow);
+}
+.guide-step h3 {
+  margin: 4px 0 6px;
+  color: #102a56;
+}
+.guide-step p {
+  margin: 0 0 10px;
+  line-height: 1.8;
+  color: #3f5679;
+}
+.guide-number {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--brand-yellow);
+  color: #102a56;
+  font-weight: 800;
+  font-size: 17px;
+}
+.guide-tips ul {
+  margin: 8px 0;
+  padding-inline-start: 20px;
+  line-height: 1.9;
+}
+.start-here {
+  border: 1px solid #f1df9b;
+  background: #fffbea;
+  margin-bottom: 18px;
+}
+.start-here-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.start-here-head h3 {
+  margin: 0;
+}
+.start-here ol {
+  margin: 10px 0 14px;
+  padding-inline-start: 22px;
+  line-height: 1.9;
+}
