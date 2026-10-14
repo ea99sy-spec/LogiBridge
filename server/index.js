@@ -172,6 +172,8 @@ export async function createApp() {
       demo: DEMO_NOW(),
       supportEmail: readState().supportEmail || process.env.MAIL_REPLY_TO || "",
       emailConfigured: mailConfigured(),
+      // Platform WhatsApp for visitors (set by the administrator; empty = no button).
+      whatsapp: readState().settings?.publicWhatsapp || "",
       // Subscription prices for the home page, unless the administrator hid them.
       pricing: pricingOf(readState()).visible ? pricingOf(readState()) : null,
       storage: cloudEnabled() ? "netlify-blobs" : process.env.DATABASE_URL ? "postgresql" : "json",

@@ -1787,4 +1787,57 @@ export const extraRows = {
     "The shipping date falls on or next to an official holiday; customs or crossings may be slower:",
     "Sevkiyat tarihi resmi tatile denk geliyor veya yakın; gümrük veya kapılar yavaşlayabilir:",
   ],
+  liveFromBorder: ["مباشر من المعابر", "Live from the crossings", "Kapılardan canlı"],
+  onNow: ["جارية الآن", "happening now", "şu anda"],
+  previewGoods: ["طلب تجريبي: ألبسة جاهزة", "Sample order: ready-made clothes", "Örnek sipariş: hazır giyim"],
+  previewPayment: [
+    "الدفع بينك وبين الشركة مباشرة",
+    "You pay the company directly",
+    "Ödemeyi doğrudan firmaya yaparsınız",
+  ],
+  previewCaption: [
+    "مثال توضيحي لما تراه في حسابك: مراحل الطلب الثلاث والموقع على الخريطة ووقت الانتظار على المعبر.",
+    "An illustrative example of what you see in your account: the three order stages, the map position and the wait at the crossing.",
+    "Hesabınızda gördüklerinize örnek: siparişin üç aşaması, haritadaki konum ve kapıdaki bekleme süresi.",
+  ],
+  faqQ7: [
+    "ماذا يحدث بعد انتهاء الفترة المجانية؟",
+    "What happens after the free period?",
+    "Ücretsiz dönem bitince ne olur?",
+  ],
+  faqA7: [
+    "نذكّرك قبل انتهائها، ثم تختار الاشتراك الشهري أو السنوي (السنة بسعر 10 أشهر). بياناتك وطلباتك تبقى محفوظة، والحسابات الفردية مجانية دائمًا.",
+    "We remind you before it ends; then you choose a monthly or yearly plan (a year costs 10 months). Your data and orders stay saved, and individual accounts are always free.",
+    "Bitmeden önce hatırlatırız; sonra aylık veya yıllık planı seçersiniz (yıl 10 ay fiyatına). Verileriniz ve siparişleriniz korunur; bireysel hesaplar her zaman ücretsizdir.",
+  ],
+  faqQ8: [
+    "هل يوجد عقد أو التزام؟ هل أستطيع التوقف؟",
+    "Is there a contract or commitment? Can I stop?",
+    "Sözleşme veya taahhüt var mı? Bırakabilir miyim?",
+  ],
+  faqA8: [
+    "لا يوجد عقد طويل ولا عمولة على شحناتك. تستطيع التوقف عن التجديد متى شئت، ويبقى حسابك وسجلّك محفوظين.",
+    "There is no long contract and no commission on your shipments. You can stop renewing at any time, and your account and history stay saved.",
+    "Uzun sözleşme ve sevkiyatlarınızdan komisyon yoktur. Yenilemeyi istediğiniz zaman bırakabilirsiniz; hesabınız ve geçmişiniz korunur.",
+  ],
+  faqQ9: [
+    "كيف أعرف إذا كان المعبر مغلقًا أو هناك عطلة؟",
+    "How do I know if a crossing is closed or there is a holiday?",
+    "Kapının kapalı olduğunu veya tatil olduğunu nasıl anlarım?",
+  ],
+  faqA9: [
+    "صفحة الحدود تعرض حالة المعابر وتقارير الانتظار من السائقين والشركات، وعدًّا تنازليًا للعطل الرسمية في تركيا وسوريا، وتصلك إشعارات الإدارة عند أي إغلاق أو تغيير.",
+    "The border page shows crossing status, wait reports from drivers and companies, and a countdown to official holidays in Türkiye and Syria; administration notices reach you on any closure or change.",
+    "Sınır sayfası kapıların durumunu, sürücü ve firmalardan bekleme raporlarını ve Türkiye ile Suriye resmi tatillerine geri sayımı gösterir; kapanma veya değişiklikte yönetim bildirimi alırsınız.",
+  ],
+  publicWhatsapp: [
+    "رقم واتساب المنصة للتواصل العام (يظهر في أسفل الصفحة الرئيسية)",
+    "Platform WhatsApp number for public contact (shown in the home page footer)",
+    "Genel iletişim için platform WhatsApp numarası (ana sayfa altında görünür)",
+  ],
+  waContactMessage: [
+    "مرحبًا، لدي استفسار عن منصة LogiBridge.",
+    "Hello, I have a question about LogiBridge.",
+    "Merhaba, LogiBridge hakkında bir sorum var.",
+  ],
 };

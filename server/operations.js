@@ -101,6 +101,7 @@ export function operationRoutes(app) {
       activityEmails: s.settings?.activityEmails !== false,
       notifyEmail: s.settings?.notifyEmail || "",
       adminWhatsapp: s.settings?.adminWhatsapp || "",
+      publicWhatsapp: s.settings?.publicWhatsapp || "",
       enforceSubscription: s.settings?.enforceSubscription === true,
       pricing: pricingOf(s),
       whatsappConfigured: whatsappConfigured(),
@@ -133,6 +134,11 @@ export function operationRoutes(app) {
       }
       pricing = { visible: p.visible, prices };
     }
+    let publicWhatsapp;
+    if ("publicWhatsapp" in b) {
+      publicWhatsapp = String(b.publicWhatsapp || "").trim();
+      if (publicWhatsapp && !waNumber(publicWhatsapp)) throw new Error("Phone must be international");
+    }
     let adminWhatsapp;
     if ("adminWhatsapp" in b) {
       adminWhatsapp = String(b.adminWhatsapp || "").trim();
@@ -141,6 +147,7 @@ export function operationRoutes(app) {
     await mutate((s) => {
       s.settings ||= {};
       if (adminWhatsapp !== undefined) s.settings.adminWhatsapp = adminWhatsapp;
+      if (publicWhatsapp !== undefined) s.settings.publicWhatsapp = publicWhatsapp;
       if (pricing) s.settings.pricing = pricing;
       if ("demoLogin" in b) s.settings.demoLogin = b.demoLogin;
       if ("activityEmails" in b) s.settings.activityEmails = b.activityEmails;

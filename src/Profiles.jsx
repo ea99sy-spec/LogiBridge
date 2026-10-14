@@ -684,6 +684,29 @@ export function AdminSiteSettings({ data, t, run, busy }) {
           {t("save")}
         </button>
       </form>
+      <form
+        className="inline-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          save({ publicWhatsapp: new FormData(e.currentTarget).get("publicWhatsapp") });
+        }}
+      >
+        <label className="field">
+          <span>{t("publicWhatsapp")}</span>
+          <input
+            type="tel"
+            name="publicWhatsapp"
+            maxLength="30"
+            dir="ltr"
+            placeholder="+90 5xx xxx xx xx"
+            defaultValue={settings.publicWhatsapp}
+            key={settings.publicWhatsapp}
+          />
+        </label>
+        <button className="button" disabled={busy}>
+          {t("save")}
+        </button>
+      </form>
       <p className="muted small">
         {t(settings.whatsappConfigured ? "whatsappActive" : "whatsappNotActive")}
         {waLink(settings.adminWhatsapp) && (

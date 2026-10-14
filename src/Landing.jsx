@@ -1,17 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { LegalLinks } from "./Legal";
+import { LiveBorderStrip, ProductPreview } from "./LandingLive";
+import { DRIVER_APP_URL } from "./Advanced";
+import { waLink } from "../shared/wa";
 
 const types = ["merchant", "carrier", "broker", "supplier", "individual"];
 const symbols = { merchant: "▤", carrier: "⇄", broker: "⚖", supplier: "▧", individual: "◉", admin: "◇" };
 
 // Public facts the page needs: whether demo accounts are on, and the support email.
 function useHealth() {
-  const [health, setHealth] = useState({ demo: false, supportEmail: "", pricing: null });
+  const [health, setHealth] = useState({ demo: false, supportEmail: "", pricing: null, whatsapp: "" });
   useEffect(() => {
     fetch("/api/health")
       .then((r) => r.json())
       .then((r) =>
-        setHealth({ demo: !!r.demo, supportEmail: r.supportEmail || "", pricing: r.pricing || null }),
+        setHealth({
+          demo: !!r.demo,
+          supportEmail: r.supportEmail || "",
+          pricing: r.pricing || null,
+          whatsapp: r.whatsapp || "",
+        }),
       )
       .catch(() => {});
   }, []);
@@ -115,25 +123,9 @@ export default function Landing({ t, langSelect, user }) {
               <span>✓ AR / EN / TR</span>
             </div>
           </div>
-          <div className="global-art" aria-hidden="true">
-            <div className="globe">
-              <i />
-              <i />
-              <i />
-              <span>⇄</span>
-            </div>
-            <span className="global-pin pin-tr">
-              TR <b>Türkiye</b>
-            </span>
-            <span className="global-pin pin-sy">
-              SY <b>Syria</b>
-            </span>
-            <span className="global-pin pin-world">
-              ◎ <b>Global</b>
-            </span>
-            <div className="global-art-caption">LOGIBRIDGE NETWORK</div>
-          </div>
+          <ProductPreview t={t} />
         </section>
+        <LiveBorderStrip t={t} lang={document.documentElement.lang} />
 
         {/* 2. Why use the platform */}
         <section id="why" className="landing-section">
@@ -207,6 +199,14 @@ export default function Landing({ t, langSelect, user }) {
                 <span className="feature-icon">{icon}</span>
                 <h3>{t(k)}</h3>
                 <p>{t(k + "Text")}</p>
+                {k === "featDriverApp" && (
+                  <p className="feature-links">
+                    <a href={DRIVER_APP_URL}>{t("downloadDriverApp")} ↓</a>
+                    <a href="/driver-app/" target="_blank" rel="noopener noreferrer">
+                      {t("tryDriverAppBrowser")} ↗
+                    </a>
+                  </p>
+                )}
               </article>
             ))}
           </div>
@@ -300,7 +300,7 @@ export default function Landing({ t, langSelect, user }) {
           </div>
           <h2>{t("faqTitle")}</h2>
           <div className="faq">
-            {[1, 2, 3, 4, 5, 6].map((n) => (
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
               <details key={n}>
                 <summary>{t("faqQ" + n)}</summary>
                 <p>{t("faqA" + n)}</p>
@@ -329,6 +329,16 @@ export default function Landing({ t, langSelect, user }) {
           ) : (
             <span>{t("contactViaAccount")}</span>
           )}
+          {waLink(health.whatsapp) && (
+            <a
+              className="button ghost small-button whatsapp"
+              href={waLink(health.whatsapp, t("waContactMessage"))}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t("chatWhatsapp")}
+            </a>
+          )}
         </div>
         <LegalLinks t={t} />
         <span>© 2026 · AR / EN / TR</span>
@@ -355,15 +365,17 @@ function About({ t }) {
           </article>
         ))}
       </div>
-      <h3 className="about-subtitle">{t("valuesTitle")}</h3>
-      <div className="about-values">
-        {["valueTransparency", "valueTrust", "valueCompliance", "valueSpeed"].map((k) => (
-          <div key={k}>
-            <b>{t(k)}</b>
-            <small>{t(k + "Text")}</small>
-          </div>
-        ))}
-      </div>
+      <details className="about-more">
+        <summary>{t("valuesTitle")}</summary>
+        <div className="about-values">
+          {["valueTransparency", "valueTrust", "valueCompliance", "valueSpeed"].map((k) => (
+            <div key={k}>
+              <b>{t(k)}</b>
+              <small>{t(k + "Text")}</small>
+            </div>
+          ))}
+        </div>
+      </details>
     </section>
   );
 }
