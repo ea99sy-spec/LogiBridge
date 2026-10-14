@@ -998,3 +998,35 @@ test("free months, the 7-operation bonus and paid months", async (t) => {
     400,
   );
 });
+
+test("administrator reset links and backups", async (t) => {
+  const server = await startServer(3224, { DEMO_MODE: "" });
+  t.after(server.stop);
+  const { call } = server;
+  const u = (
+    await call("u", "/auth/register", {
+      accountType: "individual",
+      name: "Forgetful User",
+      email: "forget@test.local",
+      password,
+      ...personFields,
+    })
+  ).body.user;
+  assert.equal((await call("u", `/admin/accounts/${u.id}/reset-link`, {})).status, 403);
+  await call("owner", "/auth/login", { email: "owner@test.local", password: "Owner-test-password-2026" });
+  const link = (await call("owner", `/admin/accounts/${u.id}/reset-link`, {})).body;
+  assert.equal(link.phone, personFields.phone);
+  const token = link.url.split("#")[1];
+  const fresh = "Fresh-password-for-test-2026";
+  assert.equal((await call("x", "/auth/reset", { token, password: fresh })).status, 200);
+  assert.equal((await call("x", "/auth/reset", { token, password: fresh })).status, 400, "one-time link");
+  assert.equal(
+    (await call("u2", "/auth/login", { email: "forget@test.local", password: fresh })).status,
+    200,
+  );
+  // Backup: administrator only.
+  assert.equal((await call("u2", "/admin/backup")).status, 403);
+  const backup = await call("owner", "/admin/backup");
+  assert.equal(backup.status, 200);
+  assert.ok(backup.body.state.users.some((x) => x.email === "forget@test.local"));
+});

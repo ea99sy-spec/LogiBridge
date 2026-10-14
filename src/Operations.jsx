@@ -792,6 +792,7 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
             <>
               <h3>{detail.account.name}</h3>
               <AccountDetails account={detail.account} t={t} />
+              {!data.user.demo && !detail.account.demo && <ResetLinkTool account={detail.account} t={t} />}
               {!data.user.demo && detail.account.taxId && (
                 <p className="actions">
                   <button
@@ -885,5 +886,60 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
         </div>
       )}
     </>
+  );
+}
+
+// One-time password reset link the administrator can send to a user (WhatsApp or any channel).
+function ResetLinkTool({ account, t }) {
+  const [link, setLink] = useState(null),
+    [error, setError] = useState("");
+  async function create() {
+    setError("");
+    try {
+      const r = await fetch(`/api/admin/accounts/${account.id}/reset-link`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "{}",
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      setLink(d);
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+  return (
+    <div className="reset-link-tool">
+      {!link ? (
+        <button type="button" className="button ghost small-button" onClick={create}>
+          🔑 {t("createResetLink")}
+        </button>
+      ) : (
+        <>
+          <small className="muted">{t("resetLinkNote")}</small>
+          <input readOnly dir="ltr" value={link.url} onFocus={(e) => e.target.select()} />
+          <div className="actions">
+            <button
+              type="button"
+              className="button ghost small-button"
+              onClick={() => navigator.clipboard?.writeText(link.url)}
+            >
+              {t("copyLink")}
+            </button>
+            {waLink(link.phone) && (
+              <a
+                className="button ghost small-button whatsapp"
+                target="_blank"
+                rel="noopener noreferrer"
+                href={waLink(link.phone, `${t("resetLinkMessage")}\n${link.url}`)}
+              >
+                {t("sendWhatsapp")}
+              </a>
+            )}
+          </div>
+        </>
+      )}
+      {error && <small className="form-error">{error}</small>}
+    </div>
   );
 }

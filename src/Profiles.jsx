@@ -525,6 +525,13 @@ export function AdminSiteSettings({ data, t, run, busy }) {
         </span>
       </label>
       <PricingSettings settings={settings} save={save} t={t} busy={busy} />
+      <div className="backup-tool">
+        <b>{t("backupTitle")}</b>
+        <small className="muted">{t("backupNote")}</small>
+        <a className="button ghost" href="/api/admin/backup" download>
+          ⬇ {t("downloadBackup")}
+        </a>
+      </div>
       <label className="consent">
         <input
           type="checkbox"

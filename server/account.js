@@ -8,10 +8,7 @@ const hash = (v) => createHash("sha256").update(String(v)).digest("hex");
 const RESET_MINUTES = 60;
 
 function siteUrl() {
-  return (process.env.URL || process.env.SITE_URL || "https://logibridge-ea99sy.netlify.app").replace(
-    /\/$/,
-    "",
-  );
+  return (process.env.URL || process.env.SITE_URL || "https://logibridge-app.netlify.app").replace(/\/$/, "");
 }
 
 // Email confirmation: a one-time link sent after registration.
@@ -107,6 +104,33 @@ export function publicAccountRoutes(app, { authLimit, txt }) {
 
 // Routes for a signed-in account.
 export function privateAccountRoutes(app, { sessionFor }) {
+  // Administrator: a one-time password reset link to send to a user directly (e.g. on WhatsApp),
+  // useful while emails cannot reach every user. Valid for 24 hours.
+  app.post("/api/admin/accounts/:id/reset-link", async (req, res) => {
+    if (req.user.role !== "admin" || req.user.demo)
+      return res.status(403).json({ error: "A registered administrator is required" });
+    const token = randomBytes(32).toString("hex");
+    let phone = "";
+    await mutate((s) => {
+      const user = s.users.find(
+        (u) => u.id === req.params.id && !u.demo && u.role !== "admin" && u.credential,
+      );
+      if (!user) throw new Error("Account unavailable");
+      phone = user.details?.phone || "";
+      const now = Date.now();
+      s.passwordResets ||= [];
+      s.passwordResets = s.passwordResets.filter((r) => Date.parse(r.expiresAt) > now - 86400000);
+      s.passwordResets.push({
+        userId: user.id,
+        tokenHash: hash(token),
+        createdAt: new Date(now).toISOString(),
+        expiresAt: new Date(now + 24 * 3600000).toISOString(),
+        used: false,
+        byAdmin: req.user.id,
+      });
+    });
+    res.json({ url: `${siteUrl()}/reset-password#${token}`, phone });
+  });
   app.post("/api/account/resend-verification", async (req, res) => {
     if (req.user.emailVerified !== false) return res.json({ ok: true, alreadyVerified: true });
     await mutate((s) => {

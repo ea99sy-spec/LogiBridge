@@ -39,7 +39,7 @@ export function queueEmail(s, userId, event, details = {}, key) {
   if (event === "border_notice" && u.profile?.borderEmails === false) return;
   s.emailOutbox ||= [];
   if (key && s.emailOutbox.some((x) => x.key === key)) return;
-  const url = (process.env.URL || process.env.SITE_URL || "https://logibridge-ea99sy.netlify.app").replace(
+  const url = (process.env.URL || process.env.SITE_URL || "https://logibridge-app.netlify.app").replace(
     /\/$/,
     "",
   );
@@ -232,7 +232,7 @@ export function queueAdminEmail(s, event, details = {}, key) {
   if (!to) return;
   s.emailOutbox ||= [];
   if (key && s.emailOutbox.some((x) => x.key === key)) return;
-  const url = (process.env.URL || process.env.SITE_URL || "https://logibridge-ea99sy.netlify.app").replace(
+  const url = (process.env.URL || process.env.SITE_URL || "https://logibridge-app.netlify.app").replace(
     /\/$/,
     "",
   );

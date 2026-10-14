@@ -83,6 +83,14 @@ export function operationRoutes(app) {
     res.status(403).json({ error: "A registered administrator is required" });
     return false;
   };
+  // Full copy of the platform data for safekeeping (registered administrator only).
+  app.get("/api/admin/backup", (req, res) => {
+    if (!realAdmin(req, res)) return;
+    const day = new Date().toISOString().slice(0, 10);
+    res.set("Content-Type", "application/json; charset=utf-8");
+    res.set("Content-Disposition", `attachment; filename="logibridge-backup-${day}.json"`);
+    res.send(JSON.stringify({ exportedAt: new Date().toISOString(), state: readState() }));
+  });
   // Platform settings the owner controls from the admin workspace.
   app.get("/api/admin/settings", (req, res) => {
     if (!realAdmin(req, res)) return;

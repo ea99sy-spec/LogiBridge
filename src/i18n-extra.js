@@ -1671,4 +1671,26 @@ export const extraRows = {
     "If turned off, the pricing section stays without numbers.",
     "Kapalıysa fiyat bölümü rakamsız kalır.",
   ],
+  // Audit additions
+  location: ["الموقع", "Location", "Konum"],
+  amount: ["المبلغ", "Amount", "Tutar"],
+  createResetLink: ["رابط إعادة تعيين كلمة المرور", "Password reset link", "Şifre sıfırlama bağlantısı"],
+  resetLinkNote: [
+    "رابط لمرة واحدة صالح 24 ساعة. أرسله للمستخدم فقط.",
+    "One-time link, valid for 24 hours. Send it only to the user.",
+    "Tek kullanımlık bağlantı, 24 saat geçerli. Yalnızca kullanıcıya gönderin.",
+  ],
+  resetLinkMessage: [
+    "رابط لاختيار كلمة مرور جديدة لحسابك في LogiBridge (صالح 24 ساعة):",
+    "Link to choose a new password for your LogiBridge account (valid 24 hours):",
+    "LogiBridge hesabınız için yeni şifre bağlantısı (24 saat geçerli):",
+  ],
+  sendWhatsapp: ["إرسال على واتساب", "Send on WhatsApp", "WhatsApp'tan gönder"],
+  backupTitle: ["نسخة احتياطية", "Backup", "Yedek"],
+  backupNote: [
+    "ملف فيه كل بيانات الموقع (الحسابات والشحنات والإعدادات). احفظه بمكان آمن ولا تشاركه.",
+    "A file with all site data (accounts, shipments, settings). Keep it somewhere safe and do not share it.",
+    "Tüm site verilerini içeren dosya (hesaplar, sevkiyatlar, ayarlar). Güvenli yerde saklayın, paylaşmayın.",
+  ],
+  downloadBackup: ["تنزيل نسخة احتياطية", "Download backup", "Yedeği indir"],
 };

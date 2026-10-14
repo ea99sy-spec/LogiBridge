@@ -1391,7 +1391,7 @@ function Border({ data, t, run }) {
       </label>
       <div className="capacity">
         <strong>{count} / 5</strong>
-        <span>{t("completed")}</span>
+        <span>{t("docsReady")}</span>
       </div>
       <progress max="5" value={count} />
       {documentKeys.map((k) => (

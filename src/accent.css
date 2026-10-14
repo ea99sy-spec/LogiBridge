@@ -263,3 +263,33 @@
   letter-spacing: 0;
   padding-inline-start: 4px;
 }
+
+/* ---- Phone widths: nothing may push the page wider than the screen ---- */
+main select,
+main input,
+main textarea {
+  max-width: 100%;
+}
+.two-cols > *,
+.tracking-layout > *,
+.border-rules,
+.border-rules > *,
+.panel {
+  min-width: 0;
+}
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.reset-link-tool,
+.backup-tool {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 10px;
+  background: #f7f9fc;
+}
+.reset-link-tool input {
+  width: 100%;
+}

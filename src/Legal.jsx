@@ -136,7 +136,7 @@ const content = {
       sections: [
         [
           "البيانات التي نجمعها",
-          "الاسم أو اسم الشركة، البريد الإلكتروني، الهاتف، البلد والمدينة، الرقم الضريبي، بيانات النشاط (البضائع، رخصة النقل، الأسطول، المعدات)، وثائق التوثيق (السجل التجاري أو صفحة الجواز)، بيانات الشحنات والعروض والمدفوعات والرسائل، ومواقع التتبع التي يشاركها الناقل أو السائق.",
+          "الاسم أو اسم الشركة، البريد الإلكتروني، الهاتف، البلد والمدينة، الرقم الضريبي، بيانات النشاط (البضائع، رخصة النقل، الأسطول، المعدات)، وثائق التوثيق (السجل التجاري أو صفحة الجواز)، بيانات الشحنات والعروض والمدفوعات والرسائل، ومواقع التتبع التي يشاركها الناقل أو السائق (من الموقع أو تطبيق السائق)، وصور مراحل الشحنة، واسم المستلم وتوقيعه عند التسليم، وتقارير الزحمة على المعابر.",
         ],
         [
           "لماذا نجمعها",
@@ -148,11 +148,11 @@ const content = {
         ],
         [
           "من يرى بياناتك",
-          "يظهر للمستخدمين الآخرين اسمك وتعريفك وخدماتك وتقييمك فقط. تفاصيل المرسل والمستلم والعنوان تظهر للناقل المكلّف بالشحنة فقط. بريدك ورقمك الضريبي ووثائقك لا تظهر في الدليل.",
+          "يظهر للمستخدمين الآخرين اسمك وتعريفك وخدماتك وتقييمك فقط. تفاصيل المرسل والمستلم والعنوان تظهر للناقل المكلّف بالشحنة فقط. بريدك ورقمك الضريبي ووثائقك لا تظهر في الدليل. صور الشحنة وإثبات التسليم يراها صاحب الشحنة والناقل والإدارة فقط. رابط التتبع الذي ينشئه صاحب الشحنة للمستلم يعرض المرحلة وموقعًا تقريبيًا (نحو كيلومتر) لكل من يملك الرابط، ويمكن إيقافه في أي وقت. تقارير الزحمة تظهر بدون اسم من أرسلها.",
         ],
         [
           "مزوّدو الخدمة",
-          "تُستضاف المنصة وبياناتها لدى Netlify، وتُرسل الرسائل الإلكترونية عبر Resend. لا نبيع بياناتك ولا نشاركها لأغراض تسويقية.",
+          "تُستضاف المنصة وبياناتها لدى Netlify، وتُرسل الرسائل الإلكترونية عبر Resend، ورسائل واتساب عبر Meta إذا فعّلتها، وتُحمَّل الخرائط من OpenStreetMap، ويُنشر تطبيق السائق عبر GitHub. لا نبيع بياناتك ولا نشاركها لأغراض تسويقية.",
         ],
         [
           "مدة الاحتفاظ",
@@ -173,7 +173,7 @@ const content = {
       sections: [
         [
           "Data we collect",
-          "Name or company name, email, phone, country and city, tax number, business details (goods, transport licence, fleet, equipment), verification documents (trade registry or passport page), shipment, offer, payment and message data, and tracking locations shared by a carrier or driver.",
+          "Name or company name, email, phone, country and city, tax number, business details (goods, transport licence, fleet, equipment), verification documents (trade registry or passport page), shipment, offer, payment and message data, tracking locations shared by a carrier or driver (on the site or in the driver app), photos of shipment stages, the receiver's name and signature at delivery, and crossing queue reports.",
         ],
         [
           "Why we collect it",
@@ -185,11 +185,11 @@ const content = {
         ],
         [
           "Who sees your data",
-          "Other users see only your name, introduction, services and rating. Sender, recipient and address details are visible only to the carrier assigned to the shipment. Your email, tax number and documents never appear in the directory.",
+          "Other users see only your name, introduction, services and rating. Sender, recipient and address details are visible only to the carrier assigned to the shipment. Your email, tax number and documents never appear in the directory. Shipment photos and proof of delivery are visible only to the shipment owner, the carrier and the administration. A tracking link the owner creates for the receiver shows the stage and an approximate position (about one kilometre) to anyone who has the link, and can be turned off at any time. Queue reports appear without the sender's name.",
         ],
         [
           "Service providers",
-          "The platform and its data are hosted on Netlify, and emails are sent through Resend. We do not sell your data or share it for marketing.",
+          "The platform and its data are hosted on Netlify; emails are sent through Resend, WhatsApp messages through Meta if you turn them on, maps load from OpenStreetMap, and the driver app is published on GitHub. We do not sell your data or share it for marketing.",
         ],
         [
           "Retention",
@@ -210,7 +210,7 @@ const content = {
       sections: [
         [
           "Topladığımız veriler",
-          "Ad veya şirket adı, e-posta, telefon, ülke ve şehir, vergi numarası, faaliyet bilgileri (ürünler, taşıma yetki belgesi, filo, ekipman), doğrulama belgeleri (ticaret sicili veya pasaport sayfası), sevkiyat, teklif, ödeme ve mesaj verileri ile taşıyıcı veya sürücünün paylaştığı takip konumları.",
+          "Ad veya şirket adı, e-posta, telefon, ülke ve şehir, vergi numarası, faaliyet bilgileri (ürünler, taşıma yetki belgesi, filo, ekipman), doğrulama belgeleri (ticaret sicili veya pasaport sayfası), sevkiyat, teklif, ödeme ve mesaj verileri ile taşıyıcı veya sürücünün (sitede veya sürücü uygulamasında) paylaştığı takip konumları, sevkiyat aşaması fotoğrafları, teslimde alıcının adı ve imzası ve kapı kuyruk raporları.",
         ],
         [
           "Neden topluyoruz",
@@ -222,11 +222,11 @@ const content = {
         ],
         [
           "Verilerinizi kim görür",
-          "Diğer kullanıcılar yalnızca adınızı, tanıtımınızı, hizmetlerinizi ve puanınızı görür. Gönderici, alıcı ve adres bilgileri yalnızca sevkiyata atanan taşıyıcıya görünür. E-posta, vergi numarası ve belgeleriniz rehberde yer almaz.",
+          "Diğer kullanıcılar yalnızca adınızı, tanıtımınızı, hizmetlerinizi ve puanınızı görür. Gönderici, alıcı ve adres bilgileri yalnızca sevkiyata atanan taşıyıcıya görünür. E-posta, vergi numarası ve belgeleriniz rehberde yer almaz. Sevkiyat fotoğraflarını ve teslim kanıtını yalnızca sevkiyat sahibi, taşıyıcı ve yönetim görür. Sevkiyat sahibinin alıcı için oluşturduğu takip bağlantısı, bağlantıya sahip herkese aşamayı ve yaklaşık konumu (yaklaşık bir kilometre) gösterir ve her an kapatılabilir. Kuyruk raporları gönderenin adı olmadan görünür.",
         ],
         [
           "Hizmet sağlayıcılar",
-          "Platform ve verileri Netlify'da barındırılır, e-postalar Resend üzerinden gönderilir. Verilerinizi satmayız ve pazarlama amacıyla paylaşmayız.",
+          "Platform ve verileri Netlify'da barındırılır; e-postalar Resend, açarsanız WhatsApp mesajları Meta üzerinden gönderilir, haritalar OpenStreetMap'ten yüklenir ve sürücü uygulaması GitHub'da yayımlanır. Verilerinizi satmayız ve pazarlama amacıyla paylaşmayız.",
         ],
         [
           "Saklama süresi",
