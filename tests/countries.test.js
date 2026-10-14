@@ -8,11 +8,14 @@ import {
   officialRegistries,
 } from "../shared/countries.js";
 test("international countries are unique ISO codes with translated labels", () => {
-  assert.equal(countryCodes.length, 249);
-  assert.equal(new Set(countryCodes).size, 249);
+  assert.equal(countryCodes.length, 248);
+  // The platform lists Palestine and does not list Israel.
+  assert.equal(countryCodes.includes("IL"), false);
+  assert.equal(countryCodes.includes("PS"), true);
+  assert.equal(new Set(countryCodes).size, 248);
   for (const lang of ["ar", "en", "tr"]) {
     const options = countryOptions(lang);
-    assert.equal(options.length, 249);
+    assert.equal(options.length, 248);
     assert.deepEqual(
       options.slice(0, 2).map((x) => x.code),
       ["TR", "SY"],

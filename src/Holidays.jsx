@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { upcomingHolidays, holidaysNear } from "../shared/holidays";
+import { Flag } from "./Flags";
 
 const index = (lang) => Math.max(0, ["ar", "en", "tr"].indexOf(lang));
 // Country labels as text chips (flag emoji render the wrong Syrian flag on many devices).
 const Chip = ({ c, t }) => (
-  <span className={`country-chip c-${c}`}>{t(c === "TR" ? "turkey" : "syria")}</span>
+  <span className={`country-chip c-${c}`}>
+    <Flag c={c} t={t} height={12} /> {t(c === "TR" ? "turkey" : "syria")}
+  </span>
 );
 
 // Re-renders every 30 seconds so countdowns stay current.
