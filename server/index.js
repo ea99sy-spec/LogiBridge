@@ -42,6 +42,7 @@ import { requiresApproval } from "../shared/access.js";
 import { queueEmail, queueAdminEmail, mailConfigured, flushEmails } from "./email.js";
 import { whatsappConfigured, flushWhatsApp } from "./whatsapp.js";
 import { subscriptionOf, pricingOf } from "../shared/subscription.js";
+import { publicStats } from "./stats.js";
 import { trackingRoutes, publicTrackingRoutes, newDeliveryCode, runTrackingWatch } from "./tracking.js";
 import { profileRoutes, announceCompany } from "./profiles.js";
 import {
@@ -176,6 +177,8 @@ export async function createApp() {
       whatsapp: readState().settings?.publicWhatsapp || "",
       // Subscription prices for the home page, unless the administrator hid them.
       pricing: pricingOf(readState()).visible ? pricingOf(readState()) : null,
+      // Live platform numbers (real accounts only), unless the administrator hid them.
+      stats: readState().settings?.showStats === false ? null : publicStats(readState()),
       storage: cloudEnabled() ? "netlify-blobs" : process.env.DATABASE_URL ? "postgresql" : "json",
       redis: !!redis,
     }),

@@ -1840,4 +1840,20 @@ export const extraRows = {
     "Hello, I have a question about LogiBridge.",
     "Merhaba, LogiBridge hakkında bir sorum var.",
   ],
+  statsTitle: ["أرقام المنصة", "Platform numbers", "Platform rakamları"],
+  statCompanies: ["شركة موثّقة", "verified companies", "doğrulanmış firma"],
+  statCompleted: ["شحنة مكتملة", "completed shipments", "tamamlanan sevkiyat"],
+  statActive: ["شحنة جارية الآن", "shipments under way", "devam eden sevkiyat"],
+  statCountries: ["دولة", "countries", "ülke"],
+  statCrossings: ["معابر مفتوحة نغطيها", "open crossings covered", "kapsanan açık kapı"],
+  showStats: [
+    "إظهار أرقام المنصة في الصفحة الرئيسية",
+    "Show platform numbers on the home page",
+    "Platform rakamlarını ana sayfada göster",
+  ],
+  showStatsNote: [
+    "أرقام حقيقية تُحسب تلقائيًا: الشركات الموثّقة، الشحنات المكتملة والجارية، والدول. لا تُحسب الحسابات التجريبية، ولا يظهر الرقم وهو صفر.",
+    "Real numbers counted automatically: verified companies, completed and ongoing shipments, and countries. Demo accounts are not counted, and a number is hidden while it is zero.",
+    "Otomatik sayılan gerçek rakamlar: doğrulanmış firmalar, tamamlanan ve süren sevkiyatlar, ülkeler. Demo hesaplar sayılmaz; sıfır olan rakam gösterilmez.",
+  ],
 };

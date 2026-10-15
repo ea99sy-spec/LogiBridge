@@ -127,3 +127,68 @@ export function ProductPreview({ t }) {
     </figure>
   );
 }
+
+// Counts up from the previous value to the new one (respects reduced motion).
+function CountUp({ value }) {
+  const [shown, setShown] = useState(0);
+  const from = React.useRef(0);
+  useEffect(() => {
+    const start = from.current;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || start === value) {
+      from.current = value;
+      setShown(value);
+      return;
+    }
+    const t0 = performance.now();
+    let raf;
+    const step = (now) => {
+      const p = Math.min(1, (now - t0) / 1200);
+      const v = Math.round(start + (value - start) * (1 - Math.pow(1 - p, 3)));
+      setShown(v);
+      if (p < 1) raf = requestAnimationFrame(step);
+      else from.current = value;
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [value]);
+  return <b>{shown.toLocaleString("en")}</b>;
+}
+
+// Real platform numbers, refreshed every minute so they grow by themselves.
+// A number is shown only once it is above zero; the administrator can hide the whole row.
+export function PlatformStats({ t }) {
+  const [stats, setStats] = useState(null);
+  useEffect(() => {
+    const load = () =>
+      fetch("/api/health")
+        .then((r) => r.json())
+        .then((r) => setStats(r.stats || null))
+        .catch(() => {});
+    load();
+    const id = setInterval(load, 60000);
+    return () => clearInterval(id);
+  }, []);
+  if (!stats) return null;
+  const items = [
+    ["companies", "statCompanies"],
+    ["completed", "statCompleted"],
+    ["active", "statActive"],
+    ["countries", "statCountries"],
+  ].filter(([k]) => stats[k] > 0);
+  if (!items.length) return null;
+  const crossingsOpen = Object.values(crossings).filter((c) => c.status === "open").length;
+  return (
+    <section className="platform-stats" aria-label={t("statsTitle")}>
+      {items.map(([k, label]) => (
+        <div key={k}>
+          <CountUp value={stats[k]} />
+          <small>{t(label)}</small>
+        </div>
+      ))}
+      <div>
+        <CountUp value={crossingsOpen} />
+        <small>{t("statCrossings")}</small>
+      </div>
+    </section>
+  );
+}

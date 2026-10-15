@@ -256,3 +256,46 @@
     display: none;
   }
 }
+
+/* Live platform numbers */
+.platform-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 8px 42px 0;
+}
+.platform-stats > div {
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px 10px;
+  text-align: center;
+  border-bottom: 3px solid #facc15;
+  box-shadow: 0 6px 18px rgba(16, 42, 86, 0.06);
+}
+.platform-stats b {
+  display: block;
+  font-size: 26px;
+  color: #102a56;
+  font-variant-numeric: tabular-nums;
+}
+.platform-stats small {
+  color: #6b7f9e;
+  font-size: 11px;
+}
+@media (max-width: 900px) {
+  .platform-stats {
+    margin-inline: 25px;
+  }
+}
+@media (max-width: 480px) {
+  .platform-stats {
+    margin-inline: 14px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .platform-stats b {
+    font-size: 21px;
+  }
+  .platform-stats > div:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}

@@ -103,6 +103,7 @@ export function operationRoutes(app) {
       adminWhatsapp: s.settings?.adminWhatsapp || "",
       publicWhatsapp: s.settings?.publicWhatsapp || "",
       enforceSubscription: s.settings?.enforceSubscription === true,
+      showStats: s.settings?.showStats !== false,
       pricing: pricingOf(s),
       whatsappConfigured: whatsappConfigured(),
       recipient: adminRecipient(s),
@@ -112,7 +113,13 @@ export function operationRoutes(app) {
   app.put("/api/admin/settings", async (req, res) => {
     if (!realAdmin(req, res)) return;
     const b = req.body;
-    for (const k of ["demoLogin", "activityEmails", "requireEmailVerification", "enforceSubscription"])
+    for (const k of [
+      "demoLogin",
+      "activityEmails",
+      "requireEmailVerification",
+      "enforceSubscription",
+      "showStats",
+    ])
       if (k in b && typeof b[k] !== "boolean") throw new Error("Invalid request");
     let notifyEmail;
     if ("notifyEmail" in b) {
@@ -153,6 +160,7 @@ export function operationRoutes(app) {
       if ("activityEmails" in b) s.settings.activityEmails = b.activityEmails;
       if ("requireEmailVerification" in b) s.settings.requireEmailVerification = b.requireEmailVerification;
       if ("enforceSubscription" in b) s.settings.enforceSubscription = b.enforceSubscription;
+      if ("showStats" in b) s.settings.showStats = b.showStats;
       if (notifyEmail !== undefined) s.settings.notifyEmail = notifyEmail;
     });
     res.json({ ok: true });
