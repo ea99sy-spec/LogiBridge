@@ -15,6 +15,7 @@ import {
 } from "./Tracking";
 import { waLink } from "../shared/wa.js";
 import { AdminEmailSettings, AdminSiteSettings, AccountDetails, TaxBadge } from "./Profiles";
+import { AccountNotes } from "./AdminNotes";
 import { officialTaxLink } from "../shared/tax";
 import { GpsShare } from "./Gps";
 import { AdminPayments, BankTransfers } from "./Payments";
@@ -814,6 +815,9 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
               <h3>{detail.account.name}</h3>
               <AccountDetails account={detail.account} t={t} />
               {!data.user.demo && !detail.account.demo && <ResetLinkTool account={detail.account} t={t} />}
+              {!data.user.demo && !detail.account.demo && (
+                <AccountNotes accountId={detail.account.id} t={t} lang={document.documentElement.lang} />
+              )}
               {!data.user.demo && detail.account.taxId && (
                 <p className="actions">
                   <button

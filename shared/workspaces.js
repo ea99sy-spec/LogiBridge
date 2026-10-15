@@ -91,6 +91,7 @@ const modules = {
     "dashboard",
     "guide",
     "admin",
+    "notes",
     "companies",
     "kyb",
     "shipments",
@@ -106,9 +107,13 @@ export function accountKind(user) {
 }
 export function workspaceModules(user, flags = {}) {
   if (requiresApproval(user)) return ["dashboard", "guide", "profile", "kyb", "security"];
-  return (modules[accountKind(user)] || [])
-    .filter((key) => !["ratings", "marketplace", "contracts"].includes(key) || flags[key])
-    .filter((key) => !["inventory", "orders"].includes(key) || flags.marketplace);
+  return (
+    (modules[accountKind(user)] || [])
+      // Private admin notes are for registered administrators only, not the shared demo admin.
+      .filter((key) => key !== "notes" || !user.demo)
+      .filter((key) => !["ratings", "marketplace", "contracts"].includes(key) || flags[key])
+      .filter((key) => !["inventory", "orders"].includes(key) || flags.marketplace)
+  );
 }
 // Carriers see open transport jobs, customs brokers see open clearance jobs,
 // and both always see the jobs assigned to them.

@@ -43,6 +43,7 @@ import { queueEmail, queueAdminEmail, mailConfigured, flushEmails } from "./emai
 import { whatsappConfigured, flushWhatsApp } from "./whatsapp.js";
 import { subscriptionOf, pricingOf } from "../shared/subscription.js";
 import { publicStats } from "./stats.js";
+import { noteRoutes } from "./notes.js";
 import { trackingRoutes, publicTrackingRoutes, newDeliveryCode, runTrackingWatch } from "./tracking.js";
 import { profileRoutes, announceCompany } from "./profiles.js";
 import {
@@ -447,6 +448,7 @@ export async function createApp() {
       fx,
       payments: _payments,
       bankAccount: _bank,
+      adminNotes: _adminNotes, // private administrator notes: only via /api/admin/notes
       ...shared
     } = s;
     res.json({
@@ -532,6 +534,7 @@ export async function createApp() {
   privateAccountRoutes(app, { sessionFor });
   twoFactorRoutes(app);
   operationRoutes(app);
+  noteRoutes(app);
   trackingRoutes(app);
   paymentRoutes(app);
   advancedRoutes(app);

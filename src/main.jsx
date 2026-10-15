@@ -2,6 +2,7 @@ import { requiresApproval } from "../shared/access";
 import BorderPage, { BorderRules } from "./BorderRules";
 import { PublicTracking } from "./Tracking";
 import { GuidePage, StartHereCard } from "./Guide";
+import { AdminNotes, NotesDueCard } from "./AdminNotes";
 import { FormHolidayWarning } from "./Holidays";
 import { SubscriptionBanner } from "./Subscription";
 import { waLink } from "../shared/wa";
@@ -455,6 +456,7 @@ const icons = {
   marketplace: "▧",
   contracts: "▱",
   admin: "⚙",
+  notes: "✎",
   fleet: "▣",
   documents: "⇧",
   newShipment: "＋",
@@ -873,6 +875,7 @@ function App() {
                   navigate={setTab}
                   userId={user.id}
                 />
+                {admin && !user.demo && <NotesDueCard t={t} lang={lang} navigate={setTab} />}
                 <RoleDashboard
                   data={data}
                   t={t}
@@ -1278,6 +1281,7 @@ function App() {
                 )}
               </>
             )}
+            {activeTab === "notes" && <AdminNotes t={t} lang={lang} />}
             {["admin", "companies"].includes(activeTab) && (
               <AdminPanel
                 data={data}
