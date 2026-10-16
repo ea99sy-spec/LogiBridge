@@ -792,3 +792,42 @@ a:focus-visible {
 .demo-access {
   flex-wrap: wrap;
 }
+/* Service provider details (legal pages and footer) */
+.company-info {
+  margin-top: 24px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: #f6f8fc;
+  border-inline-start: 4px solid #facc15;
+}
+.company-info h2 {
+  margin-top: 0;
+}
+.company-info dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 14px;
+  margin: 8px 0 0;
+}
+.company-info dt {
+  color: #6b7f9e;
+}
+.company-info dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.company-line {
+  flex-basis: 100%;
+  font-size: 10px;
+  color: #869bb9;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 480px) {
+  .company-info dl {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .company-info dd {
+    margin-bottom: 8px;
+  }
+}

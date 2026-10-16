@@ -104,6 +104,7 @@ export function operationRoutes(app) {
       publicWhatsapp: s.settings?.publicWhatsapp || "",
       enforceSubscription: s.settings?.enforceSubscription === true,
       showStats: s.settings?.showStats !== false,
+      company: s.settings?.company || {},
       pricing: pricingOf(s),
       whatsappConfigured: whatsappConfigured(),
       recipient: adminRecipient(s),
@@ -146,6 +147,27 @@ export function operationRoutes(app) {
       publicWhatsapp = String(b.publicWhatsapp || "").trim();
       if (publicWhatsapp && !waNumber(publicWhatsapp)) throw new Error("Phone must be international");
     }
+    let company;
+    if ("company" in b) {
+      const c = b.company || {};
+      const str = (v, max) =>
+        String(v ?? "")
+          .trim()
+          .slice(0, max);
+      company = {
+        legalName: str(c.legalName, 200),
+        mersis: str(c.mersis, 16).replace(/\s/g, ""),
+        taxOffice: str(c.taxOffice, 80),
+        taxNumber: str(c.taxNumber, 11).replace(/\s/g, ""),
+        address: str(c.address, 400),
+        kep: str(c.kep, 120).toLowerCase(),
+      };
+      if (company.mersis && !/^\d{16}$/.test(company.mersis))
+        throw new Error("MERSIS number must be 16 digits");
+      if (company.taxNumber && !/^\d{10,11}$/.test(company.taxNumber))
+        throw new Error("Tax number must be 10 or 11 digits");
+      if (company.kep && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(company.kep)) throw new Error("Invalid email");
+    }
     let adminWhatsapp;
     if ("adminWhatsapp" in b) {
       adminWhatsapp = String(b.adminWhatsapp || "").trim();
@@ -155,6 +177,7 @@ export function operationRoutes(app) {
       s.settings ||= {};
       if (adminWhatsapp !== undefined) s.settings.adminWhatsapp = adminWhatsapp;
       if (publicWhatsapp !== undefined) s.settings.publicWhatsapp = publicWhatsapp;
+      if (company) s.settings.company = company;
       if (pricing) s.settings.pricing = pricing;
       if ("demoLogin" in b) s.settings.demoLogin = b.demoLogin;
       if ("activityEmails" in b) s.settings.activityEmails = b.activityEmails;

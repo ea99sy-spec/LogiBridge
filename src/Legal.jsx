@@ -1,4 +1,56 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+
+// Legal details of the company running the platform, set by the administrator.
+export function useCompany() {
+  const [company, setCompany] = useState(null);
+  useEffect(() => {
+    fetch("/api/health")
+      .then((r) => r.json())
+      .then((r) => setCompany(r.company || null))
+      .catch(() => {});
+  }, []);
+  return company;
+}
+
+// "Service provider" box (Turkish e-commerce law asks for the provider's details on the site).
+export function CompanyInfo({ company, t, compact = false }) {
+  if (!company?.legalName) return null;
+  const rows = [
+    ["mersis", company.mersis],
+    [
+      "taxOffice",
+      company.taxOffice && company.taxNumber
+        ? `${company.taxOffice} · ${company.taxNumber}`
+        : company.taxOffice || company.taxNumber,
+    ],
+    ["address", company.address],
+    ["kep", company.kep],
+  ].filter(([, v]) => v);
+  if (compact)
+    return (
+      <span className="company-line" dir="auto">
+        {company.legalName}
+        {company.mersis ? ` · MERSIS ${company.mersis}` : ""}
+        {company.address ? ` · ${company.address}` : ""}
+      </span>
+    );
+  return (
+    <section className="company-info">
+      <h2>{t("serviceProvider")}</h2>
+      <p>
+        <b dir="auto">{company.legalName}</b>
+      </p>
+      <dl>
+        {rows.map(([k, v]) => (
+          <React.Fragment key={k}>
+            <dt>{t("company_" + k)}</dt>
+            <dd dir="auto">{v}</dd>
+          </React.Fragment>
+        ))}
+      </dl>
+    </section>
+  );
+}
 
 // Terms of use and privacy policy in the three interface languages.
 // Last updated date is shown on the page; update it whenever the text changes.
@@ -247,6 +299,7 @@ const content = {
 
 export default function Legal({ page, t, lang, langSelect }) {
   const doc = content[page][lang] || content[page].en;
+  const company = useCompany();
   return (
     <div className="legal-page">
       <header className="access-header">
@@ -268,6 +321,7 @@ export default function Legal({ page, t, lang, langSelect }) {
             <p>{text}</p>
           </section>
         ))}
+        <CompanyInfo company={company} t={t} />
         <p className="legal-links">
           <a href={page === "terms" ? "/privacy" : "/terms"}>
             {t(page === "terms" ? "privacyPolicy" : "termsOfUse")}

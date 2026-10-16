@@ -720,6 +720,41 @@ export function AdminSiteSettings({ data, t, run, busy }) {
           {t("save")}
         </button>
       </form>
+      <form
+        className="form-stack company-info-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          save({ company: Object.fromEntries(new FormData(e.currentTarget)) });
+        }}
+      >
+        <h3>{t("companyInfoTitle")}</h3>
+        <small className="muted">{t("companyInfoNote")}</small>
+        {[
+          ["legalName", "text", 200, ""],
+          ["mersis", "text", 16, "0123456789012345"],
+          ["taxOffice", "text", 80, ""],
+          ["taxNumber", "text", 11, "1234567890"],
+          ["address", "text", 400, ""],
+          ["kep", "email", 120, "unvan@hs01.kep.tr"],
+        ].map(([k, type, max, ph]) => (
+          <label className="field" key={k}>
+            <span>{t("company_" + k)}</span>
+            <input
+              type={type}
+              name={k}
+              maxLength={max}
+              placeholder={ph}
+              dir={["mersis", "taxNumber", "kep"].includes(k) ? "ltr" : "auto"}
+              inputMode={["mersis", "taxNumber"].includes(k) ? "numeric" : undefined}
+              defaultValue={settings.company?.[k] || ""}
+              key={(settings.company?.[k] || "") + k}
+            />
+          </label>
+        ))}
+        <button className="button" disabled={busy}>
+          {t("save")}
+        </button>
+      </form>
       <p className="muted small">
         {t(settings.whatsappConfigured ? "whatsappActive" : "whatsappNotActive")}
         {waLink(settings.adminWhatsapp) && (

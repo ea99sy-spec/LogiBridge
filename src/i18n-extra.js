@@ -1920,4 +1920,35 @@ export const extraRows = {
     "Note limit reached (2000). Delete old finished notes.",
     "Not sınırına ulaşıldı (2000). Eski tamamlanmış notları silin.",
   ],
+  companyInfoTitle: [
+    "بيانات الشركة المشغّلة للمنصة",
+    "Company running the platform",
+    "Platformu işleten şirket",
+  ],
+  companyInfoNote: [
+    "تظهر في أسفل الصفحة الرئيسية وفي صفحتي الشروط والخصوصية (يطلبها قانون التجارة الإلكترونية التركي). اترك الحقل فارغًا إذا لا تريد إظهاره.",
+    "Shown in the home page footer and on the terms and privacy pages (required by Turkish e-commerce law). Leave a field empty to hide it.",
+    "Ana sayfa altında ve koşullar ile gizlilik sayfalarında gösterilir (6563 sayılı Kanun gereği). Göstermek istemediğiniz alanı boş bırakın.",
+  ],
+  company_legalName: [
+    "الاسم التجاري الرسمي (Ticari unvan)",
+    "Registered company name (Ticari unvan)",
+    "Ticari unvan",
+  ],
+  company_mersis: ["رقم MERSIS", "MERSIS number", "MERSIS numarası"],
+  company_taxOffice: ["دائرة الضرائب", "Tax office", "Vergi dairesi"],
+  company_taxNumber: ["الرقم الضريبي", "Tax number", "Vergi numarası"],
+  company_address: ["العنوان", "Address", "Adres"],
+  company_kep: ["عنوان KEP (إن وجد)", "KEP address (if any)", "KEP adresi (varsa)"],
+  serviceProvider: ["مقدّم الخدمة", "Service provider", "Hizmet sağlayıcı"],
+  "err_MERSIS number must be 16 digits": [
+    "رقم MERSIS يتكون من 16 رقمًا.",
+    "The MERSIS number has 16 digits.",
+    "MERSIS numarası 16 hanelidir.",
+  ],
+  "err_Tax number must be 10 or 11 digits": [
+    "الرقم الضريبي 10 أرقام (أو 11 للمؤسسة الفردية).",
+    "The tax number has 10 digits (11 for a sole proprietorship).",
+    "Vergi numarası 10 hanelidir (şahıs şirketi için 11).",
+  ],
 };

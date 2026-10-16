@@ -176,6 +176,8 @@ export async function createApp() {
       emailConfigured: mailConfigured(),
       // Platform WhatsApp for visitors (set by the administrator; empty = no button).
       whatsapp: readState().settings?.publicWhatsapp || "",
+      // Legal details of the company running the platform (shown in the footer and legal pages).
+      company: readState().settings?.company?.legalName ? readState().settings.company : null,
       // Subscription prices for the home page, unless the administrator hid them.
       pricing: pricingOf(readState()).visible ? pricingOf(readState()) : null,
       // Live platform numbers (real accounts only), unless the administrator hid them.

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { LegalLinks } from "./Legal";
+import { LegalLinks, CompanyInfo } from "./Legal";
 import { LiveBorderStrip, ProductPreview, PlatformStats } from "./LandingLive";
 import { DRIVER_APP_URL } from "./Advanced";
 import { waLink } from "../shared/wa";
@@ -19,6 +19,7 @@ function useHealth() {
           supportEmail: r.supportEmail || "",
           pricing: r.pricing || null,
           whatsapp: r.whatsapp || "",
+          company: r.company || null,
         }),
       )
       .catch(() => {});
@@ -343,6 +344,7 @@ export default function Landing({ t, langSelect, user }) {
         </div>
         <LegalLinks t={t} />
         <span>© 2026 · AR / EN / TR</span>
+        <CompanyInfo company={health.company} t={t} compact />
       </footer>
     </div>
   );
