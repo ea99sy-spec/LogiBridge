@@ -490,3 +490,23 @@ svg.flag {
 .payment-form input {
   width: 120px;
 }
+
+/* Language picker: globe icon beside the language name */
+.lang-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.lang-picker .lang-icon {
+  position: absolute;
+  inset-inline-start: 9px;
+  pointer-events: none;
+  color: #c27c0e;
+}
+.lang-picker .language {
+  padding-inline-start: 31px !important;
+  cursor: pointer;
+}
+.landing-header-actions .lang-picker .language {
+  width: auto;
+}

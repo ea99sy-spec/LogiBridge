@@ -624,14 +624,33 @@ function App() {
       setBusy(false);
     }
   }
+  // Language picker with a globe icon so visitors spot where to change the language.
   const langSelect = (
-    <select aria-label="Language" value={lang} onChange={(e) => setLang(e.target.value)} className="language">
-      {Object.entries(languages).map(([k, v]) => (
-        <option key={k} value={k}>
-          {v}
-        </option>
-      ))}
-    </select>
+    <span className="lang-picker">
+      <svg className="lang-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+        <circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <path
+          d="M2.5 12h19M12 2.5c2.6 2.8 3.9 6 3.9 9.5s-1.3 6.7-3.9 9.5M12 2.5C9.4 5.3 8.1 8.5 8.1 12s1.3 6.7 3.9 9.5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
+      </svg>
+      <select
+        aria-label="Language / اللغة / Dil"
+        title="Language / اللغة / Dil"
+        value={lang}
+        onChange={(e) => setLang(e.target.value)}
+        className="language"
+      >
+        {Object.entries(languages).map(([k, v]) => (
+          <option key={k} value={k}>
+            {v}
+          </option>
+        ))}
+      </select>
+    </span>
   );
   if (window.location.pathname === "/driver") return <DriverPortal t={t} />;
   if (window.location.pathname === "/border") return <BorderPage t={t} lang={lang} langSelect={langSelect} />;
