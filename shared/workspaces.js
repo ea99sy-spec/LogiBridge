@@ -19,6 +19,7 @@ const modules = {
     "contracts",
     "reports",
     "integrations",
+    "feedback",
     "security",
   ],
   individual: [
@@ -38,6 +39,7 @@ const modules = {
     "marketplace",
     "contracts",
     "border",
+    "feedback",
     "security",
   ],
   carrier: [
@@ -58,6 +60,7 @@ const modules = {
     "contracts",
     "drivers",
     "reports",
+    "feedback",
     "security",
   ],
   broker: [
@@ -73,6 +76,7 @@ const modules = {
     "kyb",
     "ratings",
     "contracts",
+    "feedback",
     "security",
   ],
   supplier: [
@@ -86,6 +90,7 @@ const modules = {
     "calendar",
     "hub",
     "kyb",
+    "feedback",
     "security",
   ],
   admin: [
@@ -95,6 +100,7 @@ const modules = {
     "notes",
     "companies",
     "accountsReport",
+    "feedbackAdmin",
     "kyb",
     "shipments",
     "tracking",
@@ -108,7 +114,7 @@ export function accountKind(user) {
   return user.role === "admin" ? "admin" : user.accountType === "individual" ? "individual" : user.role;
 }
 export function workspaceModules(user, flags = {}) {
-  if (requiresApproval(user)) return ["dashboard", "guide", "profile", "kyb", "security"];
+  if (requiresApproval(user)) return ["dashboard", "guide", "profile", "kyb", "feedback", "security"];
   return (
     (modules[accountKind(user)] || [])
       // Private admin notes are for registered administrators only, not the shared demo admin.

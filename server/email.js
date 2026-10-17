@@ -197,6 +197,7 @@ export async function flushEmails(limit = 3) {
 // Activity report for the platform owner: one email per important event on the site.
 const adminSubjects = {
   account_registered: "حساب جديد بانتظار موافقتك",
+  feedback_new: "تقييم أو شكوى أو اقتراح جديد",
   verification_submitted: "طلب توثيق جديد بانتظار المراجعة",
   shipment_created: "طلب شحن جديد",
   bid_accepted: "تم قبول عرض نقل",

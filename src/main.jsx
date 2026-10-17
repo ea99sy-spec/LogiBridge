@@ -4,6 +4,7 @@ import { PublicTracking } from "./Tracking";
 import { GuidePage, StartHereCard } from "./Guide";
 import { AdminNotes, NotesDueCard } from "./AdminNotes";
 import { AccountsReport } from "./AccountsReport";
+import { FeedbackPage, FeedbackAdmin } from "./Feedback";
 import { FormHolidayWarning } from "./Holidays";
 import { SubscriptionBanner } from "./Subscription";
 import { waLink } from "../shared/wa";
@@ -494,6 +495,8 @@ const icons = {
   admin: "⚙",
   notes: "✎",
   accountsReport: "▥",
+  feedback: "☺",
+  feedbackAdmin: "✉",
   fleet: "▣",
   documents: "⇧",
   newShipment: "＋",
@@ -1344,6 +1347,10 @@ function App() {
             )}
             {activeTab === "notes" && <AdminNotes t={t} lang={lang} />}
             {activeTab === "accountsReport" && <AccountsReport t={t} lang={lang} />}
+            {activeTab === "feedback" && (
+              <FeedbackPage data={data} user={user} t={t} lang={lang} run={run} busy={busy} />
+            )}
+            {activeTab === "feedbackAdmin" && <FeedbackAdmin t={t} lang={lang} run={run} busy={busy} />}
             {["admin", "companies"].includes(activeTab) && (
               <AdminPanel
                 data={data}

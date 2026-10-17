@@ -67,6 +67,25 @@ const adminDocs = S(
   ],
 );
 
+const feedback = S(
+  "feedback",
+  ["قيّم المنصة أو اشتكِ أو اقترح", "Rate, complain or suggest", "Değerlendirin, şikâyet edin veya önerin"],
+  [
+    "من «تقييم وشكاوى واقتراحات» أعطِ المنصة من 1 إلى 5 نجوم، أو أرسل شكوى (يمكن ربطها بشحنة أو شركة)، أو اقترح فكرة. تصل للإدارة فقط، ويصلك إشعار بالرد.",
+    "In 'Ratings, complaints & ideas' give the platform 1 to 5 stars, send a complaint (linked to a shipment or company if you like) or suggest an idea. Only the administration sees it, and you are notified of the reply.",
+    "'Değerlendirme, şikâyet ve öneri' bölümünde platforma 1-5 yıldız verin, şikâyet gönderin (isterseniz bir sevkiyat veya şirkete bağlayın) ya da fikir önerin. Yalnızca yönetim görür; yanıtta bildirim alırsınız.",
+  ],
+);
+const feedbackAdminStep = S(
+  "feedbackAdmin",
+  ["التقييمات والشكاوى", "Ratings and complaints", "Değerlendirme ve şikâyetler"],
+  [
+    "كل تقييمات المنصة والشكاوى والاقتراحات بمكان واحد: متوسط التقييم، الشكاوى المفتوحة، فلترة حسب النوع والحالة، وردّ يصل للحساب كإشعار.",
+    "All platform ratings, complaints and suggestions in one place: average rating, open complaints, filters by type and status, and replies that reach the account as notifications.",
+    "Tüm platform değerlendirmeleri, şikâyetler ve öneriler tek yerde: ortalama puan, açık şikâyetler, türe ve duruma göre filtreler ve hesaba bildirim olarak giden yanıtlar.",
+  ],
+);
+
 export const guide = {
   merchant: [
     profile,
@@ -120,6 +139,7 @@ export const guide = {
     documents,
     docsPrivacy,
     hub,
+    feedback,
   ],
   carrier: [
     profile,
@@ -190,6 +210,7 @@ export const guide = {
     documents,
     docsPrivacy,
     hub,
+    feedback,
   ],
   broker: [
     S(
@@ -236,6 +257,7 @@ export const guide = {
     documents,
     docsPrivacy,
     hub,
+    feedback,
   ],
   supplier: [
     profile,
@@ -270,6 +292,7 @@ export const guide = {
     documents,
     docsPrivacy,
     hub,
+    feedback,
   ],
   individual: [
     profile,
@@ -313,6 +336,7 @@ export const guide = {
     documents,
     docsPrivacy,
     hub,
+    feedback,
   ],
   admin: [
     S(
@@ -343,6 +367,7 @@ export const guide = {
       ],
     ),
     adminDocs,
+    feedbackAdminStep,
     S(
       "admin",
       ["إعدادات الموقع", "Site settings", "Site ayarları"],

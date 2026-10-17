@@ -6,7 +6,7 @@ import { workspaceModules } from "../shared/workspaces.js";
 test("every unapproved registered account has only onboarding modules", () => {
   assert.deepEqual(
     workspaceModules({ role: "carrier", accountType: "carrier", demo: false, verified: false }),
-    ["dashboard", "guide", "profile", "kyb", "security"],
+    ["dashboard", "guide", "profile", "kyb", "feedback", "security"],
   );
   const person = workspaceModules({
     role: "merchant",
@@ -14,7 +14,7 @@ test("every unapproved registered account has only onboarding modules", () => {
     demo: false,
     verified: false,
   });
-  assert.deepEqual(person, ["dashboard", "guide", "profile", "kyb", "security"]);
+  assert.deepEqual(person, ["dashboard", "guide", "profile", "kyb", "feedback", "security"]);
   const approved = workspaceModules({
     role: "merchant",
     accountType: "individual",

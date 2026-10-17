@@ -44,6 +44,7 @@ import { whatsappConfigured, flushWhatsApp } from "./whatsapp.js";
 import { subscriptionOf, pricingOf } from "../shared/subscription.js";
 import { publicStats } from "./stats.js";
 import { noteRoutes } from "./notes.js";
+import { feedbackRoutes } from "./feedback.js";
 import { documentRoutes, documentVisible, requestVisible, adminMayOpen } from "./documents.js";
 import { accountsReportRoutes } from "./accountsReport.js";
 import { TERMS_VERSION, termsOutdated } from "../shared/legal.js";
@@ -370,6 +371,7 @@ export async function createApp() {
         "/account/password",
         "/account/accept-terms",
         "/account/document-privacy",
+        "/feedback",
         "/fx",
         "/notifications/read",
         "/account/2fa/setup",
@@ -479,6 +481,7 @@ export async function createApp() {
       bankAccount: _bank,
       adminNotes: _adminNotes, // private administrator notes: only via /api/admin/notes
       documentRequests: _documentRequests, // filtered per account below
+      feedback: _feedback, // only through /api/feedback and /api/admin/feedback
       ...shared
     } = s;
     res.json({
@@ -573,6 +576,7 @@ export async function createApp() {
   privateAccountRoutes(app, { sessionFor });
   twoFactorRoutes(app);
   documentRoutes(app);
+  feedbackRoutes(app);
   operationRoutes(app);
   noteRoutes(app);
   accountsReportRoutes(app);
