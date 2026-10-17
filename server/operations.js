@@ -19,6 +19,19 @@ const text = (value, max = 300) => {
 };
 const canSee = (user, shipment) =>
   user.role === "admin" || [shipment.ownerId, shipment.carrierId].includes(user.id);
+// Amount received for paid subscription months: what the administrator typed, or the listed
+// monthly price × months (a full year is billed as 10 months).
+export function paymentAmount(s, u, months, typed) {
+  if (typed !== undefined && typed !== null && typed !== "") {
+    const n = Number(typed);
+    if (!Number.isFinite(n) || n < 0 || n > 100000) throw new Error("Invalid amount");
+    return Math.round(n * 100) / 100;
+  }
+  const kind = u.accountType === "individual" ? "individual" : u.role;
+  const price = Number(pricingOf(s).prices[kind]) || 0;
+  return Math.round(price * (months === 12 ? 10 : months) * 100) / 100;
+}
+
 export function operationRoutes(app) {
   app.patch("/api/orders/:id/status", async (req, res) => {
     if (req.user.role !== "supplier") return res.status(403).json({ error: "Forbidden" });
@@ -214,7 +227,13 @@ export function operationRoutes(app) {
       const current = subscriptionOf(s, u);
       const from = current.endsAt && current.endsAt > now ? current.endsAt : now;
       u.subscription.paidUntil = addMonths(from, months);
-      (u.subscription.payments ||= []).push({ months, at: now, by: req.user.id });
+      (u.subscription.payments ||= []).push({
+        months,
+        amount: paymentAmount(s, u, months, req.body.amount),
+        currency: "USD",
+        at: now,
+        by: req.user.id,
+      });
       notice(s, u.id, "subscription_paid", undefined, u.subscription.paidUntil.slice(0, 10));
     });
     res.json({ ok: true });

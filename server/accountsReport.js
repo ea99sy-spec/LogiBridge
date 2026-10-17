@@ -2,6 +2,7 @@ import { readState } from "./store.js";
 import { subscriptionOf } from "../shared/subscription.js";
 import { countryName } from "../shared/countries.js";
 import { crossings } from "../shared/crossings.js";
+import { paymentAmount } from "./operations.js";
 
 // Accounts report for the administrator: who joined, what they offer and how much they use the
 // platform. Registered (non-demo) accounts only. Shown as a table and downloadable as Excel.
@@ -53,6 +54,9 @@ export const reportColumns = [
   ["about", ["نبذة الملف", "Profile summary", "Profil özeti"]],
   ["subscription", ["الاشتراك", "Subscription", "Abonelik"]],
   ["subscriptionEnds", ["ينتهي في", "Ends on", "Bitiş"]],
+  ["paidMonths", ["أشهر مدفوعة", "Paid months", "Ödenen ay"]],
+  ["revenue", ["ربحي منه (اشتراكات $)", "My revenue (subscriptions $)", "Gelirim (abonelik $)"]],
+  ["lastPayment", ["آخر دفعة", "Last payment", "Son ödeme"]],
   ["logins", ["مرات تسجيل الدخول", "Sign-ins", "Giriş sayısı"]],
   ["activeDays", ["أيام الاستخدام", "Active days", "Aktif gün"]],
   ["lastSeen", ["آخر استخدام", "Last active", "Son kullanım"]],
@@ -61,6 +65,11 @@ export const reportColumns = [
   ["bids", ["عروض قدّمها", "Offers sent", "Verdiği teklif"]],
   ["completed", ["عمليات مكتملة", "Completed", "Tamamlanan"]],
   ["active", ["عمليات جارية", "Under way", "Devam eden"]],
+  ["shipmentValue", ["قيمة شحناته ($)", "Value of his shipments ($)", "Sevkiyatlarının değeri ($)"]],
+  [
+    "earnedValue",
+    ["قيمة العمليات التي نفّذها ($)", "Value of jobs carried out ($)", "Üstlendiği işlerin değeri ($)"],
+  ],
   ["rating", ["التقييم", "Rating", "Puan"]],
   ["reviews", ["عدد التقييمات", "Reviews", "Değerlendirme"]],
   ["termsAccepted", ["الموافقة على الشروط", "Terms accepted", "Koşul onayı"]],
@@ -103,6 +112,11 @@ export function accountsReport(s, lang = "ar") {
       const own = orders.filter((x) => x.ownerId === u.id);
       const taken = legs.filter((x) => x.carrierId === u.id);
       const mine = [...own, ...taken];
+      const payments = u.subscription?.payments || [];
+      const money = (n) => Math.round(n * 100) / 100;
+      // Agreed price of a stage or shipment = the accepted offer (orders count through their stages).
+      const price = (x) => Number((s.bids || []).find((b) => b.id === x.bidId)?.price) || 0;
+      const agreed = (list) => money(list.filter((x) => x.bidId).reduce((a, x) => a + price(x), 0));
       return {
         id: u.id,
         kind,
@@ -122,6 +136,9 @@ export function accountsReport(s, lang = "ar") {
         about: (u.profile?.about || "").slice(0, 400),
         subscription: w(sub.status, i),
         subscriptionEnds: day(sub.endsAt),
+        paidMonths: payments.reduce((a, p) => a + (p.months || 0), 0),
+        revenue: money(payments.reduce((a, p) => a + (p.amount ?? paymentAmount(s, u, p.months || 0)), 0)),
+        lastPayment: day(payments.at(-1)?.at),
         logins: u.loginCount || 0,
         activeDays: u.activeDays || 0,
         lastSeen: day(u.lastSeenAt || u.lastLoginAt),
@@ -129,6 +146,8 @@ export function accountsReport(s, lang = "ar") {
         jobsTaken: taken.length,
         bids: (s.bids || []).filter((b) => b.carrierId === u.id).length,
         completed: mine.filter((x) => x.status === "delivered").length,
+        shipmentValue: agreed(legs.filter((x) => x.ownerId === u.id)),
+        earnedValue: agreed(taken),
         active: mine.filter((x) => !["delivered", "cancelled", "demo_reserved"].includes(x.status)).length,
         rating: scores.length
           ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10
@@ -142,6 +161,10 @@ export function accountsReport(s, lang = "ar") {
 }
 
 const numeric = new Set([
+  "paidMonths",
+  "revenue",
+  "shipmentValue",
+  "earnedValue",
   "logins",
   "activeDays",
   "shipmentsPosted",
@@ -153,7 +176,15 @@ const numeric = new Set([
   "reviews",
   "notes",
 ]);
-const dates = new Set(["joined", "approvedAt", "subscriptionEnds", "lastSeen", "termsAccepted"]);
+const dates = new Set([
+  "joined",
+  "approvedAt",
+  "subscriptionEnds",
+  "lastPayment",
+  "lastSeen",
+  "termsAccepted",
+]);
+const moneyCols = new Set(["revenue", "shipmentValue", "earnedValue"]);
 
 export function accountsReportRoutes(app) {
   const realAdmin = (req, res) => {
@@ -198,6 +229,7 @@ export function accountsReportRoutes(app) {
       const col = sheet.getColumn(idx + 1);
       if (dates.has(key)) col.numFmt = "yyyy-mm-dd";
       if (numeric.has(key)) col.alignment = { horizontal: "center" };
+      if (moneyCols.has(key)) col.numFmt = "#,##0.00";
       if (["offers", "about"].includes(key)) col.alignment = { wrapText: true, vertical: "top" };
     });
 
@@ -214,6 +246,8 @@ export function accountsReportRoutes(app) {
       ["عمليات منفّذة", "Jobs carried out", "Üstlenilen iş"],
       ["عمليات مكتملة", "Completed", "Tamamlanan"],
       ["مرات الدخول", "Sign-ins", "Giriş"],
+      ["ربحي (اشتراكات $)", "My revenue (subscriptions $)", "Gelirim (abonelik $)"],
+      ["قيمة الشحنات ($)", "Shipment value ($)", "Sevkiyat değeri ($)"],
     ];
     sum.columns = H.map((h, n) => ({ header: h[i], key: "c" + n, width: n ? 16 : 30 }));
     const kinds = ["merchant", "carrier", "broker", "supplier", "individual"];
@@ -229,6 +263,8 @@ export function accountsReportRoutes(app) {
         c5: total(list, "jobsTaken"),
         c6: total(list, "completed"),
         c7: total(list, "logins"),
+        c8: Math.round(total(list, "revenue") * 100) / 100,
+        c9: Math.round(total(list, "shipmentValue") * 100) / 100,
       });
     }
     sum.getRow(1).font = { bold: true };

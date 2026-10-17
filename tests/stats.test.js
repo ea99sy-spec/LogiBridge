@@ -47,6 +47,10 @@ test("accounts report lists real accounts with usage and operations", () => {
         createdAt: "2026-10-01T10:00:00Z",
         details: { country: "TR", city: "Gaziantep", activity: "import", products: "Textiles" },
         loginCount: 4,
+        subscription: {
+          startedAt: "2026-10-02T09:00:00Z",
+          payments: [{ months: 12, amount: 290, at: "2026-10-05T10:00:00Z" }, { months: 1 }],
+        },
         activeDays: 3,
       },
       { id: "c", role: "carrier", accountType: "carrier", name: "Carrier", verificationStatus: "pending" },
@@ -54,10 +58,13 @@ test("accounts report lists real accounts with usage and operations", () => {
     ],
     shipments: [
       { id: "1", ownerId: "m", status: "delivered" },
-      { id: "1a", ownerId: "m", parentId: "1", carrierId: "c", status: "delivered" },
+      { id: "1a", ownerId: "m", parentId: "1", carrierId: "c", status: "delivered", bidId: "b1" },
       { id: "2", ownerId: "m", status: "open" },
     ],
-    bids: [{ carrierId: "c" }, { carrierId: "c" }],
+    bids: [
+      { id: "b1", carrierId: "c", price: 450 },
+      { id: "b2", carrierId: "c", price: 900 },
+    ],
     ratings: [
       { targetId: "c", score: 4 },
       { targetId: "c", score: 5 },
@@ -80,4 +87,9 @@ test("accounts report lists real accounts with usage and operations", () => {
   assert.equal(c.jobsTaken, 1);
   assert.equal(c.bids, 2);
   assert.equal(c.rating, 4.5);
+  // 290 typed + 1 month at the default trader price (29)
+  assert.equal(m.revenue, 319);
+  assert.equal(m.paidMonths, 13);
+  assert.equal(m.shipmentValue, 450);
+  assert.equal(c.earnedValue, 450);
 });

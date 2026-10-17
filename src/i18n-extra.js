@@ -2018,4 +2018,15 @@ export const extraRows = {
     "Sign-ins, active days and last active are counted from the day this report was added, so older accounts start from zero. The report contains private data (emails, tax numbers): keep the file somewhere safe.",
     "Giriş sayısı, aktif gün ve son kullanım bu raporun eklendiği günden itibaren sayılır; eski hesaplar sıfırdan başlar. Rapor özel veriler içerir (e-posta, vergi no): dosyayı güvenli bir yerde saklayın.",
   ],
+  paidMonths: ["عدد الأشهر المدفوعة", "Paid months", "Ödenen ay"],
+  oneYearTenMonths: ["12 (سنة بسعر 10 أشهر)", "12 (a year for the price of 10)", "12 (10 ay fiyatına 1 yıl)"],
+  amountReceived: ["المبلغ المستلم ($)", "Amount received ($)", "Alınan tutar ($)"],
+  amountAuto: ["تلقائي حسب السعر", "Auto from price", "Fiyattan otomatik"],
+  reportRevenue: ["ربحي من الاشتراكات", "my subscription revenue", "abonelik gelirim"],
+  reportShipmentValue: [
+    "قيمة الشحنات عبر المنصة",
+    "shipment value on the platform",
+    "platformdaki sevkiyat değeri",
+  ],
+  "err_Invalid amount": ["المبلغ غير صحيح.", "Invalid amount.", "Geçersiz tutar."],
 };

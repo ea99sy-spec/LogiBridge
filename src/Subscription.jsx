@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 const date = (iso, lang) => (iso ? new Date(iso).toLocaleDateString(lang, { dateStyle: "medium" }) : "—");
 
@@ -79,18 +79,60 @@ export function SubscriptionAdminCell({ account, t, lang, run, busy }) {
         </small>
       )}
       {!account.demo && sub.status !== "pending" && (
-        <button
-          className="button ghost small-button"
-          disabled={busy}
-          onClick={() => {
-            const months = Number(window.prompt(t("paidMonthsPrompt"), "1"));
-            if (Number.isInteger(months) && months > 0)
-              run(`/admin/accounts/${account.id}/subscription`, { months });
-          }}
-        >
-          + {t("addPaidMonths")}
-        </button>
+        <PaymentForm account={account} t={t} run={run} busy={busy} />
       )}
     </div>
+  );
+}
+
+// Record a subscription payment: months and the amount received (empty = listed price).
+function PaymentForm({ account, t, run, busy }) {
+  const [open, setOpen] = useState(false);
+  if (!open)
+    return (
+      <button
+        type="button"
+        className="button ghost small-button"
+        disabled={busy}
+        onClick={() => setOpen(true)}
+      >
+        + {t("addPaidMonths")}
+      </button>
+    );
+  return (
+    <form
+      className="payment-form"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        const f = new FormData(e.currentTarget);
+        const amount = String(f.get("amount") || "").trim();
+        await run(`/admin/accounts/${account.id}/subscription`, {
+          months: Number(f.get("months")),
+          ...(amount ? { amount: Number(amount) } : {}),
+        });
+        setOpen(false);
+      }}
+    >
+      <label>
+        <small>{t("paidMonths")}</small>
+        <select name="months" defaultValue="1">
+          {[1, 2, 3, 6, 12].map((m) => (
+            <option key={m} value={m}>
+              {m === 12 ? t("oneYearTenMonths") : m}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        <small>{t("amountReceived")}</small>
+        <input name="amount" type="number" min="0" step="0.01" dir="ltr" placeholder={t("amountAuto")} />
+      </label>
+      <button className="button small-button" disabled={busy}>
+        {t("save")}
+      </button>
+      <button type="button" className="text-button" onClick={() => setOpen(false)}>
+        {t("cancel")}
+      </button>
+    </form>
   );
 }

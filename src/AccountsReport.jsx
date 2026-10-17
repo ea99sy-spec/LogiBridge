@@ -3,6 +3,10 @@ import "./accounts-report.css";
 
 // Administrator: spreadsheet-style report of every registered account, with Excel download.
 const NUMERIC = new Set([
+  "paidMonths",
+  "revenue",
+  "shipmentValue",
+  "earnedValue",
   "logins",
   "activeDays",
   "shipmentsPosted",
@@ -67,6 +71,8 @@ export function AccountsReport({ t, lang }) {
       ],
       ["reportShipments", sum("shipmentsPosted")],
       ["reportCompleted", all.length ? sum("completed") : 0],
+      ["reportRevenue", "$" + Math.round(sum("revenue")).toLocaleString("en")],
+      ["reportShipmentValue", "$" + Math.round(sum("shipmentValue")).toLocaleString("en")],
     ];
   }, [data]);
   return (
