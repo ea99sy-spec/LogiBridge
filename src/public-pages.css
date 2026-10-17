@@ -1,0 +1,32 @@
+.public-page .access-header{flex-wrap:wrap;gap:10px}
+.public-nav{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.public-nav a{color:inherit;text-decoration:none;font-weight:600;font-size:.92rem}
+.public-page section{margin:22px 0}
+.public-page h2{font-size:1.15rem;margin:0 0 10px}
+.company-hero{display:flex;gap:16px;align-items:center}
+.company-hero h1{margin:0}
+.company-logo{width:72px;height:72px;border-radius:14px;object-fit:contain;background:#fff;border:1px solid #e5e7eb;flex:none}
+.company-logo.placeholder{display:grid;place-items:center;font-weight:700;font-size:1.4rem;background:#eff6ff;color:#1d4ed8}
+.verified-chip{margin-inline-start:8px;background:#dcfce7;color:#166534;border-radius:999px;padding:2px 8px;font-size:.8rem}
+.company-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:16px 0}
+.company-stats div{border:1px solid #e5e7eb;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px;background:#fff}
+.company-stats strong{font-size:1.3rem}
+.company-stats small{color:#64748b}
+.pre-line{white-space:pre-line}
+.public-reviews{list-style:none;padding:0;display:grid;gap:8px}
+.public-reviews li{border-inline-start:3px solid #f59e0b;padding:4px 10px}
+.public-cta{margin:28px 0;padding:18px;border-radius:14px;background:#eff6ff;border:1px solid #bfdbfe;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.public-cta p{margin:0;flex:1 1 260px}
+.route-links{display:flex;flex-wrap:wrap;gap:8px}
+.route-links a{border:1px solid #e5e7eb;border-radius:999px;padding:6px 12px;text-decoration:none;color:inherit;background:#fff;font-size:.92rem}
+.route-links a:hover{border-color:#2563eb}
+.route-links small{color:#16a34a}
+.route-stages{list-style:none;padding:0;display:grid;gap:8px}
+.route-crossings{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.route-crossings article{display:flex;flex-direction:column;gap:4px}
+.crumbs{margin:0 0 4px;font-size:.9rem}
+.public-page .public-footer{display:block;text-align:center;padding:24px 16px;color:#64748b;font-size:.9rem}
+.public-footer a{color:inherit}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .company-stats div,:root:not([data-theme="light"]) .route-links a{background:transparent}}
+.footer-routes{display:flex;gap:14px;flex-wrap:wrap}.footer-routes a{color:inherit}
+.public-cta .button{text-decoration:none}

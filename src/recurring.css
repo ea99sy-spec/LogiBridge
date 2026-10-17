@@ -1,0 +1,16 @@
+.recurring-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.recurring-grid .wide{grid-column:1/-1}
+.recurring-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.recurring-card header{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.recurring-card p{margin:6px 0}
+.recurring-card.paused{opacity:.75}
+.recurring-facts{list-style:none;padding:0;margin:8px 0;display:grid;gap:4px;font-size:.92rem}
+.recurring-actions{display:flex;gap:10px;align-items:center}
+.small{font-size:.85rem}
+.monthly-report header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.monthly-report h3{margin:0}
+.mr-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:12px 0}
+.mr-tiles div{background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:2px}
+.mr-tiles strong{font-size:1.35rem}
+.mr-tiles small{color:#64748b}
+.recurring-form{margin-bottom:22px}

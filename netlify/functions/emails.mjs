@@ -18,6 +18,11 @@ export async function handler(event) {
   // Late or stopped trucks: checked every minute with the email queue.
   const { runTrackingWatch } = await import("../../server/tracking.js");
   await runTrackingWatch().catch(() => false);
+  // Recurring shipments due to be published, and the monthly company reports.
+  const { runRecurringWatch } = await import("../../server/recurring.js");
+  await runRecurringWatch().catch(() => false);
+  const { runMonthlyWatch } = await import("../../server/monthlyReport.js");
+  await runMonthlyWatch().catch(() => false);
   if (!mailConfigured() && !whatsappConfigured())
     return { statusCode: 200, body: JSON.stringify({ configured: false, sent: 0 }) };
   const email = await flushEmails(1);

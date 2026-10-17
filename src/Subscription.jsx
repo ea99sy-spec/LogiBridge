@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const date = (iso, lang) => (iso ? new Date(iso).toLocaleDateString(lang, { dateStyle: "medium" }) : "—");
 
@@ -45,7 +45,75 @@ export function SubscriptionCard({ sub, t, lang, pricing, accountType }) {
           </small>
         </div>
       ) : null}
+      <OnlinePayment t={t} />
     </section>
+  );
+}
+
+// Pay the subscription online (PayTR), when the platform turned it on.
+function OnlinePayment({ t }) {
+  const [info, setInfo] = useState(null);
+  const [token, setToken] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    fetch("/api/subscription/online")
+      .then((r) => (r.ok ? r.json() : null))
+      .then(setInfo)
+      .catch(() => {});
+  }, []);
+  const result = new URLSearchParams(location.search).get("payment");
+  if (!info?.enabled || !(info.prices?.[1] > 0)) return null;
+  const pay = async (months) => {
+    setBusy(true);
+    setError("");
+    try {
+      const r = await fetch("/api/subscription/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ months, lang: document.documentElement.lang === "tr" ? "tr" : "en" }),
+      });
+      const v = await r.json();
+      if (!r.ok) throw new Error(v.error || "");
+      setToken(v.token);
+    } catch (e) {
+      setError(
+        t("err_" + e.message) !== "err_" + e.message ? t("err_" + e.message) : t("paymentUnavailable"),
+      );
+    }
+    setBusy(false);
+  };
+  return (
+    <div className="online-pay">
+      {result === "ok" && <p className="notice">✓ {t("paymentReceivedNote")}</p>}
+      {result === "failed" && <p className="notice error">{t("paymentFailedNote")}</p>}
+      <b>💳 {t("payOnline")}</b>
+      <div className="online-pay-options">
+        <button type="button" className="button small-button" disabled={busy} onClick={() => pay(1)}>
+          {t("payOneMonth")} · <bdi dir="ltr">${info.prices[1]}</bdi>
+        </button>
+        <button type="button" className="button ghost small-button" disabled={busy} onClick={() => pay(12)}>
+          {t("payOneYear")} · <bdi dir="ltr">${info.prices[12]}</bdi>
+        </button>
+      </div>
+      <small className="muted">{t("payOnlineNote")}</small>
+      {error && <p className="form-error">{error}</p>}
+      {token && (
+        <div className="pay-modal" role="dialog" aria-modal="true" aria-label={t("payOnline")}>
+          <div className="pay-modal-box">
+            <button type="button" className="text-button pay-close" onClick={() => setToken("")}>
+              ✕ {t("close")}
+            </button>
+            <iframe
+              title="PayTR"
+              src={`https://www.paytr.com/odeme/guvenli/${token}`}
+              frameBorder="0"
+              scrolling="yes"
+            />
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

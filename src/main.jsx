@@ -11,6 +11,10 @@ import { ReturnTrips } from "./ReturnTrips";
 import { ReferralCard } from "./Referral";
 import { DriverReview, ShipmentDriver } from "./Drivers";
 import { CostCalculator } from "./CostCalculator";
+import { GrowthPage } from "./Growth";
+import { TeamPage, TeamInvite } from "./Team";
+import { RecurringPage } from "./Recurring";
+import { CompanyPublic, RoutesIndex, RoutePage } from "./PublicPages";
 import { FormHolidayWarning } from "./Holidays";
 import { SubscriptionBanner } from "./Subscription";
 import { waLink } from "../shared/wa";
@@ -740,6 +744,9 @@ const icons = {
   notes: "✎",
   accountsReport: "▥",
   feedback: "☺",
+  growth: "📈",
+  team: "👥",
+  recurring: "🔁",
   prices: "＄",
   returnTrips: "↩",
   feedbackAdmin: "✉",
@@ -944,6 +951,14 @@ function App() {
     return <Legal page={window.location.pathname.slice(1)} t={t} lang={lang} langSelect={langSelect} />;
   if (window.location.pathname === "/verify-email")
     return <VerifyEmail t={t} langSelect={langSelect} run={run} />;
+  if (/^\/c\/[^/]+$/.test(window.location.pathname))
+    return <CompanyPublic t={t} lang={lang} langSelect={langSelect} />;
+  if (/^\/routes\/?$/.test(window.location.pathname))
+    return <RoutesIndex t={t} lang={lang} langSelect={langSelect} />;
+  if (/^\/routes\/[a-z]+-[a-z]+$/.test(window.location.pathname))
+    return <RoutePage t={t} lang={lang} langSelect={langSelect} />;
+  if (window.location.pathname === "/team-invite")
+    return <TeamInvite t={t} langSelect={langSelect} run={run} busy={busy} />;
   if (window.location.pathname === "/reset-password")
     return <ResetPassword t={t} langSelect={langSelect} run={run} busy={busy} toast={toast} />;
   if (loading) return <div className="loading">{t("loading")}</div>;
@@ -1055,6 +1070,11 @@ function App() {
               </span>
               <div>
                 <b>{user.name}</b>
+                {user.member && (
+                  <small className="member-chip">
+                    {user.member.name} · {t("teamRole_" + user.member.teamRole)}
+                  </small>
+                )}
                 <small>
                   {t(user.role === "admin" ? "administrator" : user.accountType)} · {t(user.plan)}
                 </small>
@@ -1605,6 +1625,19 @@ function App() {
               <FeedbackPage data={data} user={user} t={t} lang={lang} run={run} busy={busy} />
             )}
             {activeTab === "prices" && <PriceIndexPage t={t} lang={lang} />}
+            {activeTab === "growth" && <GrowthPage t={t} lang={lang} />}
+            {activeTab === "team" && <TeamPage t={t} lang={lang} run={run} busy={busy} />}
+            {activeTab === "recurring" && (
+              <RecurringPage
+                data={data}
+                user={user}
+                t={t}
+                lang={lang}
+                run={run}
+                busy={busy}
+                navigate={setTab}
+              />
+            )}
             {activeTab === "returnTrips" && (
               <ReturnTrips
                 data={data}

@@ -7,6 +7,7 @@ const modules = {
     "directory",
     "newShipment",
     "shipments",
+    "recurring",
     "documents",
     "tracking",
     "groups",
@@ -22,6 +23,7 @@ const modules = {
     "returnTrips",
     "prices",
     "feedback",
+    "team",
     "security",
   ],
   individual: [
@@ -31,6 +33,7 @@ const modules = {
     "directory",
     "newShipment",
     "shipments",
+    "recurring",
     "tracking",
     "groups",
     "documents",
@@ -67,6 +70,7 @@ const modules = {
     "returnTrips",
     "prices",
     "feedback",
+    "team",
     "security",
   ],
   broker: [
@@ -84,6 +88,7 @@ const modules = {
     "contracts",
     "prices",
     "feedback",
+    "team",
     "security",
   ],
   supplier: [
@@ -99,6 +104,7 @@ const modules = {
     "kyb",
     "prices",
     "feedback",
+    "team",
     "security",
   ],
   admin: [
@@ -107,6 +113,7 @@ const modules = {
     "admin",
     "notes",
     "companies",
+    "growth",
     "accountsReport",
     "feedbackAdmin",
     "returnTrips",
@@ -131,6 +138,10 @@ export function workspaceModules(user, flags = {}) {
       .filter((key) => !["notes", "accountsReport"].includes(key) || !user.demo)
       .filter((key) => !["ratings", "marketplace", "contracts"].includes(key) || flags[key])
       .filter((key) => !["inventory", "orders"].includes(key) || flags.marketplace)
+      // Team management is for real company owners; employees don't manage the owner's security.
+      .filter((key) => key !== "team" || !user.demo)
+      .filter((key) => !user.member || !["team", "security"].includes(key))
+      .filter((key) => !["kyb"].includes(key) || !user.member || user.member.teamRole === "manager")
   );
 }
 // Carriers see open transport jobs, customs brokers see open clearance jobs,

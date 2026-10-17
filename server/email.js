@@ -28,6 +28,7 @@ const subjects = {
   subscription_bonus: "حصلت على 3 شهور مجانية إضافية في LogiBridge",
   subscription_ending: "اشتراكك المجاني في LogiBridge ينتهي قريبًا",
   subscription_expired: "انتهت الفترة المجانية لاشتراكك في LogiBridge",
+  monthly_report: "تقريرك الشهري على LogiBridge",
 };
 // Security emails also reach administrators; everything else is for platform accounts.
 const securityEvents = new Set(["password_reset", "password_changed", "login", "verify_email"]);
@@ -75,6 +76,7 @@ export function queueEmail(s, userId, event, details = {}, key) {
       "تنتهي الفترة المجانية لاشتراكك خلال أيام. للاستمرار بدون انقطاع تواصل مع إدارة المنصة لتفعيل الاشتراك الشهري. تاريخ الانتهاء:",
     subscription_expired:
       "انتهت الفترة المجانية لاشتراكك. يمكنك الاطلاع على حسابك وإكمال الشحنات الحالية، وللاستمرار بشحنات وعروض جديدة تواصل مع إدارة المنصة لتفعيل الاشتراك.",
+    monthly_report: "هذا ملخص نشاطك على المنصة خلال الشهر الماضي. التفاصيل الكاملة في لوحة التحكم.",
     border_notice:
       "نشرت إدارة LogiBridge تنبيهًا جديدًا عن المعابر أو الجمارك بين تركيا وسوريا. التفاصيل وكل القوانين المحدّثة في صفحة الحدود:",
     verify_email: "شكرًا لتسجيلك. اضغط الرابط التالي خلال 3 أيام لتأكيد بريدك الإلكتروني:",

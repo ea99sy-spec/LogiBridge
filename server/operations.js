@@ -35,6 +35,18 @@ export function paymentAmount(s, u, months, typed) {
   return Math.round(price * (months === 12 ? 10 : months) * 100) / 100;
 }
 
+// Adds paid months after the current end (free or paid), records the payment and tells the account.
+export function grantPaidMonths(s, u, months, amount, extra = {}) {
+  const now = new Date().toISOString();
+  u.subscription ||= { startedAt: now };
+  u.subscription.startedAt ||= now;
+  const current = subscriptionOf(s, u);
+  const from = current.endsAt && current.endsAt > now ? current.endsAt : now;
+  u.subscription.paidUntil = addMonths(from, months);
+  (u.subscription.payments ||= []).push({ months, amount, currency: "USD", at: now, ...extra });
+  notice(s, u.id, "subscription_paid", undefined, u.subscription.paidUntil.slice(0, 10));
+}
+
 export function operationRoutes(app) {
   app.patch("/api/orders/:id/status", async (req, res) => {
     if (req.user.role !== "supplier") return res.status(403).json({ error: "Forbidden" });
@@ -242,20 +254,7 @@ export function operationRoutes(app) {
     await mutate((s) => {
       const u = s.users.find((x) => x.id === req.params.id && x.role !== "admin" && !x.demo);
       if (!u) throw new Error("Account unavailable");
-      const now = new Date().toISOString();
-      u.subscription ||= { startedAt: now };
-      u.subscription.startedAt ||= now;
-      const current = subscriptionOf(s, u);
-      const from = current.endsAt && current.endsAt > now ? current.endsAt : now;
-      u.subscription.paidUntil = addMonths(from, months);
-      (u.subscription.payments ||= []).push({
-        months,
-        amount: paymentAmount(s, u, months, req.body.amount),
-        currency: "USD",
-        at: now,
-        by: req.user.id,
-      });
-      notice(s, u.id, "subscription_paid", undefined, u.subscription.paidUntil.slice(0, 10));
+      grantPaidMonths(s, u, months, paymentAmount(s, u, months, req.body.amount), { by: req.user.id });
     });
     res.json({ ok: true });
   });

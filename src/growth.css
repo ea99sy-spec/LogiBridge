@@ -1,0 +1,133 @@
+.g-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.g-tiles > div {
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px;
+  display: grid;
+  gap: 2px;
+  border-bottom: 3px solid #facc15;
+}
+.g-tiles b {
+  font-size: 26px;
+  color: #102a56;
+  font-variant-numeric: tabular-nums;
+}
+.g-tiles small {
+  color: #6b7f9e;
+}
+.g-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.g-chart {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.g-chart figcaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.g-bars {
+  height: 170px;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  border-bottom: 1px solid #d5dde9;
+  padding-top: 26px;
+}
+.g-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  position: relative;
+  min-width: 0;
+  outline: none;
+  cursor: default;
+}
+.g-col i {
+  width: 70%;
+  max-width: 26px;
+  background: #2563eb;
+  border-radius: 4px 4px 0 0;
+  min-height: 2px;
+}
+.g-col i.zero {
+  background: #d5dde9;
+}
+.g-col.on i {
+  background: #1d4ed8;
+}
+.g-col small {
+  position: absolute;
+  bottom: -18px;
+  font-size: 9px;
+  color: #6b7f9e;
+  white-space: nowrap;
+}
+.g-tip {
+  position: absolute;
+  top: -24px;
+  white-space: nowrap;
+  background: #102a56;
+  color: #fff;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  z-index: 2;
+}
+.g-chart .g-bars {
+  margin-bottom: 18px;
+}
+.g-table {
+  width: 100%;
+  font-size: 12px;
+  border-collapse: collapse;
+}
+.g-table th,
+.g-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid #edf1f7;
+  text-align: start;
+}
+.g-list {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.g-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+.g-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) 1fr auto;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+}
+.g-list li span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.g-list li i {
+  height: 8px;
+  border-radius: 4px;
+  background: #2563eb;
+  justify-self: start;
+}

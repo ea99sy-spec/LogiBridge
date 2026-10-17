@@ -23,6 +23,8 @@ export function profileRoutes(app) {
       companyEmails: b.companyEmails,
       whatsappNotify: b.whatsappNotify === true,
       borderEmails: b.borderEmails !== false,
+      // Public company page (/c/...) that anyone can open; companies can turn it off.
+      publicPage: b.publicPage !== false,
     };
     if (!profile.about || !profile.services) throw Error("Required field missing");
     if (profile.website && !/^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(profile.website))

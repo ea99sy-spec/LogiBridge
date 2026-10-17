@@ -24,6 +24,19 @@
   status = 200
   force = true
 
+# Search engines: the sitemap lists every public route and company page, so it is built live.
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/.netlify/functions/api/api/seo/sitemap.xml"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/robots.txt"
+  to = "/.netlify/functions/api/api/seo/robots.txt"
+  status = 200
+  force = true
+
 [[redirects]]
   from = "/driver-api/*"
   to = "/.netlify/functions/api/driver-api/:splat"

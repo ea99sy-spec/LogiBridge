@@ -1,5 +1,7 @@
 import { HolidayCard } from "./Holidays";
 import { SubscriptionCard } from "./Subscription";
+import { MonthlyReportCard } from "./MonthlyReport";
+import "./recurring.css";
 import React, { useState } from "react";
 import { accountKind, workspaceModules } from "../shared/workspaces";
 export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }) {
@@ -277,6 +279,7 @@ export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }
           </div>
         </div>
       )}
+      {kind !== "admin" && <MonthlyReportCard t={t} lang={document.documentElement.lang} kind={kind} />}
       <div className="panel role-next-step">
         <span>◇</span>
         <div>

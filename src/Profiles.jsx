@@ -93,6 +93,7 @@ export function Profile({ data, t, run, busy, navigate }) {
               companyEmails: f.has("companyEmails"),
               borderEmails: f.has("borderEmails"),
               whatsappNotify: f.has("whatsappNotify"),
+              publicPage: f.has("publicPage"),
               logo: logo || null,
             },
             "PUT",
@@ -216,6 +217,24 @@ export function Profile({ data, t, run, busy, navigate }) {
             </small>
           </span>
         </label>
+        {data.user.publicSlug && !data.user.demo && (
+          <label className="consent">
+            <input type="checkbox" name="publicPage" defaultChecked={p.publicPage !== false} />
+            <span>
+              <b>{t("publicPageOption")}</b>
+              <br />
+              <small>{t("publicPageNote")}</small>
+              {p.about && p.publicPage !== false && data.user.verified && (
+                <>
+                  <br />
+                  <a href={`/c/${data.user.publicSlug}`} target="_blank" rel="noreferrer" dir="ltr">
+                    {window.location.host}/c/{data.user.publicSlug} ↗
+                  </a>
+                </>
+              )}
+            </span>
+          </label>
+        )}
         <p className="muted">{t("profilePrivacyNote")}</p>
         <button className="button" disabled={busy}>
           {t("save")}

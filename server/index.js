@@ -50,6 +50,13 @@ import { returnTripRoutes, visibleTrips } from "./returnTrips.js";
 import { commercialRoutes } from "./commercial.js";
 import { driverRoutes, driversFor, driverInfo } from "./drivers.js";
 import { sharedTruckRoutes, sharedMatches, suggestSharing } from "./sharedTruck.js";
+import { paytrPublicRoutes, paytrRoutes } from "./paytr.js";
+import { growthRoutes } from "./growth.js";
+import { buildShipment, insertShipment } from "./shipmentFactory.js";
+import { recurringRoutes, recurringFor, runRecurringWatch } from "./recurring.js";
+import { monthlyReportRoutes, runMonthlyWatch } from "./monthlyReport.js";
+import { publicPageRoutes, seoRoutes, companySlug } from "./publicPages.js";
+import { teamRoutes, teamInviteRoute, memberBlocked } from "./team.js";
 import { crossingTimes } from "../shared/crossingTimes.js";
 import { crossingKeys } from "../shared/crossings.js";
 import { inviterFor, rewardReferral, referralState } from "./referrals.js";
@@ -202,6 +209,13 @@ export async function createApp() {
   );
   // Route price index and quick estimate from real deals (public, registered accounts only).
   priceIndexRoutes(app, { publicOnly: true });
+  // Team invite acceptance (public: the employee has no session yet).
+  teamInviteRoute(app, { sessionFor, authLimit });
+  // PayTR payment notices (server to server, no session).
+  paytrPublicRoutes(app);
+  // Public company pages, route pages and the sitemap (no account needed).
+  publicPageRoutes(app);
+  seoRoutes(app);
   // Border and customs notices posted by the administration (public, like the rules page).
   app.get("/api/border", (req, res) => {
     const s = readState();
@@ -212,10 +226,10 @@ export async function createApp() {
       times: Object.fromEntries(crossingKeys.map((k) => [k, crossingTimes(s.crossingStats, k)])),
     });
   });
-  async function sessionFor(user, res, respond = true) {
+  async function sessionFor(user, res, respond = true, memberId) {
     const token = randomBytes(32).toString("hex"),
       expiry = Date.now() + 86400000;
-    const value = { userId: user.id, expiry, createdAt: Date.now() };
+    const value = { userId: user.id, expiry, createdAt: Date.now(), ...(memberId ? { memberId } : {}) };
     if (cloudEnabled()) await writeSession(token, value);
     else if (redis) await redis.set(`session:${token}`, JSON.stringify(value), { EX: 86400 });
     else sessions.set(token, value);
@@ -299,6 +313,26 @@ export async function createApp() {
             .trim()
             .toLowerCase() && !u.demo,
     );
+    // Team members sign in with their own email and work inside their company's account.
+    if (!user) {
+      const email = String(req.body.email || "")
+        .trim()
+        .toLowerCase();
+      const member = (readState().teamMembers || []).find((m) => m.email === email && !m.disabled);
+      const company = member && readState().users.find((u) => u.id === member.companyId);
+      if (
+        member?.credential &&
+        company &&
+        !company.disabled &&
+        (await checkPassword(req.body.password, member.credential))
+      ) {
+        await mutate((s) => {
+          const m = (s.teamMembers || []).find((x) => x.id === member.id);
+          if (m) m.lastLoginAt = new Date().toISOString();
+        });
+        return sessionFor(company, res, true, member.id);
+      }
+    }
     // The login page an account is opened from does not matter: a valid email and
     // password always open that account's own workspace. This avoids the confusing
     // "wrong page" failure while revealing nothing to someone without the password.
@@ -366,6 +400,16 @@ export async function createApp() {
     req.user = readState().users.find((u) => u.id === session.userId);
     if (!req.user || (!DEMO_NOW() && req.user.demo))
       return res.status(401).json({ error: "Sign in required" });
+    if (session.memberId) {
+      const m = (readState().teamMembers || []).find(
+        (x) => x.id === session.memberId && x.companyId === req.user.id && !x.disabled && x.credential,
+      );
+      if (!m || (m.sessionsValidAfter && (session.createdAt || 0) < m.sessionsValidAfter))
+        return res.status(401).json({ error: "Sign in required" });
+      req.member = m;
+      if (memberBlocked(m, req.method, req.path))
+        return res.status(403).json({ error: "Your team role does not allow this" });
+    }
     // Password changes and resets end every session that was opened before them.
     if (req.user.sessionsValidAfter && (session.createdAt || 0) < req.user.sessionsValidAfter)
       return res.status(401).json({ error: "Sign in required" });
@@ -433,7 +477,14 @@ export async function createApp() {
       admin = req.user.role === "admin";
     if (requiresApproval(req.user))
       return res.json({
-        user: publicUser(req.user, true),
+        user: {
+          ...publicUser(req.user, true),
+          publicSlug:
+            req.user.accountType !== "individual" && req.user.role !== "admin" ? companySlug(req.user) : null,
+          ...(req.member
+            ? { member: { id: req.member.id, name: req.member.name, teamRole: req.member.teamRole } }
+            : {}),
+        },
         users: [publicUser(req.user)],
         approvalRequired: true,
         emailVerificationRequired: emailVerificationRequired(s, req.user),
@@ -508,6 +559,10 @@ export async function createApp() {
       crossingStats: _crossingStats, // public summary on /api/border only
       drivers: _drivers, // own drivers (carrier) or all (admin), without documents, below
       sharedPairs: _sharedPairs, // internal: suggestions already sent
+      subscriptionOrders: _subscriptionOrders, // online payment orders (private)
+      teamMembers: _teamMembers, // only through /api/team
+      recurring: _recurring, // filtered below
+      monthlyReportsSent: _monthlyReportsSent,
       ...shared
     } = s;
     res.json({
@@ -571,8 +626,16 @@ export async function createApp() {
             doc.shipmentId,
         })),
       trackingEvents: s.trackingEvents.filter((e) => visibleShipment(e.shipmentId)),
+      recurring: recurringFor(fullState, req.user),
       users: s.users.map((u) => publicUser(u)),
-      user: publicUser(req.user, true),
+      user: {
+        ...publicUser(req.user, true),
+        publicSlug:
+          req.user.accountType !== "individual" && req.user.role !== "admin" ? companySlug(req.user) : null,
+        ...(req.member
+          ? { member: { id: req.member.id, name: req.member.name, teamRole: req.member.teamRole } }
+          : {}),
+      },
       emailVerificationRequired: emailVerificationRequired(readState(), req.user),
       demo: DEMO_NOW(),
       kyb: s.kyb
@@ -624,18 +687,21 @@ export async function createApp() {
   commercialRoutes(app);
   driverRoutes(app);
   sharedTruckRoutes(app);
+  paytrRoutes(app);
+  growthRoutes(app);
+  teamRoutes(app, { sessionFor });
+  recurringRoutes(app);
+  monthlyReportRoutes(app);
   trackingRoutes(app);
   paymentRoutes(app);
   advancedRoutes(app);
   app.post(["/api/shipments", "/api/v1/shipments"], async (req, res) => {
     role(req.user, "merchant");
     const b = req.body;
-    const route = routeDetails(b);
-    const hsCode = b.hsCode == null ? "" : String(b.hsCode).trim();
-    if (!/^[0-9]{6,12}$/.test(hsCode)) throw new Error("HS Code is required and must contain 6 to 12 digits");
+    const shipment = buildShipment(req.user, b);
     // Prohibited goods are refused before anything is saved; the administration is told.
     const banned = checkGoods(
-      { hsCode, title: b.title, description: b.description },
+      { hsCode: shipment.hsCode, title: b.title, description: b.description },
       prohibitedRules(readState().settings),
     );
     if (banned.length) {
@@ -645,47 +711,6 @@ export async function createApp() {
       });
       throw new Error("Prohibited goods: this request cannot be accepted");
     }
-    if (
-      !["textiles", "food", "machinery", "packaging", "other"].includes(b.category) ||
-      !/^\d{4}-\d{2}-\d{2}$/.test(b.date) ||
-      !Number.isFinite(Date.parse(b.date)) ||
-      b.date < new Date().toISOString().slice(0, 10)
-    )
-      throw new Error("Invalid shipment details");
-    if (
-      (b.originCountry && !validCountry(b.originCountry)) ||
-      (b.destinationCountry && !validCountry(b.destinationCountry))
-    )
-      throw new Error("Invalid route country");
-    const privateDetails = b.senderName
-      ? {
-          senderName: txt(b.senderName, 120),
-          recipientName: txt(b.recipientName, 120),
-          phone: txt(b.phone, 40),
-          destinationAddress: txt(b.destinationAddress, 300),
-        }
-      : null;
-    const shipment = {
-      id: id(),
-      ownerId: req.user.id,
-      title: txt(b.title),
-      origin: txt(b.origin, 80),
-      destination: txt(b.destination, 80),
-      ...route,
-      description: b.description ? txt(b.description, 2000) : "",
-      hsCode,
-      insuranceRequested: b.insuranceRequested === true || b.insuranceRequested === "on",
-      insuranceStatus:
-        b.insuranceRequested === true || b.insuranceRequested === "on" ? "requested" : "not_requested",
-      privateDetails,
-      category: b.category,
-      volume: positive(b.volume, "volume"),
-      weight: positive(b.weight, "weight"),
-      date: b.date,
-      status: "open",
-      deliveryCode: newDeliveryCode(),
-      createdAt: new Date().toISOString(),
-    };
     const created = await mutate((s) => {
       if (req.path === "/api/v1/shipments") {
         const requestKey = req.get("Idempotency-Key");
@@ -696,58 +721,7 @@ export async function createApp() {
           shipment.integrationKey = requestKey;
         }
       }
-      if (shipment.transportType === "crossBorder") {
-        // Türkiye⇄Syria: an order with three stages, each taken by its own provider.
-        shipment.isOrder = true;
-        shipment.status = "coordinating";
-        shipment.legs = [];
-        for (const leg of splitCrossBorder(shipment)) {
-          const child = {
-            ...shipment,
-            id: id(),
-            isOrder: false,
-            legs: undefined,
-            integrationKey: undefined,
-            parentId: shipment.id,
-            legType: leg.legType,
-            legIndex: leg.legIndex,
-            originCountry: leg.originCountry,
-            destinationCountry: leg.destinationCountry,
-            transportType: leg.transportType,
-            origin: leg.from || shipment.origin,
-            destination: leg.to || shipment.destination,
-            status: "open",
-          };
-          shipment.legs.push(child.id);
-          s.shipments.push(child);
-          if (leg.legType !== "clearance") {
-            matchRoutes(s, child);
-            suggestSharing(s, child);
-          }
-        }
-        s.shipments.push(shipment);
-      } else {
-        s.shipments.push(shipment);
-        matchRoutes(s, shipment);
-        suggestSharing(s, shipment);
-      }
-      if (!req.user.demo)
-        queueAdminEmail(s, "shipment_created", {
-          الشحنة: shipment.title,
-          صاحبها: req.user.name,
-          المسار: `${shipment.origin} → ${shipment.destination}`,
-          "الحجم/الوزن": `${shipment.volume} m³ / ${shipment.weight} kg`,
-          التاريخ: shipment.date,
-        });
-      s.trackingEvents.push({
-        id: id(),
-        shipmentId: shipment.id,
-        actorId: req.user.id,
-        event: "open",
-        source: "platform",
-        createdAt: shipment.createdAt,
-      });
-      return shipment;
+      return insertShipment(s, req.user, shipment);
     });
     res.status(201).json(created);
   });
@@ -1319,7 +1293,11 @@ export async function createApp() {
   // Late or stopped trucks are checked every five minutes (on Netlify by the scheduled function).
   if (process.env.LOGIBRIDGE_SERVERLESS !== "true" && !process.env.NODE_TEST_CONTEXT) {
     const timer = setInterval(
-      () => runTrackingWatch().catch((e) => console.error("Tracking:", e.message)),
+      () =>
+        runTrackingWatch()
+          .then(() => runRecurringWatch())
+          .then(() => runMonthlyWatch())
+          .catch((e) => console.error("Tracking:", e.message)),
       300000,
     );
     timer.unref();

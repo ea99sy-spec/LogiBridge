@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import "./public-pages.css";
 import { LegalLinks, CompanyInfo } from "./Legal";
 import { LiveBorderStrip, ProductPreview, PlatformStats } from "./LandingLive";
 import { QuickPrice } from "./Prices";
@@ -344,6 +345,10 @@ export default function Landing({ t, langSelect, user }) {
             </a>
           )}
         </div>
+        <nav className="footer-routes">
+          <a href="/routes">{t("routesTitle")}</a>
+          <a href="/border">{t("borderRules")}</a>
+        </nav>
         <LegalLinks t={t} />
         <span>© 2026 · AR / EN / TR</span>
         <CompanyInfo company={health.company} t={t} compact />

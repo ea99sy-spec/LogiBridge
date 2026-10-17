@@ -37,6 +37,7 @@ const whatsappEvents = {
   return_trip_accepted: "قبل الناقل طلبك على رحلة العودة",
   shipment_rejected: "رفضت الإدارة طلب الشحن",
   feedback_replied: "ردّت الإدارة على رسالتك",
+  recurring_invite: "عميل متكرر نشر شحنة جديدة لك",
   shared_truck_suggestion: "يمكنك مشاركة شاحنة مع شحنة أخرى على نفس الطريق",
   referral_reward: "حصلت على شهر مجاني لأن شركة دعوتها انضمت",
   driver_verified: "تم توثيق السائق",
