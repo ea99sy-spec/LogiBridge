@@ -44,6 +44,7 @@ import { whatsappConfigured, flushWhatsApp } from "./whatsapp.js";
 import { subscriptionOf, pricingOf } from "../shared/subscription.js";
 import { publicStats } from "./stats.js";
 import { noteRoutes } from "./notes.js";
+import { accountsReportRoutes } from "./accountsReport.js";
 import { TERMS_VERSION, termsOutdated } from "../shared/legal.js";
 import { trackingRoutes, publicTrackingRoutes, newDeliveryCode, runTrackingWatch } from "./tracking.js";
 import { profileRoutes, announceCompany } from "./profiles.js";
@@ -292,7 +293,13 @@ export async function createApp() {
           s.users.find((u) => u.id === user.id).totp.backup.splice(factor.index, 1);
         });
     }
-    await mutate((s) => queueEmail(s, user.id, "login", { time: new Date().toISOString() }));
+    await mutate((s) => {
+      queueEmail(s, user.id, "login", { time: new Date().toISOString() });
+      // Usage numbers for the administrator's accounts report.
+      const u = s.users.find((x) => x.id === user.id);
+      u.loginCount = (u.loginCount || 0) + 1;
+      u.lastLoginAt = new Date().toISOString();
+    });
     await sessionFor(user, res);
   });
   app.post("/api/login", async (req, res) => {
@@ -342,6 +349,16 @@ export async function createApp() {
     if (req.user.sessionsValidAfter && (session.createdAt || 0) < req.user.sessionsValidAfter)
       return res.status(401).json({ error: "Sign in required" });
     if (req.user.disabled) return res.status(403).json({ error: "Account disabled" });
+    // Usage tracking (at most once every 30 minutes per account): last visit and active days.
+    if (!req.user.demo && Date.now() - Date.parse(req.user.lastSeenAt || 0) > 30 * 60000) {
+      const now = new Date().toISOString();
+      await mutate((s) => {
+        const u = s.users.find((x) => x.id === req.user.id);
+        if (!u) return;
+        if (u.lastSeenAt?.slice(0, 10) !== now.slice(0, 10)) u.activeDays = (u.activeDays || 0) + 1;
+        u.lastSeenAt = now;
+      });
+    }
     if (
       requiresApproval(req.user) &&
       ![
@@ -543,6 +560,7 @@ export async function createApp() {
   twoFactorRoutes(app);
   operationRoutes(app);
   noteRoutes(app);
+  accountsReportRoutes(app);
   trackingRoutes(app);
   paymentRoutes(app);
   advancedRoutes(app);

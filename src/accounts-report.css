@@ -1,0 +1,113 @@
+.accounts-report .section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.accounts-report a.button[aria-disabled="true"] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.report-totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+.report-totals > div {
+  background: #fff;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+  border-bottom: 3px solid #facc15;
+}
+.report-totals b {
+  display: block;
+  font-size: 22px;
+  color: #102a56;
+}
+.report-totals small {
+  color: #6b7f9e;
+}
+.report-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.report-filters input[type="search"] {
+  flex: 1;
+  min-width: 180px;
+}
+.report-scroll {
+  overflow: auto;
+  max-height: 70vh;
+  max-width: 100%;
+  border: 1px solid #d5dde9;
+  border-radius: 12px;
+  background: #fff;
+}
+.report-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 12px;
+  min-width: 100%;
+}
+.report-table th,
+.report-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #edf1f7;
+  border-inline-end: 1px solid #edf1f7;
+  white-space: nowrap;
+  text-align: start;
+  vertical-align: top;
+}
+.report-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fff3c4;
+}
+.report-table th button {
+  background: none;
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  color: #102a56;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+.report-table th:first-child,
+.report-table td:first-child {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  background: #fff;
+  font-weight: 700;
+}
+.report-table th:first-child {
+  z-index: 3;
+  background: #fff3c4;
+}
+.report-table td.num {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.report-table td.long {
+  white-space: normal;
+  min-width: 260px;
+  max-width: 360px;
+}
+.report-table tr:nth-child(even) td {
+  background: #fafbfd;
+}
+.report-table tr.st-pending td:first-child {
+  box-shadow: inset -3px 0 0 #facc15;
+}
+.report-table tr.st-disabled td,
+.report-table tr.st-rejected td {
+  color: #9aa7bb;
+}

@@ -93,6 +93,7 @@ const modules = {
     "admin",
     "notes",
     "companies",
+    "accountsReport",
     "kyb",
     "shipments",
     "tracking",
@@ -110,7 +111,7 @@ export function workspaceModules(user, flags = {}) {
   return (
     (modules[accountKind(user)] || [])
       // Private admin notes are for registered administrators only, not the shared demo admin.
-      .filter((key) => key !== "notes" || !user.demo)
+      .filter((key) => !["notes", "accountsReport"].includes(key) || !user.demo)
       .filter((key) => !["ratings", "marketplace", "contracts"].includes(key) || flags[key])
       .filter((key) => !["inventory", "orders"].includes(key) || flags.marketplace)
   );
