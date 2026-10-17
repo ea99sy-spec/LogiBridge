@@ -129,9 +129,9 @@ const commercial = S(
     "Tek seferde fatura ve çeki listesi",
   ],
   [
-    "في ملف الشحنة اكتب الأصناف مرة واحدة، فتُنشأ فاتورة تجارية وقائمة تعبئة متطابقتان، ونفحص الوزن ورمز HS قبل الحفظ. افتحهما للطباعة أو PDF، وقّع واختم وارفع.",
-    "In the shipment folder enter the items once to get a matching commercial invoice and packing list, checked for weight and HS code before saving. Open them to print or save as PDF, sign, stamp and upload.",
-    "Sevkiyat klasöründe ürünleri bir kez girin; uyumlu ticari fatura ve çeki listesi oluşur, kaydetmeden önce ağırlık ve HS kodu kontrol edilir. Yazdırmak veya PDF için açın, imzalayıp kaşeleyin ve yükleyin.",
+    "في ملف الشحنة اكتب الأصناف مرة واحدة، فتُنشأ فاتورة مبدئية (Proforma) وقائمة تعبئة متطابقتان، ونفحص الوزن ورمز HS قبل الحفظ. الفاتورة الرسمية تصدرها من نظامك بنفس الأرقام وترفعها.",
+    "In the shipment folder enter the items once to get a matching proforma invoice and packing list, checked for weight and HS code before saving. Issue the official invoice from your own system with the same figures and upload it.",
+    "Sevkiyat klasöründe ürünleri bir kez girin; uyumlu proforma fatura ve çeki listesi oluşur, kaydetmeden önce ağırlık ve HS kodu kontrol edilir. Resmî faturayı kendi sisteminizden aynı rakamlarla düzenleyip yükleyin.",
   ],
 );
 const repeat = S(
