@@ -130,6 +130,17 @@ function DocLine({ d, t, user, name, run, busy, lang }) {
         <small>
           {name(d.userId)} · {new Date(d.createdAt).toLocaleDateString(lang)}
         </small>
+        {d.views?.length > 0 && (
+          <small
+            className="doc-views"
+            title={d.views
+              .slice(-10)
+              .map((v) => `${name(v.userId)} · ${new Date(v.at).toLocaleString(lang)}`)
+              .join("\n")}
+          >
+            👁 {t("docViewedBy")} {d.views.length} {t("docViewsTimes")} · {name(d.views.at(-1).userId)}
+          </small>
+        )}
       </span>
       <a
         className="text-button"
@@ -497,115 +508,122 @@ export function DocumentCenter({ data, user, t, run, busy, navigate, lang }) {
   );
   const file = files.find((f) => f.id === selected) || shown[0];
   const mineTotal = files.reduce((n, f) => n + f.mine.length, 0);
+  // Light protection: no right-click menu, dragging or text selection on this page, and nothing
+  // of it is printed. Files opened from here carry a watermark with the viewer's name (server side).
+  const block = (e) => e.preventDefault();
   return (
     <>
-      <div className="section-heading">
-        <div>
-          <h1>{t("uploadDocuments")}</h1>
-          <p>{t("documentsIntroNew")}</p>
+      <div className="print-blocked">{t("printBlocked")}</div>
+      <div className="protected-docs" onContextMenu={block} onDragStart={block} onCopy={block}>
+        <div className="section-heading">
+          <div>
+            <h1>{t("uploadDocuments")}</h1>
+            <p>{t("documentsIntroNew")}</p>
+            <p className="doc-protect-note">🔒 {t("docWatermarkNote")}</p>
+          </div>
+          <button className="button ghost" onClick={() => navigate("kyb")}>
+            {t(
+              user.role === "admin"
+                ? "identityApplications"
+                : user.accountType === "individual"
+                  ? "passportUpload"
+                  : "registryUpload",
+            )}{" "}
+            ↗
+          </button>
         </div>
-        <button className="button ghost" onClick={() => navigate("kyb")}>
-          {t(
-            user.role === "admin"
-              ? "identityApplications"
-              : user.accountType === "individual"
-                ? "passportUpload"
-                : "registryUpload",
-          )}{" "}
-          ↗
-        </button>
-      </div>
-      <p className="muted small doc-review-note">
-        🛡 {t(user.role === "admin" ? "adminDocsReviewNote" : "docsReviewNote")}
-      </p>
-      {mineTotal > 0 && (
-        <p className="notice doc-alert" role="status">
-          📎 {t("documentsAskedFromYou").replace("{n}", mineTotal)}
+        <p className="muted small doc-review-note">
+          🛡 {t(user.role === "admin" ? "adminDocsReviewNote" : "docsReviewNote")}
         </p>
-      )}
-      {error && (
-        <p className="notice error" role="alert">
-          {error}
-        </p>
-      )}
-      {!files.length ? (
-        <section className="panel doc-empty">
-          <p>{t(user.role === "supplier" ? "noOrdersForDocuments" : "createShipmentBeforeUpload")}</p>
-          {["merchant"].includes(user.role) && (
-            <button className="button" type="button" onClick={() => navigate("newShipment")}>
-              {t("enterShipment")}
-            </button>
-          )}
-        </section>
-      ) : (
-        <div className="doc-layout">
-          <aside className="panel doc-files">
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t("searchShipments")}
-              aria-label={t("searchShipments")}
-            />
-            <div className="chip-tabs">
-              {["all", "mine", "missing", "complete"].map((k) => (
-                <button
-                  key={k}
-                  type="button"
-                  className={filter === k ? "active" : ""}
-                  onClick={() => setFilter(k)}
-                >
-                  {t("docFilter_" + k)}
-                </button>
-              ))}
-            </div>
-            <ul>
-              {shown.map((f) => (
-                <li key={f.id}>
+        {mineTotal > 0 && (
+          <p className="notice doc-alert" role="status">
+            📎 {t("documentsAskedFromYou").replace("{n}", mineTotal)}
+          </p>
+        )}
+        {error && (
+          <p className="notice error" role="alert">
+            {error}
+          </p>
+        )}
+        {!files.length ? (
+          <section className="panel doc-empty">
+            <p>{t(user.role === "supplier" ? "noOrdersForDocuments" : "createShipmentBeforeUpload")}</p>
+            {["merchant"].includes(user.role) && (
+              <button className="button" type="button" onClick={() => navigate("newShipment")}>
+                {t("enterShipment")}
+              </button>
+            )}
+          </section>
+        ) : (
+          <div className="doc-layout">
+            <aside className="panel doc-files">
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t("searchShipments")}
+                aria-label={t("searchShipments")}
+              />
+              <div className="chip-tabs">
+                {["all", "mine", "missing", "complete"].map((k) => (
                   <button
+                    key={k}
                     type="button"
-                    className={`doc-file-item ${file?.id === f.id ? "active" : ""}`}
-                    onClick={() => {
-                      setSelected(f.id);
-                      setError("");
-                      if (window.innerWidth < 900)
-                        setTimeout(
-                          () => document.querySelector(".doc-file")?.scrollIntoView({ behavior: "smooth" }),
-                          50,
-                        );
-                    }}
+                    className={filter === k ? "active" : ""}
+                    onClick={() => setFilter(k)}
                   >
-                    <b dir="auto">{f.title}</b>
-                    <small dir="auto">{f.route}</small>
-                    <span className="doc-file-meta">
-                      <span className={`doc-count ${f.done === f.items.length ? "ok" : ""}`}>
-                        📎 {f.done}/{f.items.length}
-                      </span>
-                      {f.mine.length > 0 && (
-                        <span className="doc-mine">{t("needsYou").replace("{n}", f.mine.length)}</span>
-                      )}
-                    </span>
+                    {t("docFilter_" + k)}
                   </button>
-                </li>
-              ))}
-              {!shown.length && <li className="muted small">{t("notesNoMatch")}</li>}
-            </ul>
-          </aside>
-          {file && (
-            <FileView
-              key={file.id}
-              file={file}
-              data={data}
-              user={user}
-              t={t}
-              run={run}
-              busy={busy}
-              lang={lang}
-              setError={setError}
-            />
-          )}
-        </div>
-      )}
+                ))}
+              </div>
+              <ul>
+                {shown.map((f) => (
+                  <li key={f.id}>
+                    <button
+                      type="button"
+                      className={`doc-file-item ${file?.id === f.id ? "active" : ""}`}
+                      onClick={() => {
+                        setSelected(f.id);
+                        setError("");
+                        if (window.innerWidth < 900)
+                          setTimeout(
+                            () => document.querySelector(".doc-file")?.scrollIntoView({ behavior: "smooth" }),
+                            50,
+                          );
+                      }}
+                    >
+                      <b dir="auto">{f.title}</b>
+                      <small dir="auto">{f.route}</small>
+                      <span className="doc-file-meta">
+                        <span className={`doc-count ${f.done === f.items.length ? "ok" : ""}`}>
+                          📎 {f.done}/{f.items.length}
+                        </span>
+                        {f.mine.length > 0 && (
+                          <span className="doc-mine">{t("needsYou").replace("{n}", f.mine.length)}</span>
+                        )}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+                {!shown.length && <li className="muted small">{t("notesNoMatch")}</li>}
+              </ul>
+            </aside>
+            {file && (
+              <FileView
+                key={file.id}
+                file={file}
+                data={data}
+                user={user}
+                t={t}
+                run={run}
+                busy={busy}
+                lang={lang}
+                setError={setError}
+              />
+            )}
+          </div>
+        )}
+      </div>
     </>
   );
 }

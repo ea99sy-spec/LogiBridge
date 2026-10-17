@@ -3118,4 +3118,8 @@ export const extraRows = {
   routeCta: ["عندك شحنة من {from} إلى {to}؟ انشرها مجاناً واستقبل العروض.", "Have a shipment from {from} to {to}? Post it for free and get offers.", "{from} → {to} sevkiyatınız mı var? Ücretsiz yayınlayın ve teklif alın."],
   relatedRoutes: ["طرق قريبة", "Related routes", "İlgili rotalar"],
   routeMissing: ["الطريق غير موجود", "Route not found", "Rota bulunamadı"],
+  docWatermarkNote: ["أي وثيقة تفتحها أو تنزّلها من وثائق غيرك تصلك نسخة PDF عليها علامة مائية باسمك وإيميلك ووقت الفتح، وصاحب الوثيقة يرى من فتحها ومتى.", "Any document of another company you open or download comes as a PDF copy watermarked with your name, email and the time, and its owner can see who opened it and when.", "Başka bir şirketin açtığınız veya indirdiğiniz her belgesi, adınız, e-postanız ve saatle filigranlı bir PDF kopyası olarak gelir; sahibi kimin ne zaman açtığını görür."],
+  printBlocked: ["طباعة صفحة الوثائق غير متاحة. افتح الوثيقة نفسها لطباعتها (النسخة عليها علامة مائية باسمك).", "Printing the documents page is not available. Open the document itself to print it (the copy carries your watermark).", "Belgeler sayfası yazdırılamaz. Yazdırmak için belgenin kendisini açın (kopya sizin filigranınızı taşır)."],
+  docViewedBy: ["فُتحت", "Opened", "Açıldı"],
+  docViewsTimes: ["مرة", "times", "kez"],
 };

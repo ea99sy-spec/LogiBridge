@@ -617,8 +617,10 @@ export async function createApp() {
       ),
       shipmentDocuments: fullState.shipmentDocuments
         .filter((d) => documentVisible(fullState, req.user, d))
-        .map(({ encryptedContent, ...doc }) => ({
+        .map(({ encryptedContent, views, ...doc }) => ({
           ...doc,
+          // Who opened a document: shown to the uploader and the administration only.
+          ...(doc.userId === req.user.id || req.user.role === "admin" ? { views: views || [] } : {}),
           // The operation a document belongs to (a 3-stage order groups all its stages).
           fileId:
             doc.orderId ||

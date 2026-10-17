@@ -166,3 +166,15 @@ test("public routes and company pages", () => {
   );
   assert.equal(corridorDeals(s, "gaziantep", "aleppo").length, 3);
 });
+
+test("documents opened by others get a watermark", async () => {
+  const { PDFDocument } = await import("pdf-lib");
+  const { watermarkDocument, watermarkText } = await import("../server/watermark.js");
+  const d = await PDFDocument.create();
+  d.addPage([300, 300]);
+  const text = watermarkText({ name: "شركة Öz", email: "a@b.test" }, new Date("2026-10-17T10:00:00Z"));
+  assert.equal(text, "Oz - a@b.test | 2026-10-17 13:00 (UTC+3) | LogiBridge");
+  const out = await watermarkDocument(Buffer.from(await d.save()), "application/pdf", text);
+  assert.ok(out && out.subarray(0, 5).toString() === "%PDF-");
+  assert.equal(await watermarkDocument(Buffer.from("not a pdf"), "application/pdf", text), null);
+});

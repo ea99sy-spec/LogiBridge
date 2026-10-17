@@ -1,3 +1,4 @@
+import { watermarkDocument, watermarkText } from "./watermark.js";
 import { readState, mutate, id } from "./store.js";
 import { validateDocument, encryptDocument, decryptDocument } from "./identity.js";
 import { notice } from "./advanced.js";
@@ -148,11 +149,47 @@ export function documentRoutes(app) {
     const { encryptedContent, ...doc } = created;
     res.status(201).json({ ok: true, document: doc });
   });
-  app.get("/api/shipment-documents/:id", (req, res) => {
+  app.get("/api/shipment-documents/:id", async (req, res) => {
     const s = readState(),
       doc = s.shipmentDocuments.find((x) => x.id === req.params.id);
     if (!doc) return res.sendStatus(404);
     if (!documentVisible(s, req.user, doc)) return res.sendStatus(403);
+    // Someone else's document (not delivery photos): a watermarked PDF copy with the viewer's
+    // name, email and time, and the opening is recorded for the uploader and the administration.
+    const viewer = req.member
+      ? { name: `${req.member.name} (${req.user.name})`, email: req.member.email }
+      : { name: req.user.name, email: req.user.email };
+    if (doc.userId !== req.user.id && !String(doc.kind || "").startsWith("photo_")) {
+      const marked = await watermarkDocument(
+        decryptDocument(doc.encryptedContent),
+        doc.mime,
+        watermarkText(viewer),
+      );
+      if (marked) {
+        if (!req.user.demo)
+          await mutate((st) => {
+            const d = st.shipmentDocuments.find((x) => x.id === doc.id);
+            if (!d) return;
+            d.views = [
+              ...(d.views || []),
+              { userId: req.user.id, memberId: req.member?.id, at: new Date().toISOString() },
+            ].slice(-50);
+          }).catch(() => {});
+        const base =
+          String(doc.filename || "document")
+            .replace(/\.[a-z0-9]+$/i, "")
+            .replace(/[^\w.\- ]+/g, "_")
+            .slice(0, 70) || "document";
+        return res
+          .set("Content-Type", "application/pdf")
+          .set("Cache-Control", "private, no-store")
+          .set(
+            "Content-Disposition",
+            `${req.query.view ? "inline" : "attachment"}; filename="${base}-LogiBridge.pdf"`,
+          )
+          .send(marked);
+      }
+    }
     const ext = { "application/pdf": "pdf", "image/png": "png", "image/jpeg": "jpg" }[doc.mime] || "bin";
     const name =
       String(doc.filename || "document")
