@@ -589,10 +589,54 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
     ).status,
     201,
   );
+  // Still incomplete: packing list and certificate of origin are required too.
+  assert.equal((await call("business", `/shipments/${paidShipment.id}/submit`, {})).status, 400);
+  for (const kind of ["packing", "origin"])
+    assert.equal(
+      (await call("business", "/shipment-documents", { ...document, kind, shipmentId: paidShipment.id }))
+        .status,
+      201,
+    );
+  // Only people working on the shipment can request documents (the carrier has only bid so far).
+  assert.equal(
+    (await call("realCarrier", "/document-requests", { shipmentId: paidShipment.id, kind: "customs" }))
+      .status,
+    400,
+  );
   assert.equal((await call("business", `/shipments/${paidShipment.id}/submit`, {})).body.completed, true);
   assert.equal((await call("business", `/shipments/${paidShipment.id}/submit`, {})).status, 200);
   const paidBid = (await call("business", "/state")).body.bids.find((b) => b.shipmentId === paidShipment.id);
   await call("business", `/shipments/${paidShipment.id}/accept`, { bidId: paidBid.id });
+  // Now assigned, the carrier asks the owner for a document; the owner's upload answers it.
+  assert.equal(
+    (
+      await call("realCarrier", "/document-requests", {
+        shipmentId: paidShipment.id,
+        kind: "other",
+        title: "Driver authorisation letter",
+      })
+    ).status,
+    201,
+  );
+  const askedFor = (await call("business", "/state")).body.documentRequests.find(
+    (r) => r.shipmentId === paidShipment.id,
+  );
+  assert.equal(askedFor.status, "open");
+  assert.equal(
+    (
+      await call("business", "/shipment-documents", {
+        ...document,
+        kind: "other",
+        shipmentId: paidShipment.id,
+        requestId: askedFor.id,
+      })
+    ).status,
+    201,
+  );
+  assert.equal(
+    (await call("realCarrier", "/state")).body.documentRequests.find((r) => r.id === askedFor.id).status,
+    "done",
+  );
   assert.equal(
     (await call("business", `/shipments/${paidShipment.id}/action`, { action: "fund" })).status,
     400,

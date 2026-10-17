@@ -18,7 +18,8 @@ import "./landing.css";
 import AccountAccess, { ResetPassword, VerifyEmail } from "./AccountAccess";
 import Legal, { LegalLinks, TermsUpdateDialog } from "./Legal";
 import Landing from "./Landing";
-import { QuickActions, ShipmentEntry, DocumentCenter, TrackingPanel, AdminPanel } from "./Operations";
+import { QuickActions, ShipmentEntry, TrackingPanel, AdminPanel } from "./Operations";
+import { DocumentCenter, pendingDocumentsCount } from "./Documents";
 import "./operations.css";
 import RoleDashboard, { CarrierJobs, SupplierInventory, SupplierOrders } from "./RoleDashboard";
 import { workspaceModules, accountKind } from "../shared/workspaces";
@@ -123,6 +124,7 @@ function OrderCard({ s, compact }) {
         <span className="tag">{t(s.category)}</span>
         <span className={`badge ${s.status}`}>{t(s.status)}</span>
       </div>
+      <DocsLink s={s} />
       <h3>{s.title}</h3>
       <div className="route">
         <span>
@@ -178,6 +180,28 @@ function OrderCard({ s, compact }) {
     </article>
   );
 }
+// "Documents" shortcut on a shipment card: opens that shipment's documents folder.
+function DocsLink({ s }) {
+  const { data, user, t, openDocuments } = useWorkspace();
+  const rootId = s.parentId || s.id;
+  const involved =
+    user.role === "admin" ||
+    s.ownerId === user.id ||
+    s.carrierId === user.id ||
+    data.shipments.some((x) => x.parentId === rootId && x.carrierId === user.id);
+  if (!involved) return null;
+  const count = data.shipmentDocuments.filter(
+    (d) => (d.fileId || d.shipmentId) === rootId && !String(d.kind).startsWith("photo_"),
+  ).length;
+  const asked = (data.documentRequests || []).filter(
+    (r) => r.shipmentId === rootId && r.status === "open" && r.from === user.id,
+  ).length;
+  return (
+    <button type="button" className={`docs-link ${asked ? "asked" : ""}`} onClick={() => openDocuments(s.id)}>
+      📎 {t("docsShort")} ({count}){asked ? ` · ${t("needsYou").replace("{n}", asked)}` : ""}
+    </button>
+  );
+}
 function ShipmentCard({ s, compact = false }) {
   const { data, user, t, run, busy, money, num, lang, openProfile } = useWorkspace();
   if (s.isOrder) return <OrderCard s={s} compact={compact} />;
@@ -207,6 +231,7 @@ function ShipmentCard({ s, compact = false }) {
         <span className="tag">{t(s.category)}</span>
         {badge(s.status)}
       </div>
+      <DocsLink s={s} />
       <h3>{s.title}</h3>
       {s.parentId && (
         <p className="stage-label">
@@ -724,6 +749,7 @@ function App() {
     num,
     lang,
     openProfile: (id) => setTab("company", id),
+    openDocuments: (id) => setTab("documents", id),
   };
   return (
     <Workspace.Provider value={workspace}>
@@ -746,6 +772,9 @@ function App() {
               >
                 <span className="nav-icon">{icons[k]}</span>
                 {t(k === "kyb" && user.accountType === "individual" ? "passportVerification" : k)}
+                {k === "documents" && pendingDocumentsCount(data, user) > 0 && (
+                  <span className="nav-count alert">{pendingDocumentsCount(data, user)}</span>
+                )}
                 {k === "shipments" && (
                   <span className="nav-count">
                     {data.shipments.filter((s) => s.status === "open").length}
@@ -1319,7 +1348,15 @@ function App() {
               <ShipmentEntry t={t} run={run} busy={busy} onCreated={() => setTab("documents")} />
             )}
             {activeTab === "documents" && (
-              <DocumentCenter data={data} user={user} t={t} run={run} busy={busy} navigate={setTab} />
+              <DocumentCenter
+                data={data}
+                user={user}
+                t={t}
+                run={run}
+                busy={busy}
+                navigate={setTab}
+                lang={lang}
+              />
             )}
           </div>
           <footer>

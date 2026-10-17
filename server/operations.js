@@ -12,6 +12,7 @@ import { recordPosition } from "./tracking.js";
 import { readState, mutate, id } from "./store.js";
 import { requiresApproval } from "../shared/access.js";
 import { TERMS_VERSION } from "../shared/legal.js";
+import { ownerMissing } from "./documents.js";
 import { subscriptionOf, addMonths, pricingOf } from "../shared/subscription.js";
 const text = (value, max = 300) => {
   if (typeof value !== "string" || !value.trim() || value.length > max) throw new Error("Invalid text");
@@ -405,43 +406,12 @@ export function operationRoutes(app) {
       const sh = s.shipments.find((x) => x.id === req.params.id && x.ownerId === req.user.id);
       if (!sh) throw Error("Shipment unavailable");
       if (sh.submittedAt) return;
-      if (!s.shipmentDocuments.some((d) => d.shipmentId === sh.id))
-        throw Error("Upload shipment documents first");
+      // The request is sent only when every required document of the owner is uploaded.
+      if (ownerMissing(s, sh).length) throw Error("Upload all required documents first");
       sh.submittedAt = new Date().toISOString();
       queueEmail(s, req.user.id, "shipment_submitted", { shipment: sh.title }, `shipment/${sh.id}`);
     });
     res.json({ ok: true, completed: true });
-  });
-  app.post("/api/shipment-documents", async (req, res) => {
-    const b = req.body;
-    validateDocument(b);
-    if (!["invoice", "packing", "origin", "transport", "customs", "other"].includes(b.kind))
-      throw new Error("Invalid document kind");
-    await mutate((s) => {
-      const sh = s.shipments.find((x) => x.id === b.shipmentId);
-      if (!sh || ![sh.ownerId, sh.carrierId].includes(req.user.id)) throw new Error("Shipment unavailable");
-      s.shipmentDocuments.push({
-        id: id(),
-        shipmentId: sh.id,
-        userId: req.user.id,
-        kind: b.kind,
-        filename: text(b.filename),
-        mime: b.mime,
-        encryptedContent: encryptDocument(b.content),
-        createdAt: new Date().toISOString(),
-      });
-    });
-    res.status(201).json({ ok: true });
-  });
-  app.get("/api/shipment-documents/:id", (req, res) => {
-    const s = readState(),
-      doc = s.shipmentDocuments.find((x) => x.id === req.params.id),
-      sh = s.shipments.find((x) => x.id === doc?.shipmentId);
-    if (!doc || !sh) return res.sendStatus(404);
-    if (!canSee(req.user, sh) || (req.user.demo && !s.users.find((u) => u.id === doc.userId)?.demo))
-      return res.sendStatus(403);
-    res.set("Content-Type", doc.mime).set("Content-Disposition", 'attachment; filename="shipment-document"');
-    res.send(decryptDocument(doc.encryptedContent));
   });
   app.post("/api/shipments/:id/location", async (req, res) => {
     await mutate((s) => {

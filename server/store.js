@@ -134,6 +134,7 @@ export async function initialize() {
   state.apiKeys ||= [];
   state.fleets ||= [];
   state.shipmentDocuments ||= [];
+  state.documentRequests ||= [];
   state.trackingEvents ||= [];
   // Every active shipment has a delivery code (older shipments got one after the feature arrived).
   for (const sh of state.shipments || [])

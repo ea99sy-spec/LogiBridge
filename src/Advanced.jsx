@@ -255,32 +255,34 @@ export function NotificationBell({ data, t, run, navigate }) {
                   navigate(
                     n.event === "border_notice"
                       ? "border"
-                      : n.event === "company_joined"
-                        ? "directory"
-                        : n.event.startsWith("verification_") || n.event === "account_registered"
-                          ? "kyb"
-                          : n.event === "matching_opportunity" || (carrier && n.event === "cancel")
-                            ? "jobs"
-                            : n.event === "equipment_booking"
-                              ? "calendar"
-                              : n.event === "message_received"
-                                ? "hub"
-                                : n.event === "order_received"
-                                  ? "orders"
-                                  : n.event === "group_reserved"
-                                    ? "groups"
-                                    : n.event.startsWith("payment_") && data.user.role === "admin"
-                                      ? "admin"
-                                      : n.event.startsWith("settlement_") ||
-                                          [
-                                            "dispute_escalated",
-                                            "bid_received",
-                                            "bid_withdrawn",
-                                            "cancel",
-                                            "crossing_busy",
-                                          ].includes(n.event)
-                                        ? "shipments"
-                                        : "tracking",
+                      : n.event === "document_requested" || n.event === "document_uploaded"
+                        ? "documents"
+                        : n.event === "company_joined"
+                          ? "directory"
+                          : n.event.startsWith("verification_") || n.event === "account_registered"
+                            ? "kyb"
+                            : n.event === "matching_opportunity" || (carrier && n.event === "cancel")
+                              ? "jobs"
+                              : n.event === "equipment_booking"
+                                ? "calendar"
+                                : n.event === "message_received"
+                                  ? "hub"
+                                  : n.event === "order_received"
+                                    ? "orders"
+                                    : n.event === "group_reserved"
+                                      ? "groups"
+                                      : n.event.startsWith("payment_") && data.user.role === "admin"
+                                        ? "admin"
+                                        : n.event.startsWith("settlement_") ||
+                                            [
+                                              "dispute_escalated",
+                                              "bid_received",
+                                              "bid_withdrawn",
+                                              "cancel",
+                                              "crossing_busy",
+                                            ].includes(n.event)
+                                          ? "shipments"
+                                          : "tracking",
                   );
                   setOpen(false);
                 }}

@@ -82,6 +82,7 @@ const modules = {
     "directory",
     "inventory",
     "orders",
+    "documents",
     "calendar",
     "hub",
     "kyb",

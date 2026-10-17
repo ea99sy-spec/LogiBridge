@@ -44,6 +44,7 @@ import { whatsappConfigured, flushWhatsApp } from "./whatsapp.js";
 import { subscriptionOf, pricingOf } from "../shared/subscription.js";
 import { publicStats } from "./stats.js";
 import { noteRoutes } from "./notes.js";
+import { documentRoutes, documentVisible, requestVisible } from "./documents.js";
 import { accountsReportRoutes } from "./accountsReport.js";
 import { TERMS_VERSION, termsOutdated } from "../shared/legal.js";
 import { trackingRoutes, publicTrackingRoutes, newDeliveryCode, runTrackingWatch } from "./tracking.js";
@@ -406,6 +407,7 @@ export async function createApp() {
     next();
   });
   app.get("/api/state", (req, res) => {
+    const fullState = readState();
     const s = readState(),
       admin = req.user.role === "admin";
     if (requiresApproval(req.user))
@@ -436,6 +438,7 @@ export async function createApp() {
         contracts: [],
         fleets: [],
         shipmentDocuments: [],
+        documentRequests: [],
         trackingEvents: [],
         driverLinks: [],
         equipmentBookings: [],
@@ -474,6 +477,7 @@ export async function createApp() {
       payments: _payments,
       bankAccount: _bank,
       adminNotes: _adminNotes, // private administrator notes: only via /api/admin/notes
+      documentRequests: _documentRequests, // filtered per account below
       ...shared
     } = s;
     res.json({
@@ -508,12 +512,19 @@ export async function createApp() {
         }
         return publicShipment;
       }),
-      shipmentDocuments: s.shipmentDocuments
-        .filter(
-          (d) =>
-            visibleShipment(d.shipmentId) && (!req.user.demo || s.users.find((u) => u.id === d.userId)?.demo),
-        )
-        .map(({ encryptedContent, ...doc }) => doc),
+      documentRequests: (fullState.documentRequests || []).filter((r) =>
+        requestVisible(fullState, req.user, r),
+      ),
+      shipmentDocuments: fullState.shipmentDocuments
+        .filter((d) => documentVisible(fullState, req.user, d))
+        .map(({ encryptedContent, ...doc }) => ({
+          ...doc,
+          // The operation a document belongs to (a 3-stage order groups all its stages).
+          fileId:
+            doc.orderId ||
+            fullState.shipments.find((x) => x.id === doc.shipmentId)?.parentId ||
+            doc.shipmentId,
+        })),
       trackingEvents: s.trackingEvents.filter((e) => visibleShipment(e.shipmentId)),
       users: s.users.map((u) => publicUser(u)),
       user: publicUser(req.user, true),
@@ -558,6 +569,7 @@ export async function createApp() {
   profileRoutes(app);
   privateAccountRoutes(app, { sessionFor });
   twoFactorRoutes(app);
+  documentRoutes(app);
   operationRoutes(app);
   noteRoutes(app);
   accountsReportRoutes(app);
