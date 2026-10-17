@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { LegalLinks, CompanyInfo } from "./Legal";
 import { LiveBorderStrip, ProductPreview, PlatformStats } from "./LandingLive";
+import { QuickPrice } from "./Prices";
 import { DRIVER_APP_URL } from "./Advanced";
 import { waLink } from "../shared/wa";
 
@@ -128,6 +129,7 @@ export default function Landing({ t, langSelect, user }) {
         </section>
         <LiveBorderStrip t={t} lang={document.documentElement.lang} />
         <PlatformStats t={t} />
+        <QuickPrice t={t} />
 
         {/* 2. Why use the platform */}
         <section id="why" className="landing-section">

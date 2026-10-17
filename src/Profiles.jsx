@@ -1,3 +1,4 @@
+import { ReputationChips } from "./Reputation";
 import React, { useState, useEffect } from "react";
 import { waLink } from "../shared/wa";
 import { crossingKeys } from "../shared/crossings";
@@ -354,6 +355,7 @@ export function Directory({ t, data, navigate }) {
                 )}{" "}
                 · {u.completed} {t("completedOperations")}
               </p>
+              <ReputationChips rep={u} t={t} kind={u.accountType} />
               {u.routes && (
                 <p className="small">
                   <b>{t("serviceRoutes")}:</b> {u.routes}
@@ -1040,6 +1042,7 @@ export function CompanyProfile({ id, t, data, navigate, money }) {
             )}{" "}
             · {c.completed} {t("completedOperations")}
           </p>
+          <ReputationChips rep={c} t={t} kind={c.accountType} />
         </div>
         {!own && (
           <div className="company-actions">

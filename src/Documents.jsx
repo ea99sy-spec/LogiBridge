@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from "react";
 import { checklist, missingFor, requestableKinds } from "../shared/documents";
 import "./documents.css";
+import { CommercialDocs } from "./CommercialDocs";
 
 // Documents page for every account: one folder per operation (shipment, 3-stage order or
 // equipment order), a checklist of required and requested documents, one-tap upload per row,
@@ -49,6 +50,8 @@ function filesFor(data, user) {
         ...legs.map((l) => l.carrierId),
       ].filter(Boolean),
       uploadTo: s.parentId && s.carrierId === user.id ? s.id : rootId,
+      root: byId[rootId] || null,
+      hasCommercialDocs: !!(byId[rootId]?.commercialDocs || s.hasCommercialDocs),
     });
   }
   for (const o of data.orders || []) {
@@ -401,6 +404,10 @@ function FileView({ file, data, user, t, run, busy, lang, setError }) {
             </>
           )}
         </div>
+      )}
+
+      {file.type === "shipment" && (
+        <CommercialDocs file={file} user={user} t={t} run={run} busy={busy} isOwner={isOwner} />
       )}
 
       {(party || user.role === "admin") && (

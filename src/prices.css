@@ -1,0 +1,110 @@
+.price-search {
+  width: 100%;
+  margin-bottom: 12px;
+}
+.price-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.price-card {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  border-top: 4px solid #facc15;
+}
+.price-card header {
+  display: grid;
+  gap: 2px;
+}
+.price-card header small,
+.price-main small {
+  color: #6b7f9e;
+}
+.price-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+.price-main strong {
+  font-size: 28px;
+  color: #102a56;
+}
+.price-trend {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef3fb;
+}
+.price-trend.up {
+  background: #fee2e2;
+  color: #9b1c1c;
+}
+.price-trend.down {
+  background: #dcfce7;
+  color: #166534;
+}
+.price-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #6b7f9e;
+}
+.price-range i {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #16a34a, #facc15, #ef4444);
+}
+.price-facts {
+  margin: 0;
+  padding-inline-start: 18px;
+  font-size: 12px;
+  color: #173a6c;
+  display: grid;
+  gap: 2px;
+}
+.quick-price-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  align-items: end;
+  background: #fff;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(16, 42, 86, 0.06);
+  margin-top: 14px;
+}
+.quick-price-form label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.quick-price-form select,
+.quick-price-form input {
+  width: 100%;
+}
+.quick-price-result {
+  margin-top: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  background: #fffbea;
+  border: 1px solid #facc15;
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+.quick-price-result strong {
+  font-size: 30px;
+  color: #102a56;
+}
+.quick-price-result.empty {
+  background: #f6f8fc;
+  border-color: #e3e9f2;
+}
+.quick-price-result .button {
+  margin-top: 6px;
+}

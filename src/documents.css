@@ -387,3 +387,100 @@
   background: #f6f8fc;
   border: 1px solid #e3e9f2;
 }
+.cd-box {
+  display: grid;
+  gap: 8px;
+}
+.cd-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0;
+}
+.cd-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 8px;
+}
+.cd-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.cd-grid label {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.cd-parties {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+.cd-parties fieldset {
+  display: grid;
+  gap: 6px;
+  border: 1px solid #e3e9f2;
+  border-radius: 12px;
+  padding: 10px;
+  margin: 0;
+  min-width: 0;
+}
+.cd-items-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.cd-items {
+  border-collapse: collapse;
+  font-size: 12px;
+  min-width: 760px;
+  width: 100%;
+}
+.cd-items th,
+.cd-items td {
+  padding: 4px;
+  border-bottom: 1px solid #edf1f7;
+  text-align: start;
+}
+.cd-items thead th,
+.cd-items tfoot th {
+  background: #fff8db;
+}
+.cd-items input,
+.cd-items select {
+  width: 100%;
+  min-width: 60px;
+  padding: 5px 6px;
+  font-size: 12px;
+}
+.cd-items td:nth-child(2) input {
+  min-width: 160px;
+}
+.cd-items input.num {
+  text-align: end;
+}
+.cd-check ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+.cd-error {
+  color: #9b1c1c;
+  background: #fff5f5;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.cd-warn {
+  color: #7a5c00;
+  background: #fffbea;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+.cd-ok {
+  color: #166534;
+  margin: 0;
+}

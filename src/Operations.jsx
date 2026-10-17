@@ -68,11 +68,46 @@ export function QuickActions({ user, t, navigate }) {
     </div>
   );
 }
-export function ShipmentEntry({ t, run, busy, onCreated }) {
+export function ShipmentEntry({ t, run, busy, onCreated, data, user }) {
+  // "Repeat shipment": /workspace/newShipment?from=<id> fills the form from an earlier shipment.
+  const fromId = new URLSearchParams(window.location.search).get("from");
+  const own = (data?.shipments || []).filter((s) => s.ownerId === user?.id && !s.parentId);
+  const tpl = own.find((s) => s.id === fromId) || null;
+  const p = tpl?.privateDetails || {};
+  const initial = {
+    title: tpl?.title,
+    volume: tpl?.volume,
+    weight: tpl?.weight,
+    hsCode: tpl?.hsCode,
+    origin: tpl?.origin,
+    destination: tpl?.destination,
+    senderName: p.senderName,
+    recipientName: p.recipientName,
+    phone: p.phone,
+    destinationAddress: p.destinationAddress,
+  };
+  // Earlier values become suggestions (saved places and contacts).
+  const history = (pick) =>
+    [...new Set(own.map(pick).filter(Boolean))].slice(0, 30).map((v) => <option key={v} value={v} />);
+  const lists = {
+    origin: history((s) => s.origin),
+    destination: history((s) => s.destination),
+    senderName: history((s) => s.privateDetails?.senderName),
+    recipientName: history((s) => s.privateDetails?.recipientName),
+    phone: history((s) => s.privateDetails?.phone),
+    destinationAddress: history((s) => s.privateDetails?.destinationAddress),
+  };
   const field = (label, name, props = {}) => (
     <label className="field">
       <span>{t(label)}</span>
-      <input name={name} required {...props} />
+      <input
+        name={name}
+        required
+        defaultValue={initial[name] ?? undefined}
+        list={lists[name]?.length ? "hist-" + name : undefined}
+        {...props}
+      />
+      {lists[name]?.length > 0 && <datalist id={"hist-" + name}>{lists[name]}</datalist>}
     </label>
   );
   return (
@@ -83,7 +118,9 @@ export function ShipmentEntry({ t, run, busy, onCreated }) {
           <p>{t("shipmentEntryIntro")}</p>
         </div>
       </div>
+      {tpl && <p className="notice repeat-note">🔁 {t("repeatingShipment").replace("{title}", tpl.title)}</p>}
       <form
+        key={tpl?.id || "new"}
         className="panel shipment-entry"
         onSubmit={async (e) => {
           e.preventDefault();
@@ -97,7 +134,7 @@ export function ShipmentEntry({ t, run, busy, onCreated }) {
           {field("title", "title", { maxLength: 300 })}
           <label className="field">
             <span>{t("category")}</span>
-            <select name="category">
+            <select name="category" defaultValue={tpl?.category || "textiles"}>
               {["textiles", "food", "machinery", "packaging", "other"].map((k) => (
                 <option key={k} value={k}>
                   {t(k)}
@@ -116,13 +153,19 @@ export function ShipmentEntry({ t, run, busy, onCreated }) {
           })}
           <label className="field full-field">
             <span>{t("cargoDescription")}</span>
-            <textarea name="description" rows="3" maxLength="2000" required />
+            <textarea
+              name="description"
+              rows="3"
+              maxLength="2000"
+              required
+              defaultValue={tpl?.description || ""}
+            />
           </label>
           <p className="notice prohibited-note full-field">⛔ {t("prohibitedFormNote")}</p>
         </div>
         <h3>02 · {t("routeAndDate")}</h3>
         <div className="form-grid">
-          <ShipmentRoute t={t} />
+          <ShipmentRoute t={t} initial={tpl} />
           {field("origin", "origin", { maxLength: 80 })}
           {field("destination", "destination", { maxLength: 80 })}
           {field("date", "date", { type: "date", min: new Date().toISOString().slice(0, 10) })}
@@ -130,7 +173,8 @@ export function ShipmentEntry({ t, run, busy, onCreated }) {
         </div>
         <PriceEstimate t={t} />
         <label className="insurance-choice">
-          <input type="checkbox" name="insuranceRequested" /> {t("requestInsurance")}
+          <input type="checkbox" name="insuranceRequested" defaultChecked={!!tpl?.insuranceRequested} />{" "}
+          {t("requestInsurance")}
         </label>
         <p className="muted small">{t("insuranceNote")}</p>
         <h3>03 · {t("contactInformation")}</h3>

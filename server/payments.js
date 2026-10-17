@@ -118,6 +118,7 @@ export function paymentRoutes(app) {
         escrow.paymentMethod = "bank_transfer";
         escrow.paymentId = p.id;
         escrow.status = "held";
+        escrow.fundedAt = new Date().toISOString();
         shipmentNotice(s, sh, "payment_approved");
         for (const u of [sh.ownerId, sh.carrierId])
           queueEmail(s, u, "payment_approved", { shipment: sh.title }, `payment/${p.id}/${u}`);

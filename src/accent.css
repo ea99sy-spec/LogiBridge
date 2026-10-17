@@ -535,3 +535,106 @@ svg.flag {
   justify-self: start;
   margin: 4px 0;
 }
+.rep-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.rep-chip {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef3fb;
+  color: #173a6c;
+}
+.rep-chip.good {
+  background: #dcfce7;
+  color: #166534;
+}
+.rep-chip.bad {
+  background: #fee2e2;
+  color: #9b1c1c;
+}
+.offer-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 3px;
+}
+.offer-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+.offer-badge.cheap {
+  background: #dcfce7;
+  color: #166534;
+}
+.offer-badge.fast {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.offer-badge.punctual {
+  background: #facc15;
+  color: #102a56;
+}
+.compare-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 6px 0 10px;
+}
+.offer-compare table {
+  border-collapse: collapse;
+  font-size: 12px;
+  min-width: 100%;
+}
+.offer-compare th,
+.offer-compare td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #edf1f7;
+  text-align: start;
+  white-space: nowrap;
+}
+.offer-compare th {
+  background: #fff8db;
+}
+.offer-compare td.best {
+  background: #dcfce7;
+  font-weight: 700;
+}
+.offer-compare tr.accepted td:first-child {
+  box-shadow: inset 3px 0 0 #16a34a;
+}
+.owner-pay {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.repeat-link {
+  text-decoration: none;
+}
+.repeat-note {
+  background: #fffbea;
+  border: 1px solid #facc15;
+  color: #7a5c00;
+}
+.install-app {
+  margin: 10px 0;
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #facc15;
+  color: #102a56;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}

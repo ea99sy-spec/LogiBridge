@@ -4,7 +4,10 @@ import { PublicTracking } from "./Tracking";
 import { GuidePage, StartHereCard } from "./Guide";
 import { AdminNotes, NotesDueCard } from "./AdminNotes";
 import { AccountsReport } from "./AccountsReport";
+import { ReputationChips } from "./Reputation";
 import { FeedbackPage, FeedbackAdmin } from "./Feedback";
+import { PriceIndexPage } from "./Prices";
+import { ReturnTrips } from "./ReturnTrips";
 import { FormHolidayWarning } from "./Holidays";
 import { SubscriptionBanner } from "./Subscription";
 import { waLink } from "../shared/wa";
@@ -62,6 +65,36 @@ async function api(path, body, method = "POST") {
 // module level (instead of inside App) stops React from re-creating them on every
 // refresh, which used to wipe whatever the user was typing into a form.
 const Workspace = createContext(null);
+// Browser's "install this site" prompt, kept until the account presses the install button.
+let installPrompt = null;
+const installListeners = new Set();
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  installPrompt = e;
+  installListeners.forEach((f) => f(true));
+});
+function InstallButton({ t }) {
+  const [ready, setReady] = useState(!!installPrompt);
+  useEffect(() => {
+    installListeners.add(setReady);
+    return () => installListeners.delete(setReady);
+  }, []);
+  if (!ready) return null;
+  return (
+    <button
+      type="button"
+      className="install-app"
+      onClick={async () => {
+        installPrompt?.prompt();
+        await installPrompt?.userChoice.catch(() => {});
+        installPrompt = null;
+        installListeners.forEach((f) => f(false));
+      }}
+    >
+      📲 {t("installApp")}
+    </button>
+  );
+}
 const useWorkspace = () => useContext(Workspace);
 const formData = (e) => Object.fromEntries(new FormData(e.currentTarget));
 function Field({ label, name, type = "text", optional = false, ...props }) {
@@ -125,7 +158,10 @@ function OrderCard({ s, compact }) {
         <span className="tag">{t(s.category)}</span>
         <span className={`badge ${s.status}`}>{t(s.status)}</span>
       </div>
-      <DocsLink s={s} />
+      <span className="card-links">
+        <DocsLink s={s} />
+        <RepeatLink s={s} />
+      </span>
       <RejectControls s={s} />
       <h3>{s.title}</h3>
       <div className="route">
@@ -209,6 +245,95 @@ function RejectControls({ s }) {
     </button>
   );
 }
+// Badges on offers: cheapest, fastest and most punctual (measured on-time share).
+function bestOf(bids, reputation) {
+  const min = (f) => Math.min(...bids.map(f));
+  const punctual = bids
+    .map((b) => ({ b, r: reputation?.[b.carrierId] }))
+    .filter((x) => x.r?.onTimeCount >= 3)
+    .sort((a, b) => b.r.onTimePct - a.r.onTimePct)[0]?.b.id;
+  return { cheapest: min((b) => b.price), fastest: min((b) => b.days), punctual };
+}
+function OfferBadges({ b, bids }) {
+  const { data, t } = useWorkspace();
+  if (bids.length < 2) return null;
+  const best = bestOf(bids, data.reputation);
+  return (
+    <span className="offer-badges">
+      {b.price === best.cheapest && <span className="offer-badge cheap">{t("cheapestOffer")}</span>}
+      {b.days === best.fastest && <span className="offer-badge fast">{t("fastestOffer")}</span>}
+      {b.id === best.punctual && <span className="offer-badge punctual">{t("mostPunctual")}</span>}
+    </span>
+  );
+}
+// Side-by-side comparison of all offers on a shipment (owner).
+function OfferCompare({ bids, s }) {
+  const { data, t, money, num } = useWorkspace();
+  const [open, setOpen] = useState(false);
+  const best = bestOf(bids, data.reputation);
+  const name = (id) => data.users.find((u) => u.id === id)?.name || "—";
+  return (
+    <div className="offer-compare">
+      <button type="button" className="text-button" onClick={() => setOpen(!open)}>
+        ⇆ {t(open ? "hideCompare" : "compareOffers")} ({bids.length})
+      </button>
+      {open && (
+        <div className="compare-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>{t("company")}</th>
+                <th>{t("price")}</th>
+                <th>{t("days")}</th>
+                <th>{t("ratingShort")}</th>
+                <th>{t("onTimeShort")}</th>
+                <th>{t("completedShort")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bids.map((b) => {
+                const r = data.reputation?.[b.carrierId] || {};
+                return (
+                  <tr key={b.id} className={s.bidId === b.id ? "accepted" : ""}>
+                    <td>
+                      <b>{name(b.carrierId)}</b>
+                    </td>
+                    <td className={b.price === best.cheapest ? "best" : ""}>{money(b.price)}</td>
+                    <td className={b.days === best.fastest ? "best" : ""}>{num(b.days)}</td>
+                    <td>{r.rating ? `★ ${r.rating} (${r.reviews})` : "—"}</td>
+                    <td className={b.id === best.punctual ? "best" : ""}>
+                      {r.onTimeCount ? `${r.onTimePct}% (${r.onTimeCount})` : "—"}
+                    </td>
+                    <td>{r.completed ?? 0}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+// "Repeat shipment": a new request with the same goods, route and contacts.
+function RepeatLink({ s }) {
+  const { user, t } = useWorkspace();
+  if (s.parentId || s.ownerId !== user.id || user.role !== "merchant") return null;
+  return (
+    <a
+      className="docs-link repeat-link"
+      href={`/workspace/newShipment?from=${encodeURIComponent(s.id)}`}
+      onClick={(e) => {
+        e.preventDefault();
+        history.pushState(null, "", `/workspace/newShipment?from=${encodeURIComponent(s.id)}`);
+        window.dispatchEvent(new PopStateEvent("popstate"));
+        window.scrollTo({ top: 0 });
+      }}
+    >
+      🔁 {t("repeatShipment")}
+    </a>
+  );
+}
 // "Documents" shortcut on a shipment card: opens that shipment's documents folder.
 function DocsLink({ s }) {
   const { data, user, t, openDocuments } = useWorkspace();
@@ -260,7 +385,10 @@ function ShipmentCard({ s, compact = false }) {
         <span className="tag">{t(s.category)}</span>
         {badge(s.status)}
       </div>
-      <DocsLink s={s} />
+      <span className="card-links">
+        <DocsLink s={s} />
+        <RepeatLink s={s} />
+      </span>
       <RejectControls s={s} />
       <h3>{s.title}</h3>
       {s.parentId && (
@@ -307,6 +435,7 @@ function ShipmentCard({ s, compact = false }) {
               {t("offers")} <span className="counter">{bids.length}</span>
             </h4>
             {!bids.length && <p className="muted small">{t("noOffers")}</p>}
+            {owner && bids.length > 1 && <OfferCompare bids={bids} s={s} />}
             {bids.map((b) => (
               <div className={`offer ${s.bidId === b.id ? "accepted-offer" : ""}`} key={b.id}>
                 <div>
@@ -332,6 +461,10 @@ function ShipmentCard({ s, compact = false }) {
                     {num(b.days)} {t("days")}
                     {b.note ? " · " + b.note : ""}
                   </small>
+                  <OfferBadges b={b} bids={bids} />
+                  {b.carrierId !== user.id && (
+                    <ReputationChips rep={data.reputation?.[b.carrierId]} t={t} kind="carrier" />
+                  )}
                 </div>
                 <strong>{money(b.price)}</strong>
                 {owner && s.status === "open" && (
@@ -359,6 +492,11 @@ function ShipmentCard({ s, compact = false }) {
                 )}
               </div>
             ))}
+            {canBid && s.status === "open" && !myBid && data.reputation?.[s.ownerId]?.payCount > 0 && (
+              <p className="small owner-pay">
+                {t("ownerRecord")}: <ReputationChips rep={data.reputation[s.ownerId]} t={t} kind="merchant" />
+              </p>
+            )}
             {canBid && s.status === "open" && !myBid && (
               <form
                 className="bid-form"
@@ -525,6 +663,8 @@ const icons = {
   notes: "✎",
   accountsReport: "▥",
   feedback: "☺",
+  prices: "＄",
+  returnTrips: "↩",
   feedbackAdmin: "✉",
   fleet: "▣",
   documents: "⇧",
@@ -825,6 +965,7 @@ function App() {
               </button>
             ))}
           </nav>
+          <InstallButton t={t} />
           <div className="sidebar-bottom">
             <span className="connection-dot" /> {t("corridor")}
             <div className="account">
@@ -1379,6 +1520,18 @@ function App() {
             {activeTab === "feedback" && (
               <FeedbackPage data={data} user={user} t={t} lang={lang} run={run} busy={busy} />
             )}
+            {activeTab === "prices" && <PriceIndexPage t={t} lang={lang} />}
+            {activeTab === "returnTrips" && (
+              <ReturnTrips
+                data={data}
+                user={user}
+                t={t}
+                lang={lang}
+                run={run}
+                busy={busy}
+                navigate={setTab}
+              />
+            )}
             {activeTab === "feedbackAdmin" && <FeedbackAdmin t={t} lang={lang} run={run} busy={busy} />}
             {["admin", "companies"].includes(activeTab) && (
               <AdminPanel
@@ -1391,7 +1544,14 @@ function App() {
               />
             )}
             {activeTab === "newShipment" && merchant && (
-              <ShipmentEntry t={t} run={run} busy={busy} onCreated={() => setTab("documents")} />
+              <ShipmentEntry
+                t={t}
+                run={run}
+                busy={busy}
+                data={data}
+                user={user}
+                onCreated={() => setTab("documents")}
+              />
             )}
             {activeTab === "documents" && (
               <DocumentCenter
@@ -1729,3 +1889,9 @@ function Chat({ data, t, user, run, busy, name, lang }) {
   );
 }
 createRoot(document.getElementById("root")).render(<App />);
+
+// Installable site: register the service worker (not on the driver app, which has its own page).
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost"))
+  window.addEventListener("load", () => {
+    navigator.serviceWorker?.register("/sw.js").catch(() => {});
+  });

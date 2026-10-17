@@ -17,6 +17,7 @@ export function acceptBid(state, shipmentId, bidId, ownerId) {
   shipment.status = "assigned";
   shipment.carrierId = bid.carrierId;
   shipment.bidId = bid.id;
+  shipment.acceptedAt = new Date().toISOString();
   state.escrows.push({
     id: `escrow-${shipment.id}`,
     shipmentId,
@@ -84,9 +85,10 @@ export function transitionShipment(state, shipment, action, actor) {
   ) {
     escrow.status = "direct_paid";
     escrow.paidAt = new Date().toISOString();
-  } else if (action === "fund" && actor.id === shipment.ownerId && escrow?.status === "awaiting_funding")
+  } else if (action === "fund" && actor.id === shipment.ownerId && escrow?.status === "awaiting_funding") {
     escrow.status = "held";
-  else if (
+    escrow.fundedAt = new Date().toISOString();
+  } else if (
     action === "dispatch" &&
     actor.id === shipment.carrierId &&
     shipment.status === "assigned" &&

@@ -94,6 +94,78 @@ const feedbackAdminStep = S(
   ],
 );
 
+const prices = S(
+  "prices",
+  ["مؤشر الأسعار", "Price index", "Fiyat endeksi"],
+  [
+    "أسعار حقيقية من العروض المقبولة لكل طريق: الوسيط والمجال المعتاد وسعر الطن والمدة والتغير الشهري. استعمله لتعرف إذا العرض منيح أو لتسعّر عرضك.",
+    "Real prices from accepted offers on each route: median, usual range, price per ton, duration and monthly change. Use it to judge an offer or to price your own.",
+    "Her güzergâh için kabul edilen tekliflerden gerçek fiyatlar: medyan, olağan aralık, ton fiyatı, süre ve aylık değişim. Bir teklifi değerlendirmek veya kendinizinkini fiyatlamak için kullanın.",
+  ],
+);
+const returnTripsTrader = S(
+  "returnTrips",
+  ["رحلات العودة الأرخص", "Cheaper return trips", "Daha ucuz dönüş seferleri"],
+  [
+    "شاحنات راجعة فاضية بأسعار أقل. اطلب الرحلة أو راسل الناقل، ويصلك إشعار إذا ظهرت رحلة على طريق شحنتك.",
+    "Trucks going back empty at lower prices. Ask for a trip or message the carrier; you are notified when one appears on your shipment's route.",
+    "Boş dönen araçlar daha düşük fiyatla. Seferi isteyin veya taşıyıcıya yazın; sevkiyatınızın güzergâhında sefer çıkınca bildirim alırsınız.",
+  ],
+);
+const returnTripsCarrier = S(
+  "returnTrips",
+  ["اعرض رحلة العودة", "Offer your return trip", "Dönüş seferinizi sunun"],
+  [
+    "راجع فاضي؟ انشر رحلة العودة بسعر الشاحنة كاملة. التجار على نفس الطريق يصلهم إشعار، وتقبل أو ترفض طلباتهم من نفس الصفحة.",
+    "Going back empty? Post the return trip with a whole-truck price. Traders on the route are notified and you accept or decline their requests on the same page.",
+    "Boş mu dönüyorsunuz? Dönüş seferini tüm araç fiyatıyla yayınlayın. Güzergâhtaki tüccarlar bilgilendirilir; isteklerini aynı sayfadan kabul veya reddedersiniz.",
+  ],
+);
+const commercial = S(
+  "documents",
+  [
+    "الفاتورة وقائمة التعبئة بضغطة",
+    "Invoice and packing list in one go",
+    "Tek seferde fatura ve çeki listesi",
+  ],
+  [
+    "في ملف الشحنة اكتب الأصناف مرة واحدة، فتُنشأ فاتورة تجارية وقائمة تعبئة متطابقتان، ونفحص الوزن ورمز HS قبل الحفظ. افتحهما للطباعة أو PDF، وقّع واختم وارفع.",
+    "In the shipment folder enter the items once to get a matching commercial invoice and packing list, checked for weight and HS code before saving. Open them to print or save as PDF, sign, stamp and upload.",
+    "Sevkiyat klasöründe ürünleri bir kez girin; uyumlu ticari fatura ve çeki listesi oluşur, kaydetmeden önce ağırlık ve HS kodu kontrol edilir. Yazdırmak veya PDF için açın, imzalayıp kaşeleyin ve yükleyin.",
+  ],
+);
+const repeat = S(
+  "shipments",
+  [
+    "كرّر الشحنة واقتراحات العناوين",
+    "Repeat a shipment, address suggestions",
+    "Sevkiyatı tekrarla, adres önerileri",
+  ],
+  [
+    "زر «🔁 كرّر الشحنة» على بطاقة أي شحنة يفتح طلبًا جديدًا معبّأ بنفس البيانات. المدن والأسماء والعناوين السابقة تظهر كاقتراحات أثناء الكتابة.",
+    "The '🔁 Repeat shipment' button on any shipment card opens a new request filled with the same details. Earlier cities, names and addresses appear as suggestions while you type.",
+    "Herhangi bir sevkiyat kartındaki '🔁 Sevkiyatı tekrarla' düğmesi aynı bilgilerle doldurulmuş yeni bir talep açar. Önceki şehirler, adlar ve adresler yazarken öneri olarak görünür.",
+  ],
+);
+const compare = S(
+  "shipments",
+  ["قارن العروض", "Compare offers", "Teklifleri karşılaştırın"],
+  [
+    "عند وصول أكثر من عرض اضغط «قارن العروض بجدول»: السعر والمدة والتقييم ونسبة الالتزام بالمواعيد المحسوبة من وصول الشاحنات الفعلي، مع علامات الأرخص والأسرع والأكثر التزامًا.",
+    "With more than one offer, press 'Compare offers in a table': price, days, rating and the on-time share measured from real truck arrivals, with cheapest, fastest and most punctual badges.",
+    "Birden fazla teklif varsa 'Teklifleri tabloda karşılaştır'a basın: fiyat, süre, puan ve gerçek varışlardan ölçülen zamanında teslim oranı; en ucuz, en hızlı ve en dakik işaretleriyle.",
+  ],
+);
+const install = S(
+  "dashboard",
+  ["ثبّت المنصة على موبايلك", "Install the platform on your phone", "Platformu telefonunuza kurun"],
+  [
+    "من زر «📲 ثبّت التطبيق» في القائمة الجانبية (أو «إضافة للشاشة الرئيسية» من المتصفح) تصير المنصة أيقونة على الشاشة وتفتح كتطبيق.",
+    "With the '📲 Install the app' button in the side menu (or 'Add to home screen' in the browser) the platform becomes an icon on your screen and opens like an app.",
+    "Yan menüdeki '📲 Uygulamayı kurun' düğmesiyle (veya tarayıcıdan 'Ana ekrana ekle') platform ekranınızda bir simge olur ve uygulama gibi açılır.",
+  ],
+);
+
 export const guide = {
   merchant: [
     profile,
@@ -146,6 +218,12 @@ export const guide = {
     border,
     documents,
     docsPrivacy,
+    compare,
+    repeat,
+    commercial,
+    returnTripsTrader,
+    prices,
+    install,
     hub,
     feedback,
   ],
@@ -217,6 +295,9 @@ export const guide = {
     ),
     documents,
     docsPrivacy,
+    returnTripsCarrier,
+    prices,
+    install,
     hub,
     feedback,
   ],
@@ -264,6 +345,8 @@ export const guide = {
     ),
     documents,
     docsPrivacy,
+    prices,
+    install,
     hub,
     feedback,
   ],
@@ -299,6 +382,7 @@ export const guide = {
     ),
     documents,
     docsPrivacy,
+    install,
     hub,
     feedback,
   ],
@@ -343,6 +427,11 @@ export const guide = {
     ),
     documents,
     docsPrivacy,
+    compare,
+    repeat,
+    returnTripsTrader,
+    prices,
+    install,
     hub,
     feedback,
   ],
@@ -376,6 +465,7 @@ export const guide = {
     ),
     adminDocs,
     feedbackAdminStep,
+    prices,
     S(
       "admin",
       ["إعدادات الموقع", "Site settings", "Site ayarları"],

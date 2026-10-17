@@ -44,6 +44,10 @@ import { whatsappConfigured, flushWhatsApp } from "./whatsapp.js";
 import { subscriptionOf, pricingOf } from "../shared/subscription.js";
 import { publicStats } from "./stats.js";
 import { noteRoutes } from "./notes.js";
+import { reputationMap } from "./insights.js";
+import { priceIndexRoutes } from "./priceIndex.js";
+import { returnTripRoutes, visibleTrips } from "./returnTrips.js";
+import { commercialRoutes } from "./commercial.js";
 import { checkGoods, prohibitedRules } from "../shared/prohibited.js";
 import { feedbackRoutes } from "./feedback.js";
 import { documentRoutes, documentVisible, requestVisible } from "./documents.js";
@@ -191,6 +195,8 @@ export async function createApp() {
       redis: !!redis,
     }),
   );
+  // Route price index and quick estimate from real deals (public, registered accounts only).
+  priceIndexRoutes(app, { publicOnly: true });
   // Border and customs notices posted by the administration (public, like the rules page).
   app.get("/api/border", (req, res) => {
     const s = readState();
@@ -442,6 +448,7 @@ export async function createApp() {
         fleets: [],
         shipmentDocuments: [],
         documentRequests: [],
+        returnTrips: [],
         trackingEvents: [],
         driverLinks: [],
         equipmentBookings: [],
@@ -482,6 +489,7 @@ export async function createApp() {
       adminNotes: _adminNotes, // private administrator notes: only via /api/admin/notes
       documentRequests: _documentRequests, // filtered per account below
       feedback: _feedback, // only through /api/feedback and /api/admin/feedback
+      returnTrips: _returnTrips, // filtered per account below
       ...shared
     } = s;
     res.json({
@@ -497,9 +505,13 @@ export async function createApp() {
       ...advancedState(s, req.user),
       ...paymentState(s, req.user),
       fleets: (s.fleets || []).filter((f) => f.userId === req.user.id),
-      shipments: visibleShipments(s, req.user).map((sh) => {
+      shipments: visibleShipments(s, req.user).map((full) => {
+        // Invoice and packing list live on the order; stages only say whether they exist.
+        const root = full.parentId ? fullState.shipments.find((x) => x.id === full.parentId) : full;
+        const sh = { ...full, hasCommercialDocs: !!root?.commercialDocs };
         const {
           privateDetails,
+          commercialDocs,
           lastPosition,
           track,
           publicToken,
@@ -511,11 +523,14 @@ export async function createApp() {
         // The delivery code and the receiver's link belong to the owner only.
         if (admin || sh.ownerId === req.user.id) return sh;
         if (sh.carrierId === req.user.id) {
-          const { publicToken: _p, deliveryCode: _d, ...carrierView } = sh;
+          const { publicToken: _p, deliveryCode: _d, commercialDocs: _c, ...carrierView } = sh;
           return carrierView;
         }
         return publicShipment;
       }),
+      // Measured reputation (on-time share, payment speed, stars) for offers and shipment cards.
+      reputation: reputationMap(fullState, req.user),
+      returnTrips: visibleTrips(fullState, req.user),
       documentRequests: (fullState.documentRequests || []).filter((r) =>
         requestVisible(fullState, req.user, r),
       ),
@@ -578,6 +593,9 @@ export async function createApp() {
   operationRoutes(app);
   noteRoutes(app);
   accountsReportRoutes(app);
+  priceIndexRoutes(app);
+  returnTripRoutes(app);
+  commercialRoutes(app);
   trackingRoutes(app);
   paymentRoutes(app);
   advancedRoutes(app);

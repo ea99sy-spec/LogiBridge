@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import CountrySelect from "./CountrySelect";
 import { crossings, crossingKeys } from "../shared/crossings";
-export default function ShipmentRoute({ t }) {
-  const [type, setType] = useState("crossBorder"),
-    [direction, setDirection] = useState("TR-SY");
+export default function ShipmentRoute({ t, initial }) {
+  const [type, setType] = useState(initial?.transportType || "crossBorder"),
+    [direction, setDirection] = useState(
+      initial?.transportType === "crossBorder" && initial.originCountry === "SY" ? "SY-TR" : "TR-SY",
+    );
   const countries =
     type === "domesticTR" ? ["TR", "TR"] : type === "domesticSY" ? ["SY", "SY"] : direction.split("-");
   return (
@@ -43,7 +45,7 @@ export default function ShipmentRoute({ t }) {
       {type === "crossBorder" && (
         <label className="field">
           <span>{t("crossing")}</span>
-          <select name="crossing" required>
+          <select name="crossing" required defaultValue={initial?.crossing || undefined}>
             {crossingKeys.map((k) => (
               <option key={k} value={k}>
                 {t(k)}

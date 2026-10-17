@@ -1,0 +1,17 @@
+{
+  "name": "LogiBridge — جسور تعبر الحدود",
+  "short_name": "LogiBridge",
+  "description": "منصة تربط التجار بشركات النقل والمخلّصين الجمركيين بين تركيا وسوريا والعالم.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/workspace/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#102a56",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

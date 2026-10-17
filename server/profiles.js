@@ -1,3 +1,4 @@
+import { reputationOf } from "./insights.js";
 import { notice } from "./advanced.js";
 import { waNumber } from "../shared/wa.js";
 import { readState, mutate } from "./store.js";
@@ -54,22 +55,13 @@ export function profileRoutes(app) {
   app.get("/api/directory", (req, res) => {
     const s = readState();
     // Reputation shown on each card: average stars, number of reviews and closed operations.
-    const reputation = (id) => {
-      const scores = s.ratings.filter((r) => r.targetId === id).map((r) => r.score);
-      return {
-        rating: scores.length
-          ? Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10
-          : null,
-        reviews: scores.length,
-        completed: s.shipments.filter(
-          (sh) => sh.status === "delivered" && (sh.ownerId === id || sh.carrierId === id),
-        ).length,
-        recent: s.ratings
-          .filter((r) => r.targetId === id && r.comment)
-          .slice(-2)
-          .map((r) => ({ score: r.score, comment: r.comment.slice(0, 200) })),
-      };
-    };
+    const reputation = (id) => ({
+      ...reputationOf(s, id),
+      recent: s.ratings
+        .filter((r) => r.targetId === id && r.comment)
+        .slice(-2)
+        .map((r) => ({ score: r.score, comment: r.comment.slice(0, 200) })),
+    });
     res.json(
       s.users
         .filter(
@@ -155,6 +147,9 @@ export function profileRoutes(app) {
       completed: s.shipments.filter(
         (sh) => sh.status === "delivered" && (sh.ownerId === u.id || sh.carrierId === u.id),
       ).length,
+      ...(({ onTimePct, onTimeCount, payDays, payCount }) => ({ onTimePct, onTimeCount, payDays, payCount }))(
+        reputationOf(s, u.id),
+      ),
       products: u.accountType === "supplier" ? s.products.filter((p) => p.supplierId === u.id) : [],
       groups:
         u.accountType === "carrier"
