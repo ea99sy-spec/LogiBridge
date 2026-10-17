@@ -1951,4 +1951,36 @@ export const extraRows = {
     "The tax number has 10 digits (11 for a sole proprietorship).",
     "Vergi numarası 10 hanelidir (şahıs şirketi için 11).",
   ],
+  termsUpdatedTitle: [
+    "حدّثنا الشروط وسياسة الخصوصية",
+    "We updated our terms and privacy policy",
+    "Koşullarımızı ve gizlilik politikamızı güncelledik",
+  ],
+  termsUpdatedText: [
+    "قبل المتابعة، يُرجى قراءة النسخة الجديدة من الشروط والأحكام وسياسة الخصوصية والموافقة عليها. تبقى بياناتك وطلباتك كما هي.",
+    "Before you continue, please read and accept the new version of the terms of use and privacy policy. Your data and orders stay as they are.",
+    "Devam etmeden önce lütfen kullanım koşullarının ve gizlilik politikasının yeni sürümünü okuyup kabul edin. Verileriniz ve siparişleriniz olduğu gibi kalır.",
+  ],
+  termsUpdatedAgree: [
+    "قرأت الشروط والأحكام وسياسة الخصوصية المحدّثة وأوافق عليها.",
+    "I have read and accept the updated terms of use and privacy policy.",
+    "Güncellenmiş kullanım koşullarını ve gizlilik politikasını okudum ve kabul ediyorum.",
+  ],
+  acceptAndContinue: ["موافق ومتابعة", "Accept and continue", "Kabul et ve devam et"],
+  termsAccepted: [
+    "شكرًا، تم حفظ موافقتك.",
+    "Thank you, your acceptance is saved.",
+    "Teşekkürler, onayınız kaydedildi.",
+  ],
+  termsAcceptedOn: ["الموافقة على الشروط", "Terms accepted on", "Koşulların kabul tarihi"],
+  termsOldVersion: [
+    "نسخة قديمة، بانتظار الموافقة على الجديدة",
+    "older version, new one pending",
+    "eski sürüm, yenisi bekleniyor",
+  ],
+  "err_Accept the updated terms": [
+    "يُرجى الموافقة على الشروط المحدّثة أولًا.",
+    "Please accept the updated terms first.",
+    "Lütfen önce güncellenmiş koşulları kabul edin.",
+  ],
 };

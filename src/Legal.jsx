@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { TERMS_VERSION } from "../shared/legal";
 
 // Legal details of the company running the platform, set by the administrator.
 export function useCompany() {
@@ -54,7 +55,7 @@ export function CompanyInfo({ company, t, compact = false }) {
 
 // Terms of use and privacy policy in the three interface languages.
 // Last updated date is shown on the page; update it whenever the text changes.
-const UPDATED = "2026-10-14";
+const UPDATED = TERMS_VERSION;
 
 const content = {
   terms: {
@@ -187,6 +188,10 @@ const content = {
       title: "سياسة الخصوصية",
       sections: [
         [
+          "المسؤول عن البيانات",
+          "الشركة المشغّلة للمنصة والمذكورة في قسم «مقدّم الخدمة» أسفل هذه الصفحة هي المسؤولة عن بياناتك (veri sorumlusu). نحتفظ أيضًا بتاريخ ونسخة موافقتك على الشروط وسياسة الخصوصية، ونطلب موافقتك من جديد عند كل تحديث.",
+        ],
+        [
           "البيانات التي نجمعها",
           "الاسم أو اسم الشركة، البريد الإلكتروني، الهاتف، البلد والمدينة، الرقم الضريبي، بيانات النشاط (البضائع، رخصة النقل، الأسطول، المعدات)، وثائق التوثيق (السجل التجاري أو صفحة الجواز)، بيانات الشحنات والعروض والمدفوعات والرسائل، ومواقع التتبع التي يشاركها الناقل أو السائق (من الموقع أو تطبيق السائق)، وصور مراحل الشحنة، واسم المستلم وتوقيعه عند التسليم، وتقارير الزحمة على المعابر.",
         ],
@@ -204,7 +209,7 @@ const content = {
         ],
         [
           "مزوّدو الخدمة",
-          "تُستضاف المنصة وبياناتها لدى Netlify، وتُرسل الرسائل الإلكترونية عبر Resend، ورسائل واتساب عبر Meta إذا فعّلتها، وتُحمَّل الخرائط من OpenStreetMap، ويُنشر تطبيق السائق عبر GitHub. لا نبيع بياناتك ولا نشاركها لأغراض تسويقية.",
+          "تُستضاف المنصة وبياناتها لدى Netlify، وتُرسل الرسائل الإلكترونية عبر Resend، ورسائل واتساب عبر Meta إذا فعّلتها، وتُحمَّل الخرائط من OpenStreetMap، ويُنشر تطبيق السائق عبر GitHub. قد تُحفظ بياناتك وتُعالج على خوادم هؤلاء المزوّدين خارج تركيا. لا نبيع بياناتك ولا نشاركها لأغراض تسويقية.",
         ],
         [
           "مدة الاحتفاظ",
@@ -224,6 +229,10 @@ const content = {
       title: "Privacy Policy",
       sections: [
         [
+          "Data controller",
+          "The company running the platform, named in the “Service provider” section at the bottom of this page, is responsible for your data (data controller). We also keep the date and version of your acceptance of the terms and privacy policy, and ask you to accept again after every update.",
+        ],
+        [
           "Data we collect",
           "Name or company name, email, phone, country and city, tax number, business details (goods, transport licence, fleet, equipment), verification documents (trade registry or passport page), shipment, offer, payment and message data, tracking locations shared by a carrier or driver (on the site or in the driver app), photos of shipment stages, the receiver's name and signature at delivery, and crossing queue reports.",
         ],
@@ -241,7 +250,7 @@ const content = {
         ],
         [
           "Service providers",
-          "The platform and its data are hosted on Netlify; emails are sent through Resend, WhatsApp messages through Meta if you turn them on, maps load from OpenStreetMap, and the driver app is published on GitHub. We do not sell your data or share it for marketing.",
+          "The platform and its data are hosted on Netlify; emails are sent through Resend, WhatsApp messages through Meta if you turn them on, maps load from OpenStreetMap, and the driver app is published on GitHub. Your data may be stored and processed on these providers' servers outside Türkiye. We do not sell your data or share it for marketing.",
         ],
         [
           "Retention",
@@ -261,6 +270,10 @@ const content = {
       title: "Gizlilik Politikası",
       sections: [
         [
+          "Veri sorumlusu",
+          "Bu sayfanın altındaki «Hizmet sağlayıcı» bölümünde belirtilen ve platformu işleten şirket, verilerinizin veri sorumlusudur. Koşulları ve gizlilik politikasını kabul ettiğiniz tarih ile sürümü de saklarız ve her güncellemeden sonra onayınızı yeniden isteriz.",
+        ],
+        [
           "Topladığımız veriler",
           "Ad veya şirket adı, e-posta, telefon, ülke ve şehir, vergi numarası, faaliyet bilgileri (ürünler, taşıma yetki belgesi, filo, ekipman), doğrulama belgeleri (ticaret sicili veya pasaport sayfası), sevkiyat, teklif, ödeme ve mesaj verileri ile taşıyıcı veya sürücünün (sitede veya sürücü uygulamasında) paylaştığı takip konumları, sevkiyat aşaması fotoğrafları, teslimde alıcının adı ve imzası ve kapı kuyruk raporları.",
         ],
@@ -278,7 +291,7 @@ const content = {
         ],
         [
           "Hizmet sağlayıcılar",
-          "Platform ve verileri Netlify'da barındırılır; e-postalar Resend, açarsanız WhatsApp mesajları Meta üzerinden gönderilir, haritalar OpenStreetMap'ten yüklenir ve sürücü uygulaması GitHub'da yayımlanır. Verilerinizi satmayız ve pazarlama amacıyla paylaşmayız.",
+          "Platform ve verileri Netlify'da barındırılır; e-postalar Resend, açarsanız WhatsApp mesajları Meta üzerinden gönderilir, haritalar OpenStreetMap'ten yüklenir ve sürücü uygulaması GitHub'da yayımlanır. Verileriniz bu sağlayıcıların Türkiye dışındaki sunucularında saklanabilir ve işlenebilir. Verilerinizi satmayız ve pazarlama amacıyla paylaşmayız.",
         ],
         [
           "Saklama süresi",
@@ -340,5 +353,50 @@ export function LegalLinks({ t }) {
       <a href="/border">{t("borderRulesTitle")}</a> · <a href="/terms">{t("termsOfUse")}</a> ·{" "}
       <a href="/privacy">{t("privacyPolicy")}</a>
     </span>
+  );
+}
+
+// Shown once after the terms or privacy policy change: the account reads and accepts the new
+// version before starting new business on the platform.
+export function TermsUpdateDialog({ t, run, busy }) {
+  const [agree, setAgree] = useState(false);
+  return (
+    <div className="terms-dialog-backdrop">
+      <section
+        className="terms-dialog panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="terms-dialog-title"
+      >
+        <h2 id="terms-dialog-title">{t("termsUpdatedTitle")}</h2>
+        <p>{t("termsUpdatedText")}</p>
+        <p className="terms-dialog-links">
+          <a href="/terms" target="_blank" rel="noopener">
+            {t("termsOfUse")} ↗
+          </a>
+          <a href="/privacy" target="_blank" rel="noopener">
+            {t("privacyPolicy")} ↗
+          </a>
+        </p>
+        <label className="consent">
+          <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
+          <span>{t("termsUpdatedAgree")}</span>
+        </label>
+        <div className="actions">
+          <button
+            className="button"
+            disabled={!agree || busy}
+            onClick={() =>
+              run("/account/accept-terms", { accept: true }, "POST", { success: "termsAccepted" })
+            }
+          >
+            {t("acceptAndContinue")}
+          </button>
+          <button className="button ghost" disabled={busy} onClick={() => run("/logout", {})}>
+            {t("logout")}
+          </button>
+        </div>
+      </section>
+    </div>
   );
 }

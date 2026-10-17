@@ -44,6 +44,7 @@ import { whatsappConfigured, flushWhatsApp } from "./whatsapp.js";
 import { subscriptionOf, pricingOf } from "../shared/subscription.js";
 import { publicStats } from "./stats.js";
 import { noteRoutes } from "./notes.js";
+import { TERMS_VERSION, termsOutdated } from "../shared/legal.js";
 import { trackingRoutes, publicTrackingRoutes, newDeliveryCode, runTrackingWatch } from "./tracking.js";
 import { profileRoutes, announceCompany } from "./profiles.js";
 import {
@@ -246,6 +247,7 @@ export async function createApp() {
       demo: false,
       createdAt: new Date().toISOString(),
       termsAcceptedAt: new Date().toISOString(),
+      termsVersion: TERMS_VERSION,
     };
     await mutate((s) => {
       if (s.users.some((u) => u.email === email)) throw new Error("Email already registered");
@@ -348,6 +350,7 @@ export async function createApp() {
         "/kyb",
         "/profile",
         "/account/password",
+        "/account/accept-terms",
         "/fx",
         "/notifications/read",
         "/account/2fa/setup",
@@ -364,6 +367,7 @@ export async function createApp() {
         "/fx",
         "/account/resend-verification",
         "/account/password",
+        "/account/accept-terms",
         "/notifications/read",
       ].includes(req.path)
     )
@@ -376,6 +380,8 @@ export async function createApp() {
         req.path,
       )
     ) {
+      // New business needs the current terms accepted (asked once after every legal update).
+      if (termsOutdated(req.user)) return res.status(428).json({ error: "Accept the updated terms" });
       const s = readState();
       if (s.settings?.enforceSubscription && subscriptionOf(s, req.user).status === "expired")
         return res.status(402).json({ error: "Subscription expired" });

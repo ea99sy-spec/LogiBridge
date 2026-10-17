@@ -15,7 +15,7 @@ import "./style.css";
 import "./access.css";
 import "./landing.css";
 import AccountAccess, { ResetPassword, VerifyEmail } from "./AccountAccess";
-import Legal, { LegalLinks } from "./Legal";
+import Legal, { LegalLinks, TermsUpdateDialog } from "./Legal";
 import Landing from "./Landing";
 import { QuickActions, ShipmentEntry, DocumentCenter, TrackingPanel, AdminPanel } from "./Operations";
 import "./operations.css";
@@ -824,6 +824,7 @@ function App() {
           )}
           {user.disabled && <p className="notice">{t("err_Account disabled")}</p>}
           <SubscriptionBanner sub={data.subscription} t={t} onOpen={() => setTab("dashboard")} />
+          {user.termsOutdated && <TermsUpdateDialog t={t} run={run} busy={busy} />}
           {!user.demo && user.emailVerified === false && (
             <div className={`notice email-verify ${data.emailVerificationRequired ? "blocking" : ""}`}>
               <span>{t(data.emailVerificationRequired ? "emailVerifyRequired" : "emailVerifyPending")}</span>

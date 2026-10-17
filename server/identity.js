@@ -1,3 +1,4 @@
+import { termsOutdated } from "../shared/legal.js";
 import { scrypt, randomBytes, timingSafeEqual, createCipheriv, createDecipheriv } from "node:crypto";
 import { promisify } from "node:util";
 import { readFile, writeFile } from "node:fs/promises";
@@ -72,6 +73,9 @@ export function publicUser(user, own = false) {
           twoFactor: !!user.totp,
           emailVerified: user.emailVerified !== false,
           backupCodesLeft: user.totp?.backup?.length ?? 0,
+          termsAcceptedAt: user.termsAcceptedAt || null,
+          termsVersion: user.termsVersion || null,
+          termsOutdated: termsOutdated(user),
         }
       : {}),
   };

@@ -831,3 +831,28 @@ a:focus-visible {
     margin-bottom: 8px;
   }
 }
+.terms-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(16, 42, 86, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+.terms-dialog {
+  max-width: 520px;
+  width: 100%;
+  border-top: 4px solid #facc15;
+  display: grid;
+  gap: 12px;
+}
+.terms-dialog h2 {
+  margin: 0;
+}
+.terms-dialog-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-weight: 700;
+}

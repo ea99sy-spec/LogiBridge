@@ -790,6 +790,13 @@ export function AccountDetails({ account, t }) {
     ["warehouseLocation", d.warehouse],
     ["brokerCrossings", d.crossings?.map((c) => t(c)).join("، ")],
     ["taxId", account.taxId],
+    [
+      "termsAcceptedOn",
+      account.termsAcceptedAt &&
+        `${new Date(account.termsAcceptedAt).toLocaleDateString(document.documentElement.lang)}${
+          account.termsOutdated ? ` · ${t("termsOldVersion")}` : ""
+        }`,
+    ],
   ].filter(([, v]) => v !== undefined && v !== null && v !== "");
   if (!rows.length && !tc) return null;
   return (

@@ -11,6 +11,7 @@ import { readPosition } from "./position.js";
 import { recordPosition } from "./tracking.js";
 import { readState, mutate, id } from "./store.js";
 import { requiresApproval } from "../shared/access.js";
+import { TERMS_VERSION } from "../shared/legal.js";
 import { subscriptionOf, addMonths, pricingOf } from "../shared/subscription.js";
 const text = (value, max = 300) => {
   if (typeof value !== "string" || !value.trim() || value.length > max) throw new Error("Invalid text");
@@ -77,6 +78,17 @@ export function operationRoutes(app) {
         .filter((sh) => [sh.ownerId, sh.carrierId].includes(account.id))
         .map(({ privateDetails, ...sh }) => sh),
     });
+  });
+  // Accept the current version of the terms of use and privacy policy.
+  app.post("/api/account/accept-terms", async (req, res) => {
+    if (req.body?.accept !== true) throw new Error("Accept the terms to continue");
+    await mutate((s) => {
+      const u = s.users.find((x) => x.id === req.user.id);
+      if (!u) throw new Error("Account unavailable");
+      u.termsAcceptedAt = new Date().toISOString();
+      u.termsVersion = TERMS_VERSION;
+    });
+    res.json({ ok: true });
   });
   const realAdmin = (req, res) => {
     if (req.user.role === "admin" && !req.user.demo) return true;
