@@ -196,6 +196,7 @@ export function seoRoutes(app) {
       ...publicCompanies(readState()).map((u) => ["/c/" + companySlug(u), "weekly", "0.5"]),
       ["/terms", "yearly", "0.2"],
       ["/privacy", "yearly", "0.2"],
+      ["/sales-terms", "yearly", "0.2"],
     ];
     res
       .type("application/xml")

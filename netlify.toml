@@ -12,6 +12,8 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
   external_node_modules = ["express", "exceljs", "pg", "redis", "@netlify/blobs", "qrcode"]
+  # Arabic font for document watermarks (read from disk at run time).
+  included_files = ["server/fonts/**"]
 
 # Emails, WhatsApp and late-truck checks. Every 10 minutes instead of every minute:
 # the minute schedule alone used a large share of the monthly compute credits.

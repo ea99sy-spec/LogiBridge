@@ -1,3 +1,4 @@
+import { UnansweredRequests, ErrorLog } from "./AdminTools";
 import { FormHolidayWarning } from "./Holidays";
 import { SubscriptionAdminCell } from "./Subscription";
 import {
@@ -796,6 +797,8 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
       )}
       {!accountsOnly && (
         <>
+          <UnansweredRequests t={t} lang={document.documentElement.lang} />
+          <ErrorLog t={t} lang={document.documentElement.lang} demo={data.user.demo} />
           <AdminSiteSettings data={data} t={t} run={run} busy={busy} />
           <AdminEmailSettings data={data} t={t} run={run} busy={busy} />
           <AdminPayments data={data} t={t} run={run} busy={busy} />

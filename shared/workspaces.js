@@ -22,6 +22,7 @@ const modules = {
     "integrations",
     "returnTrips",
     "prices",
+    "support",
     "feedback",
     "team",
     "security",
@@ -46,6 +47,7 @@ const modules = {
     "border",
     "returnTrips",
     "prices",
+    "support",
     "feedback",
     "security",
   ],
@@ -69,6 +71,7 @@ const modules = {
     "reports",
     "returnTrips",
     "prices",
+    "support",
     "feedback",
     "team",
     "security",
@@ -87,6 +90,7 @@ const modules = {
     "ratings",
     "contracts",
     "prices",
+    "support",
     "feedback",
     "team",
     "security",
@@ -103,6 +107,7 @@ const modules = {
     "hub",
     "kyb",
     "prices",
+    "support",
     "feedback",
     "team",
     "security",
@@ -131,7 +136,8 @@ export function accountKind(user) {
   return user.role === "admin" ? "admin" : user.accountType === "individual" ? "individual" : user.role;
 }
 export function workspaceModules(user, flags = {}) {
-  if (requiresApproval(user)) return ["dashboard", "guide", "profile", "kyb", "feedback", "security"];
+  if (requiresApproval(user))
+    return ["dashboard", "guide", "profile", "kyb", "support", "feedback", "security"];
   return (
     (modules[accountKind(user)] || [])
       // Private admin notes are for registered administrators only, not the shared demo admin.

@@ -1,4 +1,5 @@
 import { crossingKeys } from "../shared/crossings.js";
+import { randomUUID } from "node:crypto";
 export const optionalFeatures = ["tracking", "ratings", "marketplace", "contracts"];
 export const crossingDocuments = Object.fromEntries(
   crossingKeys.map((k) => [k, ["invoice", "packing", "origin", "transport", "customs"]]),
@@ -108,6 +109,7 @@ export function transitionShipment(state, shipment, action, actor) {
     shipment.status = "delivered";
     shipment.completedAt = new Date().toISOString();
     applyDelayGuarantee(state, shipment);
+    askForRating(state, shipment);
     if (escrow.status === "held") escrow.status = escrow.simulated === false ? "payout_pending" : "released";
   } else if (
     action === "dispute" &&
@@ -181,8 +183,25 @@ export function closeDelivered(state, shipment, reason) {
   shipment.closedBy = reason;
   delete shipment.autoCloseAt;
   applyDelayGuarantee(state, shipment);
+  askForRating(state, shipment);
   if (escrow.status === "held") escrow.status = escrow.simulated === false ? "payout_pending" : "released";
   return true;
+}
+
+// After an operation closes, both sides are asked to rate each other (one tap from the notice).
+export function askForRating(state, shipment) {
+  if (!state.flags?.ratings || !shipment.carrierId) return;
+  for (const userId of [shipment.ownerId, shipment.carrierId])
+    if (!(state.ratings || []).some((r) => r.shipmentId === shipment.id && r.userId === userId))
+      (state.notifications ||= []).push({
+        id: randomUUID(),
+        userId,
+        event: "rate_prompt",
+        shipmentId: shipment.id,
+        createdAt: new Date().toISOString(),
+        status: "in_app",
+        read: false,
+      });
 }
 
 // Delay guarantee: when the accepted offer promised a discount per late day, the discount is

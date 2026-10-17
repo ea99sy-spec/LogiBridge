@@ -252,6 +252,10 @@ export function NotificationBell({ data, t, run, navigate }) {
                 key={n.id}
                 onClick={() => {
                   run("/notifications/read", { id: n.id }, "POST", { silent: true });
+                  if (n.event === "rate_prompt")
+                    try {
+                      localStorage.setItem("lb_rate", n.shipmentId);
+                    } catch {}
                   const carrier = data.user.role === "carrier";
                   navigate(
                     n.event === "border_notice"
@@ -260,49 +264,53 @@ export function NotificationBell({ data, t, run, navigate }) {
                         ? "documents"
                         : n.event === "shipment_rejected" || n.event === "shipment_rejected_provider"
                           ? "shipments"
-                          : n.event === "recurring_invite"
-                            ? "jobs"
-                            : n.event.startsWith("recurring_")
-                              ? "recurring"
-                              : n.event === "monthly_report"
-                                ? "dashboard"
-                                : n.event.startsWith("return_trip_")
-                                  ? "returnTrips"
-                                  : n.event === "prohibited_attempt"
-                                    ? "admin"
-                                    : n.event === "feedback_new"
-                                      ? "feedbackAdmin"
-                                      : n.event === "feedback_replied"
-                                        ? "feedback"
-                                        : n.event === "company_joined"
-                                          ? "directory"
-                                          : n.event.startsWith("verification_") ||
-                                              n.event === "account_registered"
-                                            ? "kyb"
-                                            : n.event === "matching_opportunity" ||
-                                                (carrier && n.event === "cancel")
-                                              ? "jobs"
-                                              : n.event === "equipment_booking"
-                                                ? "calendar"
-                                                : n.event === "message_received"
-                                                  ? "hub"
-                                                  : n.event === "order_received"
-                                                    ? "orders"
-                                                    : n.event === "group_reserved"
-                                                      ? "groups"
-                                                      : n.event.startsWith("payment_") &&
-                                                          data.user.role === "admin"
-                                                        ? "admin"
-                                                        : n.event.startsWith("settlement_") ||
-                                                            [
-                                                              "dispute_escalated",
-                                                              "bid_received",
-                                                              "bid_withdrawn",
-                                                              "cancel",
-                                                              "crossing_busy",
-                                                            ].includes(n.event)
-                                                          ? "shipments"
-                                                          : "tracking",
+                          : n.event === "rate_prompt"
+                            ? "ratings"
+                            : ["route_alert", "admin_nudge"].includes(n.event)
+                              ? "jobs"
+                              : n.event === "recurring_invite"
+                                ? "jobs"
+                                : n.event.startsWith("recurring_")
+                                  ? "recurring"
+                                  : n.event === "monthly_report"
+                                    ? "dashboard"
+                                    : n.event.startsWith("return_trip_")
+                                      ? "returnTrips"
+                                      : n.event === "prohibited_attempt"
+                                        ? "admin"
+                                        : n.event === "feedback_new"
+                                          ? "feedbackAdmin"
+                                          : n.event === "feedback_replied"
+                                            ? "feedback"
+                                            : n.event === "company_joined"
+                                              ? "directory"
+                                              : n.event.startsWith("verification_") ||
+                                                  n.event === "account_registered"
+                                                ? "kyb"
+                                                : n.event === "matching_opportunity" ||
+                                                    (carrier && n.event === "cancel")
+                                                  ? "jobs"
+                                                  : n.event === "equipment_booking"
+                                                    ? "calendar"
+                                                    : n.event === "message_received"
+                                                      ? "hub"
+                                                      : n.event === "order_received"
+                                                        ? "orders"
+                                                        : n.event === "group_reserved"
+                                                          ? "groups"
+                                                          : n.event.startsWith("payment_") &&
+                                                              data.user.role === "admin"
+                                                            ? "admin"
+                                                            : n.event.startsWith("settlement_") ||
+                                                                [
+                                                                  "dispute_escalated",
+                                                                  "bid_received",
+                                                                  "bid_withdrawn",
+                                                                  "cancel",
+                                                                  "crossing_busy",
+                                                                ].includes(n.event)
+                                                              ? "shipments"
+                                                              : "tracking",
                   );
                   setOpen(false);
                 }}

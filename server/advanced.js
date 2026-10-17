@@ -38,6 +38,8 @@ const whatsappEvents = {
   shipment_rejected: "رفضت الإدارة طلب الشحن",
   feedback_replied: "ردّت الإدارة على رسالتك",
   recurring_invite: "عميل متكرر نشر شحنة جديدة لك",
+  route_alert: "طلب شحن جديد على طريق محفوظ عندك",
+  admin_nudge: "طلب شحن على طريقك ما وصله عرض بعد",
   shared_truck_suggestion: "يمكنك مشاركة شاحنة مع شحنة أخرى على نفس الطريق",
   referral_reward: "حصلت على شهر مجاني لأن شركة دعوتها انضمت",
   driver_verified: "تم توثيق السائق",

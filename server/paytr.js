@@ -1,3 +1,4 @@
+import { SALES_TERMS_VERSION } from "../shared/legal.js";
 import express from "express";
 import { createHmac, randomBytes } from "node:crypto";
 import { readState, mutate } from "./store.js";
@@ -61,6 +62,8 @@ export function paytrRoutes(app) {
     if (!paytrConfigured()) throw new Error("Online payment is not available yet");
     const months = Number(req.body?.months);
     if (![1, 3, 6, 12].includes(months)) throw new Error("Invalid request");
+    // Distance sales: the buyer must accept the pre-information and the contract (/sales-terms).
+    if (req.body?.acceptSales !== true) throw new Error("Please accept the sales terms");
     const s = readState();
     const u = s.users.find((x) => x.id === req.user.id);
     if (!u || u.demo || u.role === "admin" || requiresApproval(u)) throw new Error("Account unavailable");
@@ -128,6 +131,8 @@ export function paytrRoutes(app) {
         amount,
         currency: "USD",
         status: "pending",
+        salesTermsAcceptedAt: new Date().toISOString(),
+        salesTermsVersion: SALES_TERMS_VERSION,
         createdAt: new Date().toISOString(),
       });
       if (s2.subscriptionOrders.length > 5000) s2.subscriptionOrders = s2.subscriptionOrders.slice(-5000);

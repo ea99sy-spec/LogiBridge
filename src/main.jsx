@@ -15,6 +15,8 @@ import { GrowthPage } from "./Growth";
 import { TeamPage, TeamInvite } from "./Team";
 import { RecurringPage } from "./Recurring";
 import { CompanyPublic, RoutesIndex, RoutePage } from "./PublicPages";
+import { RouteAlerts } from "./RouteAlerts";
+import { SupportPage, FloatingHelp } from "./Support";
 import { FormHolidayWarning } from "./Holidays";
 import { SubscriptionBanner } from "./Subscription";
 import { waLink } from "../shared/wa";
@@ -49,6 +51,31 @@ import {
   Integrations,
 } from "./Advanced";
 import { VerificationPanel, ReviewQueue } from "./Verification";
+
+// Browser errors go to the administration's error log (message and page only), at most a few per visit.
+if (typeof window !== "undefined" && !window.__lbErrors) {
+  window.__lbErrors = 0;
+  const report = (message, stack, file) => {
+    if (window.__lbErrors >= 5 || !message || /ResizeObserver loop/.test(message)) return;
+    // Errors from browser extensions or other sites are not ours.
+    if (file && !String(file).startsWith(window.location.origin)) return;
+    window.__lbErrors++;
+    fetch("/api/client-error", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: String(message).slice(0, 300),
+        path: window.location.pathname.slice(0, 200),
+        stack: String(stack || "").slice(0, 1200),
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  };
+  window.addEventListener("error", (e) => report(e.message, e.error?.stack, e.filename));
+  window.addEventListener("unhandledrejection", (e) =>
+    report(e.reason?.message || String(e.reason || ""), e.reason?.stack),
+  );
+}
 
 async function api(path, body, method = "POST") {
   let response;
@@ -746,6 +773,7 @@ const icons = {
   feedback: "☺",
   growth: "📈",
   team: "👥",
+  support: "🛟",
   recurring: "🔁",
   prices: "＄",
   returnTrips: "↩",
@@ -947,6 +975,8 @@ function App() {
   if (window.location.pathname === "/border") return <BorderPage t={t} lang={lang} langSelect={langSelect} />;
   if (/^\/t\/[a-f0-9]{40}$/.test(window.location.pathname))
     return <PublicTracking t={t} lang={lang} langSelect={langSelect} />;
+  if (window.location.pathname === "/sales-terms")
+    return <Legal page="sales" t={t} lang={lang} langSelect={langSelect} />;
   if (["/terms", "/privacy"].includes(window.location.pathname))
     return <Legal page={window.location.pathname.slice(1)} t={t} lang={lang} langSelect={langSelect} />;
   if (window.location.pathname === "/verify-email")
@@ -1221,7 +1251,10 @@ function App() {
               </>
             )}
             {activeTab === "jobs" && (carrier || user.role === "broker") && (
-              <CarrierJobs data={data} t={t} ShipmentCard={ShipmentCard} />
+              <>
+                <RouteAlerts data={data} user={user} t={t} lang={lang} run={run} busy={busy} />
+                <CarrierJobs data={data} t={t} ShipmentCard={ShipmentCard} />
+              </>
             )}
             {activeTab === "inventory" && user.role === "supplier" && (
               <SupplierInventory data={data} t={t} run={run} busy={busy} money={money} />
@@ -1482,7 +1515,17 @@ function App() {
                       <>
                         <label className="field">
                           <span>{t("selectShipment")}</span>
-                          <select name="shipmentId">
+                          <select
+                            name="shipmentId"
+                            defaultValue={(() => {
+                              try {
+                                const id = localStorage.getItem("lb_rate");
+                                return eligibleRatings.some((x) => x.id === id) ? id : undefined;
+                              } catch {
+                                return undefined;
+                              }
+                            })()}
+                          >
                             {eligibleRatings.map((s) => (
                               <option key={s.id} value={s.id}>
                                 {s.title}
@@ -1490,7 +1533,17 @@ function App() {
                             ))}
                           </select>
                         </label>
-                        <Field label="score" name="score" type="number" min="1" max="5" />
+                        <fieldset className="star-pick">
+                          <legend>{t("score")}</legend>
+                          {[5, 4, 3, 2, 1].map((n) => (
+                            <React.Fragment key={n}>
+                              <input type="radio" id={`star-${n}`} name="score" value={n} required />
+                              <label htmlFor={`star-${n}`} title={String(n)}>
+                                ★
+                              </label>
+                            </React.Fragment>
+                          ))}
+                        </fieldset>
                         <Field label="commentOptional" name="comment" maxLength="1000" optional />
                         <button disabled={busy} className="button">
                           {t("submit")}
@@ -1627,6 +1680,7 @@ function App() {
             {activeTab === "prices" && <PriceIndexPage t={t} lang={lang} />}
             {activeTab === "growth" && <GrowthPage t={t} lang={lang} />}
             {activeTab === "team" && <TeamPage t={t} lang={lang} run={run} busy={busy} />}
+            {activeTab === "support" && <SupportPage t={t} lang={lang} navigate={setTab} />}
             {activeTab === "recurring" && (
               <RecurringPage
                 data={data}
@@ -2005,7 +2059,12 @@ function Chat({ data, t, user, run, busy, name, lang }) {
     </div>
   );
 }
-createRoot(document.getElementById("root")).render(<App />);
+createRoot(document.getElementById("root")).render(
+  <>
+    <App />
+    <FloatingHelp />
+  </>,
+);
 
 // Installable site: register the service worker (not on the driver app, which has its own page).
 if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost"))

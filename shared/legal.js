@@ -5,3 +5,6 @@ export const TERMS_VERSION = "2026-10-17.2"; // .2: prohibited goods and documen
 
 export const termsOutdated = (user) =>
   !!user && user.role !== "admin" && !user.demo && user.termsVersion !== TERMS_VERSION;
+
+// Version of the distance sales / refund terms accepted with each online payment.
+export const SALES_TERMS_VERSION = "2026-10-17";

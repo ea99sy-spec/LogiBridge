@@ -308,6 +308,120 @@ const content = {
       ],
     },
   },
+  // Online subscription purchase: pre-information, distance service contract, cancellation and refunds.
+  sales: {
+    ar: {
+      title: "شروط البيع عن بُعد والاسترجاع",
+      sections: [
+        [
+          "البائع",
+          "مقدّم الخدمة هو الشركة المشغّلة للمنصة، وبياناتها (الاسم التجاري، رقم MERSIS، الرقم الضريبي، العنوان، البريد الإلكتروني المسجّل KEP) مذكورة في قسم «مقدّم الخدمة» أسفل هذه الصفحة.",
+        ],
+        [
+          "الخدمة",
+          "اشتراك رقمي في منصة LogiBridge لمدة شهر أو سنة حسب اختيارك، يتيح استخدام خدمات المنصة لحساب الشركة: نشر طلبات الشحن وتقديم العروض والوثائق والتتبع والرسائل. المنصة وسيط تقني وليست ناقلًا أو وكيلًا جمركيًا، والاتفاق على النقل يكون بين المستخدمين مباشرة كما في الشروط والأحكام.",
+        ],
+        [
+          "السعر والدفع",
+          "السعر الظاهر قبل الدفع بالدولار الأمريكي هو المبلغ الذي تدفعه، والاشتراك السنوي بسعر 10 أشهر. الدفع بالبطاقة عبر PayTR، ولا تصل بيانات البطاقة إلى LogiBridge. تصدر الفاتورة وفق التشريعات المعمول بها في تركيا. لا يوجد تجديد تلقائي: لا يُسحب أي مبلغ إضافي إلا إذا دفعت أنت مرة أخرى.",
+        ],
+        [
+          "بدء الخدمة",
+          "تبدأ الخدمة فور تأكيد الدفع من PayTR، وتُضاف المدة المدفوعة بعد نهاية اشتراكك الحالي أو الفترة المجانية إن وُجدت، ويظهر تاريخ الانتهاء الجديد في لوحة حسابك.",
+        ],
+        [
+          "حق الانسحاب",
+          "الخدمة رقمية وتُقدَّم إلكترونيًا فورًا وتبدأ بموافقتك عند الدفع، لذلك لا ينطبق عليها حق الانسحاب خلال 14 يومًا وفق المادة 15 من لائحة العقود عن بُعد التركية. وبالنسبة للحسابات التجارية يُعد الشراء معاملة بين شركات.",
+        ],
+        [
+          "الإلغاء والاسترجاع",
+          "يُرد المبلغ كاملًا إذا سُحب منك خطأً أو مرتين، أو إذا لم يُفعَّل الاشتراك بعد الدفع ولم نتمكن من تفعيله. وإذا أوقفت المنصة الخدمة نهائيًا أو أوقفت حسابك دون مخالفة منك، يُرد الجزء غير المستخدم من المدة. لا يُرد المبلغ عند إيقاف الحساب بسبب مخالفة الشروط. اطلب الاسترجاع خلال 14 يومًا من الدفع عبر بريد الدعم أو قسم الدعم في حسابك مع رقم الطلب، ويُعاد المبلغ إلى البطاقة نفسها عبر PayTR، وتختلف مدة ظهوره حسب البنك.",
+        ],
+        [
+          "الشكاوى والنزاعات",
+          "تواصل معنا أولًا عبر قسم الدعم. يخضع هذا العقد لقوانين الجمهورية التركية. للمستهلكين حق التقدّم إلى لجان التحكيم الخاصة بالمستهلك أو محاكم المستهلك ضمن الحدود القانونية، وفي غير ذلك تختص محاكم إسطنبول.",
+        ],
+        [
+          "الموافقة",
+          "بالضغط على زر الدفع بعد وضع علامة الموافقة، تقرّ بأنك قرأت هذه المعلومات المسبقة وعقد الخدمة عن بُعد ووافقت عليهما. نحفظ تاريخ موافقتك ونسختها مع طلب الدفع.",
+        ],
+      ],
+    },
+    en: {
+      title: "Distance sales and refund terms",
+      sections: [
+        [
+          "Seller",
+          "The service provider is the company operating the platform. Its details (trade name, MERSIS number, tax number, address and registered electronic mail KEP) are in the “Service provider” section at the bottom of this page.",
+        ],
+        [
+          "Service",
+          "A digital LogiBridge subscription for one month or one year, as you choose, letting the company account use the platform: posting shipment requests, sending offers, documents, tracking and messages. The platform is a technical intermediary, not a carrier or customs agent; transport is agreed directly between users as set out in the terms of use.",
+        ],
+        [
+          "Price and payment",
+          "The US dollar price shown before payment is the amount you pay; the yearly plan costs 10 months. Payment is by card through PayTR, and card details never reach LogiBridge. Invoices are issued under the legislation in force in Türkiye. There is no automatic renewal: nothing more is charged unless you pay again.",
+        ],
+        [
+          "Start of service",
+          "The service starts as soon as PayTR confirms the payment. The paid period is added after the end of your current subscription or free period, and the new end date is shown on your dashboard.",
+        ],
+        [
+          "Right of withdrawal",
+          "The service is digital, performed electronically at once and started with your approval when you pay, so the 14-day right of withdrawal does not apply, under article 15 of the Turkish Distance Contracts Regulation. For business accounts the purchase is a business-to-business transaction.",
+        ],
+        [
+          "Cancellation and refunds",
+          "You get a full refund if you were charged by mistake or twice, or if the subscription was not activated after payment and we could not activate it. If the platform ends the service for good, or suspends your account without any breach on your part, the unused part of the period is refunded. No refund is given when an account is suspended for breaching the terms. Ask for a refund within 14 days of payment through the support email or the Support section of your account, with the order number. The money goes back to the same card through PayTR; how long it takes to appear depends on your bank.",
+        ],
+        [
+          "Complaints and disputes",
+          "Please contact us first through Support. This contract is governed by the laws of the Republic of Türkiye. Consumers may apply to consumer arbitration committees or consumer courts within the legal limits; otherwise the courts of Istanbul have jurisdiction.",
+        ],
+        [
+          "Acceptance",
+          "By pressing the payment button after ticking the acceptance box you confirm that you have read and accept this pre-contract information and the distance service contract. We keep the date and version of your acceptance with the payment order.",
+        ],
+      ],
+    },
+    tr: {
+      title: "Mesafeli satış, ön bilgilendirme ve iade koşulları",
+      sections: [
+        [
+          "Satıcı",
+          "Hizmet sağlayıcı, platformu işleten şirkettir. Ticaret unvanı, MERSIS numarası, vergi numarası, adresi ve KEP adresi bu sayfanın altındaki “Hizmet sağlayıcı” bölümünde yer alır.",
+        ],
+        [
+          "Hizmet",
+          "Seçiminize göre bir aylık veya bir yıllık dijital LogiBridge aboneliği. Şirket hesabının platform hizmetlerini kullanmasını sağlar: sevkiyat talebi yayınlama, teklif verme, belgeler, takip ve mesajlaşma. Platform teknik bir aracıdır; taşıyıcı veya gümrük müşaviri değildir. Taşıma, kullanım koşullarında belirtildiği gibi kullanıcılar arasında doğrudan kararlaştırılır.",
+        ],
+        [
+          "Fiyat ve ödeme",
+          "Ödemeden önce ABD doları olarak gösterilen fiyat ödeyeceğiniz tutardır; yıllık plan 10 aylık fiyattır. Ödeme PayTR üzerinden kartla yapılır; kart bilgileri LogiBridge'e ulaşmaz. Fatura Türkiye'de yürürlükteki mevzuata göre düzenlenir. Otomatik yenileme yoktur: siz tekrar ödeme yapmadıkça ek tutar tahsil edilmez.",
+        ],
+        [
+          "Hizmetin başlaması",
+          "Hizmet, PayTR ödemeyi onayladığı anda başlar. Ödenen süre mevcut aboneliğinizin veya ücretsiz dönemin bitiminden sonra eklenir ve yeni bitiş tarihi panelinizde görünür.",
+        ],
+        [
+          "Cayma hakkı",
+          "Hizmet dijitaldir, elektronik ortamda anında ifa edilir ve ödeme sırasında onayınızla başlar. Bu nedenle Mesafeli Sözleşmeler Yönetmeliği'nin 15. maddesi uyarınca 14 günlük cayma hakkı uygulanmaz. Ticari hesaplar için satın alma, işletmeler arası bir işlemdir.",
+        ],
+        [
+          "İptal ve iade",
+          "Hatalı veya mükerrer tahsilatta ya da ödeme sonrası abonelik etkinleşmediği ve etkinleştiremediğimiz durumda tutarın tamamı iade edilir. Platform hizmeti tamamen sonlandırırsa veya hesabınızı sizden kaynaklanan bir ihlal olmadan askıya alırsa kullanılmayan süre iade edilir. Kullanım koşullarının ihlali nedeniyle askıya alınan hesaplara iade yapılmaz. İadeyi ödemeden itibaren 14 gün içinde, sipariş numarasıyla destek e-postasından veya hesabınızdaki Destek bölümünden isteyin. Tutar PayTR üzerinden aynı karta iade edilir; hesabınıza yansıma süresi bankanıza göre değişir.",
+        ],
+        [
+          "Şikâyet ve uyuşmazlıklar",
+          "Lütfen önce Destek bölümünden bize ulaşın. Bu sözleşme Türkiye Cumhuriyeti kanunlarına tabidir. Tüketiciler yasal sınırlar içinde tüketici hakem heyetlerine veya tüketici mahkemelerine başvurabilir; diğer durumlarda İstanbul mahkemeleri yetkilidir.",
+        ],
+        [
+          "Onay",
+          "Onay kutusunu işaretleyip ödeme düğmesine bastığınızda bu ön bilgilendirmeyi ve mesafeli hizmet sözleşmesini okuduğunuzu ve kabul ettiğinizi onaylarsınız. Onay tarihiniz ve sürümü ödeme siparişiyle birlikte saklanır.",
+        ],
+      ],
+    },
+  },
 };
 
 export default function Legal({ page, t, lang, langSelect }) {
@@ -340,6 +454,10 @@ export default function Legal({ page, t, lang, langSelect }) {
             {t(page === "terms" ? "privacyPolicy" : "termsOfUse")}
           </a>
           {" · "}
+          <a href={page === "sales" ? "/terms" : "/sales-terms"}>
+            {t(page === "sales" ? "termsOfUse" : "salesTerms")}
+          </a>
+          {" · "}
           <a href="/">{t("siteHome")}</a>
         </p>
       </main>
@@ -351,7 +469,7 @@ export function LegalLinks({ t }) {
   return (
     <span className="legal-footer-links">
       <a href="/border">{t("borderRulesTitle")}</a> · <a href="/terms">{t("termsOfUse")}</a> ·{" "}
-      <a href="/privacy">{t("privacyPolicy")}</a>
+      <a href="/privacy">{t("privacyPolicy")}</a> · <a href="/sales-terms">{t("salesTerms")}</a>
     </span>
   );
 }

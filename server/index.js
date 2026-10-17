@@ -56,6 +56,8 @@ import { buildShipment, insertShipment } from "./shipmentFactory.js";
 import { recurringRoutes, recurringFor, runRecurringWatch } from "./recurring.js";
 import { monthlyReportRoutes, runMonthlyWatch } from "./monthlyReport.js";
 import { publicPageRoutes, seoRoutes, companySlug } from "./publicPages.js";
+import { adminToolsRoutes, clientErrorRoute, logError } from "./adminTools.js";
+import { supportRoutes } from "./support.js";
 import { teamRoutes, teamInviteRoute, memberBlocked } from "./team.js";
 import { crossingTimes } from "../shared/crossingTimes.js";
 import { crossingKeys } from "../shared/crossings.js";
@@ -216,6 +218,8 @@ export async function createApp() {
   // Public company pages, route pages and the sitemap (no account needed).
   publicPageRoutes(app);
   seoRoutes(app);
+  // Errors from visitors' browsers (public, rate limited).
+  clientErrorRoute(app);
   // Border and customs notices posted by the administration (public, like the rules page).
   app.get("/api/border", (req, res) => {
     const s = readState();
@@ -374,6 +378,26 @@ export async function createApp() {
     res.json({ ok: true });
   });
   publicAccountRoutes(app, { authLimit, txt });
+  // Signed-in user of a public request, when there is one (no error when signed out).
+  async function sessionUser(req) {
+    const token = req.headers.cookie
+      ?.split(";")
+      .map((x) => x.trim())
+      .find((x) => x.startsWith("lb_session="))
+      ?.slice(11);
+    const session =
+      token &&
+      (cloudEnabled()
+        ? await readSession(token)
+        : redis
+          ? JSON.parse((await redis.get(`session:${token}`)) || "null")
+          : sessions.get(token));
+    if (!session || session.expiry < Date.now()) return null;
+    const u = readState().users.find((x) => x.id === session.userId);
+    return u && (DEMO_NOW() || !u.demo) ? u : null;
+  }
+  // Help centre and support assistant (visitors and signed-in accounts).
+  supportRoutes(app, { sessionUser });
   publicAdvancedRoutes(app);
   publicTrackingRoutes(app);
   app.use("/api", async (req, res, next) => {
@@ -563,6 +587,8 @@ export async function createApp() {
       teamMembers: _teamMembers, // only through /api/team
       recurring: _recurring, // filtered below
       monthlyReportsSent: _monthlyReportsSent,
+      routeAlerts: _routeAlerts, // own alerts only, below
+      errorLog: _errorLog, // administration only, /api/admin/errors
       ...shared
     } = s;
     res.json({
@@ -629,6 +655,7 @@ export async function createApp() {
         })),
       trackingEvents: s.trackingEvents.filter((e) => visibleShipment(e.shipmentId)),
       recurring: recurringFor(fullState, req.user),
+      routeAlerts: (fullState.routeAlerts || []).filter((a) => a.userId === req.user.id),
       users: s.users.map((u) => publicUser(u)),
       user: {
         ...publicUser(req.user, true),
@@ -694,6 +721,7 @@ export async function createApp() {
   teamRoutes(app, { sessionFor });
   recurringRoutes(app);
   monthlyReportRoutes(app);
+  adminToolsRoutes(app);
   trackingRoutes(app);
   paymentRoutes(app);
   advancedRoutes(app);
@@ -1282,6 +1310,19 @@ export async function createApp() {
     // Programming errors are logged but never shown to visitors.
     if (err instanceof TypeError || err instanceof ReferenceError || err instanceof RangeError) {
       console.error(err);
+      // Kept for the administration's error log (message and place only, no request data).
+      mutate((st) =>
+        logError(st, {
+          source: "server",
+          message: `${err.name}: ${err.message}`,
+          path: `${req.method} ${req.path}`,
+          userId: req.user?.id,
+          stack: String(err.stack || "")
+            .split("\n")
+            .slice(1, 4)
+            .join("\n"),
+        }),
+      ).catch(() => {});
       return res.status(500).json({ error: "Unexpected server error" });
     }
     if ((err.status || 400) >= 500) console.error(err.message);

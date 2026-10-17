@@ -56,6 +56,7 @@ function OnlinePayment({ t }) {
   const [token, setToken] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [accepted, setAccepted] = useState(false);
   useEffect(() => {
     fetch("/api/subscription/online")
       .then((r) => (r.ok ? r.json() : null))
@@ -71,7 +72,11 @@ function OnlinePayment({ t }) {
       const r = await fetch("/api/subscription/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ months, lang: document.documentElement.lang === "tr" ? "tr" : "en" }),
+        body: JSON.stringify({
+          months,
+          acceptSales: accepted,
+          lang: document.documentElement.lang === "tr" ? "tr" : "en",
+        }),
       });
       const v = await r.json();
       if (!r.ok) throw new Error(v.error || "");
@@ -88,11 +93,30 @@ function OnlinePayment({ t }) {
       {result === "ok" && <p className="notice">✓ {t("paymentReceivedNote")}</p>}
       {result === "failed" && <p className="notice error">{t("paymentFailedNote")}</p>}
       <b>💳 {t("payOnline")}</b>
+      <label className="consent pay-consent">
+        <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />
+        <span>
+          {t("acceptSalesPrefix")}{" "}
+          <a href="/sales-terms" target="_blank" rel="noopener">
+            {t("salesTerms")}
+          </a>
+        </span>
+      </label>
       <div className="online-pay-options">
-        <button type="button" className="button small-button" disabled={busy} onClick={() => pay(1)}>
+        <button
+          type="button"
+          className="button small-button"
+          disabled={busy || !accepted}
+          onClick={() => pay(1)}
+        >
           {t("payOneMonth")} · <bdi dir="ltr">${info.prices[1]}</bdi>
         </button>
-        <button type="button" className="button ghost small-button" disabled={busy} onClick={() => pay(12)}>
+        <button
+          type="button"
+          className="button ghost small-button"
+          disabled={busy || !accepted}
+          onClick={() => pay(12)}
+        >
           {t("payOneYear")} · <bdi dir="ltr">${info.prices[12]}</bdi>
         </button>
       </div>

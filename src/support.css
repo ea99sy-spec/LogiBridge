@@ -1,0 +1,45 @@
+.support-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(220px,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.support-grid{grid-template-columns:1fr}}
+.support-contacts{display:grid;gap:12px}
+.contact-card{display:flex;gap:12px;align-items:center;text-decoration:none;color:inherit;text-align:start;cursor:pointer;width:100%;font:inherit}
+.contact-card span{display:flex;flex-direction:column;gap:2px}
+.contact-card small{color:#64748b}
+.contact-card.wa{border-color:#86efac;background:#f0fdf4}
+.contact-card.wa svg{color:#16a34a;flex:none}
+.contact-icon{font-size:1.4rem}
+.faq-list details{border-bottom:1px solid #e5e7eb;padding:10px 0}
+.faq-list summary{cursor:pointer;font-weight:600}
+.faq-list p{margin:8px 0 0;line-height:1.7;color:#334155}
+.support-chat{display:flex;flex-direction:column;gap:8px}
+.chat-log{min-height:220px;max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px}
+.support-chat.compact .chat-log{min-height:160px;max-height:min(52vh,380px)}
+.chat-hello p{margin:0 0 8px}
+.chat-examples{display:flex;flex-wrap:wrap;gap:6px}
+.chat-examples button{border:1px solid #bfdbfe;background:#eff6ff;color:#1e3a8a;border-radius:999px;padding:5px 10px;font:inherit;font-size:.85rem;cursor:pointer}
+.msg{border-radius:12px;padding:8px 12px;max-width:92%;line-height:1.6;font-size:.94rem}
+.msg.user{align-self:flex-end;background:#2563eb;color:#fff}
+.msg.bot{align-self:flex-start;background:#f1f5f9;color:#0f172a}
+.msg.bot p{margin:0}
+.msg.typing{color:#64748b}
+.faq-hit{margin:6px 0}
+.faq-hit p{margin:4px 0 0;font-size:.9rem}
+.msg-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;border-top:1px solid #e2e8f0;padding-top:6px}
+.wa-small{display:inline-flex;align-items:center;gap:4px;color:#15803d;font-weight:600;text-decoration:none;font-size:.88rem}
+.wa-small svg{width:18px;height:18px}
+.chat-input{display:flex;gap:8px}
+.chat-input input{flex:1;min-width:0}
+.chat-note{font-size:.78rem}
+.pre-line{white-space:pre-line}
+.floating-help{position:fixed;bottom:16px;inset-inline-end:16px;z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.fab{width:54px;height:54px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;box-shadow:0 6px 18px rgba(15,23,42,.25);font-size:1.4rem;font-weight:700;text-decoration:none}
+.fab-wa{background:#25d366;color:#fff}
+.fab-help{background:#1e3a8a;color:#fff}
+.help-pop{width:min(360px,calc(100vw - 32px));background:#fff;color:#0f172a;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 12px 32px rgba(15,23,42,.25);padding:12px}
+.help-pop header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+@media print{.floating-help{display:none}}
+.faq-list{margin-top:16px}
+@media (max-width:640px){
+  .fab{width:46px;height:46px;font-size:1.2rem}
+  .fab svg{width:22px;height:22px}
+  body{padding-bottom:110px}
+}

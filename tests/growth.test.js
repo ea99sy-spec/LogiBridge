@@ -178,3 +178,56 @@ test("documents opened by others get a watermark", async () => {
   assert.ok(out && out.subarray(0, 5).toString() === "%PDF-");
   assert.equal(await watermarkDocument(Buffer.from("not a pdf"), "application/pdf", text), null);
 });
+
+test("route alerts, likely providers and error log", async () => {
+  const { alertMatches, notifyRouteAlerts, likelyProviders, logError } =
+    await import("../server/adminTools.js");
+  const { searchFaq } = await import("../shared/supportFaq.js");
+  const { askForRating } = await import("../server/domain.js");
+  const ok = { verified: true, verificationStatus: "approved" };
+  const s = {
+    users: [
+      { id: "m", role: "merchant", accountType: "merchant", ...ok },
+      { id: "c1", role: "carrier", accountType: "carrier", ...ok, details: { routes: "Mersin - Halep" } },
+      { id: "c2", role: "carrier", accountType: "carrier", ...ok },
+      { id: "b1", role: "broker", accountType: "broker", ...ok, details: { crossings: ["bab"] } },
+    ],
+    routeAlerts: [
+      { id: "a1", userId: "c2", from: "Gaziantep", to: "" },
+      { id: "a2", userId: "b1", crossing: "bab" },
+    ],
+    shipments: [],
+    bids: [],
+    notifications: [],
+    ratings: [],
+    flags: { ratings: true },
+  };
+  const leg = {
+    id: "l1",
+    ownerId: "m",
+    status: "open",
+    origin: "Antep",
+    destination: "Halep",
+    date: "2026-11-01",
+  };
+  assert.ok(alertMatches(s.routeAlerts[0], leg));
+  assert.ok(!alertMatches(s.routeAlerts[0], { ...leg, origin: "Mersin" }));
+  assert.ok(alertMatches(s.routeAlerts[1], { ...leg, legType: "clearance", crossing: "bab" }));
+  notifyRouteAlerts(s, leg);
+  assert.deepEqual(
+    s.notifications.map((n) => [n.userId, n.event]),
+    [["c2", "route_alert"]],
+  );
+  const p = likelyProviders(s, { ...leg, origin: "Mersin" });
+  assert.deepEqual(
+    p.map((x) => x.id),
+    ["c1"],
+  );
+  logError(s, { source: "server", message: "TypeError: x", path: "/a" });
+  logError(s, { source: "server", message: "TypeError: x", path: "/a" });
+  assert.equal(s.errorLog.length, 1);
+  assert.equal(s.errorLog[0].count, 2);
+  assert.equal(searchFaq("نسيت كلمة المرور", "ar")[0].id, "password");
+  askForRating(s, { id: "x", ownerId: "m", carrierId: "c1" });
+  assert.equal(s.notifications.filter((n) => n.event === "rate_prompt").length, 2);
+});

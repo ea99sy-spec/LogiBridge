@@ -1,4 +1,4 @@
-import { watermarkDocument, watermarkText } from "./watermark.js";
+import { watermarkDocument, watermarkText, arabicPart } from "./watermark.js";
 import { readState, mutate, id } from "./store.js";
 import { validateDocument, encryptDocument, decryptDocument } from "./identity.js";
 import { notice } from "./advanced.js";
@@ -164,6 +164,7 @@ export function documentRoutes(app) {
         decryptDocument(doc.encryptedContent),
         doc.mime,
         watermarkText(viewer),
+        arabicPart(viewer.name),
       );
       if (marked) {
         if (!req.user.demo)

@@ -7,6 +7,7 @@ import { matchRoutes } from "./advanced.js";
 import { suggestSharing } from "./sharedTruck.js";
 import { queueAdminEmail } from "./email.js";
 import { newDeliveryCode } from "./tracking.js";
+import { notifyRouteAlerts } from "./adminTools.js";
 
 const txt = (v, max = 300) => {
   if (typeof v !== "string" || !v.trim()) throw new Error("Required field missing");
@@ -91,12 +92,14 @@ export function insertShipment(s, user, shipment) {
         matchRoutes(s, child);
         suggestSharing(s, child);
       }
+      notifyRouteAlerts(s, child);
     }
     s.shipments.push(shipment);
   } else {
     s.shipments.push(shipment);
     matchRoutes(s, shipment);
     suggestSharing(s, shipment);
+    notifyRouteAlerts(s, shipment);
   }
   if (!user.demo)
     queueAdminEmail(s, "shipment_created", {

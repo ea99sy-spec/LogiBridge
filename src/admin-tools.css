@@ -1,0 +1,26 @@
+.unanswered header,.error-log header,.route-alerts header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.unanswered h3,.error-log h3,.route-alerts h3{margin:0}
+.unanswered-list,.error-list{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:12px}
+.unanswered-list>li{border:1px solid #e5e7eb;border-radius:10px;padding:12px;display:grid;gap:8px}
+.ua-head{display:grid;gap:3px}
+.ua-providers{display:grid;gap:6px}
+.ua-provider{display:flex;align-items:center;gap:8px}
+.ua-provider span{flex:1}
+.ua-wa{text-decoration:none;font-size:1.1rem}
+.ok{color:#16a34a}
+.error-list li{border-bottom:1px solid #e5e7eb;padding:8px 0;display:grid;gap:4px}
+.error-list code{word-break:break-word;font-size:.82rem}
+.error-list pre{white-space:pre-wrap;font-size:.75rem;background:#f8fafc;padding:8px;border-radius:6px;overflow:auto}
+.route-alerts form{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin:10px 0}
+.route-alerts form .field{flex:1 1 160px;margin:0}
+.alert-chips{display:flex;gap:8px;flex-wrap:wrap}
+.alert-chip{display:inline-flex;gap:6px;align-items:center;border:1px solid #bfdbfe;background:#eff6ff;border-radius:999px;padding:4px 10px;font-size:.9rem}
+.alert-chip button{border:0;background:none;cursor:pointer;color:#b91c1c;font-size:1rem;line-height:1}
+/* Star picker: five radio buttons shown as stars (right-to-left order handled by row-reverse). */
+.star-pick{border:0;padding:0;margin:0;display:inline-flex;flex-direction:row-reverse;justify-content:flex-end;gap:4px}
+.star-pick legend{width:100%;margin-bottom:4px;font-size:.9rem}
+.star-pick input{position:absolute;opacity:0;width:1px;height:1px}
+.star-pick label{font-size:2rem;color:#cbd5e1;cursor:pointer;line-height:1}
+.star-pick input:checked~label,.star-pick label:hover,.star-pick label:hover~label{color:#f59e0b}
+.star-pick input:focus-visible+label{outline:2px solid #2563eb;border-radius:4px}
+.route-alerts{margin-bottom:22px}.faq-list{margin-top:16px}
