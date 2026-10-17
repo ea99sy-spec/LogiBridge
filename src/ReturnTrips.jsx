@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { countryOptions } from "../shared/countries";
 import { crossings } from "../shared/crossings";
 import { ReputationChips } from "./Reputation";
+import { CostCalculator } from "./CostCalculator";
 import "./return-trips.css";
 
 // Empty return trips: carriers offer trucks going back empty at a lower price; traders ask for them.
@@ -247,6 +248,13 @@ export function ReturnTrips({ data, user, t, lang, run, busy, navigate }) {
               <input name="note" maxLength={300} placeholder={t("tripNoteExample")} />
             </label>
           </div>
+          <CostCalculator
+            t={t}
+            onUse={(price) => {
+              const input = document.querySelector("form.trip-form input[name=price]");
+              if (input) input.value = price;
+            }}
+          />
           <button className="button" disabled={busy}>
             {t("publishTrip")}
           </button>

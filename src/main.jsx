@@ -8,6 +8,9 @@ import { ReputationChips } from "./Reputation";
 import { FeedbackPage, FeedbackAdmin } from "./Feedback";
 import { PriceIndexPage } from "./Prices";
 import { ReturnTrips } from "./ReturnTrips";
+import { ReferralCard } from "./Referral";
+import { DriverReview, ShipmentDriver } from "./Drivers";
+import { CostCalculator } from "./CostCalculator";
 import { FormHolidayWarning } from "./Holidays";
 import { SubscriptionBanner } from "./Subscription";
 import { waLink } from "../shared/wa";
@@ -65,6 +68,11 @@ async function api(path, body, method = "POST") {
 // module level (instead of inside App) stops React from re-creating them on every
 // refresh, which used to wipe whatever the user was typing into a form.
 const Workspace = createContext(null);
+// Invite links (?ref=CODE) are remembered until the visitor registers.
+try {
+  const ref = new URLSearchParams(location.search).get("ref");
+  if (ref && /^[A-Za-z0-9]{8}$/.test(ref)) localStorage.setItem("lb_ref", ref.toUpperCase());
+} catch {}
 // Browser's "install this site" prompt, kept until the account presses the install button.
 let installPrompt = null;
 const installListeners = new Set();
@@ -163,6 +171,8 @@ function OrderCard({ s, compact }) {
         <RepeatLink s={s} />
       </span>
       <RejectControls s={s} />
+      <ShipmentDriver s={s} data={data} user={user} t={t} run={run} busy={busy} />
+      <SharedTruck s={s} />
       <h3>{s.title}</h3>
       <div className="route">
         <span>
@@ -288,6 +298,7 @@ function OfferCompare({ bids, s }) {
                 <th>{t("ratingShort")}</th>
                 <th>{t("onTimeShort")}</th>
                 <th>{t("completedShort")}</th>
+                <th>{t("guaranteeShort")}</th>
               </tr>
             </thead>
             <tbody>
@@ -305,6 +316,7 @@ function OfferCompare({ bids, s }) {
                       {r.onTimeCount ? `${r.onTimePct}% (${r.onTimeCount})` : "—"}
                     </td>
                     <td>{r.completed ?? 0}</td>
+                    <td>{b.delayPct ? `${b.delayPct}%` : "—"}</td>
                   </tr>
                 );
               })}
@@ -333,6 +345,35 @@ function RepeatLink({ s }) {
       🔁 {t("repeatShipment")}
     </a>
   );
+}
+// Shared truck: other small shipments on the same route and week; owners can accept sharing.
+function SharedTruck({ s }) {
+  const { user, t, run, busy } = useWorkspace();
+  if (s.status !== "open" || s.parentId) return null;
+  const owner = s.ownerId === user.id;
+  if (owner && (s.shareMatches > 0 || s.shareOpen))
+    return (
+      <div className="shared-truck">
+        {s.shareMatches > 0 && <span>🤝 {t("shareMatchesOwner").replace("{n}", s.shareMatches)}</span>}
+        <label>
+          <input
+            type="checkbox"
+            checked={!!s.shareOpen}
+            disabled={busy}
+            onChange={(e) => run(`/shipments/${s.id}/share`, { open: e.target.checked })}
+          />{" "}
+          {t("acceptSharing")}
+        </label>
+      </div>
+    );
+  if (!owner && (s.shareOpen || s.shareMatches > 0))
+    return (
+      <div className="shared-truck">
+        {s.shareOpen && <span className="share-tag">🤝 {t("ownerAcceptsSharing")}</span>}
+        {s.shareMatches > 0 && <span>{t("shareMatchesCarrier").replace("{n}", s.shareMatches)}</span>}
+      </div>
+    );
+  return null;
 }
 // "Documents" shortcut on a shipment card: opens that shipment's documents folder.
 function DocsLink({ s }) {
@@ -390,6 +431,8 @@ function ShipmentCard({ s, compact = false }) {
         <RepeatLink s={s} />
       </span>
       <RejectControls s={s} />
+      <ShipmentDriver s={s} data={data} user={user} t={t} run={run} busy={busy} />
+      <SharedTruck s={s} />
       <h3>{s.title}</h3>
       {s.parentId && (
         <p className="stage-label">
@@ -462,6 +505,11 @@ function ShipmentCard({ s, compact = false }) {
                     {b.note ? " · " + b.note : ""}
                   </small>
                   <OfferBadges b={b} bids={bids} />
+                  {b.delayPct ? (
+                    <span className="guarantee-chip" title={t("delayGuaranteeHint")}>
+                      🛡 {t("delayPctOption").replace("{p}", b.delayPct)}
+                    </span>
+                  ) : null}
                   {b.carrierId !== user.id && (
                     <ReputationChips rep={data.reputation?.[b.carrierId]} t={t} kind="carrier" />
                   )}
@@ -500,15 +548,35 @@ function ShipmentCard({ s, compact = false }) {
             {canBid && s.status === "open" && !myBid && (
               <form
                 className="bid-form"
+                data-id={s.id}
                 onSubmit={async (e) => {
                   e.preventDefault();
                   const form = e.currentTarget;
                   if (await run("/bids", { ...formData(e), shipmentId: s.id })) form.reset();
                 }}
               >
+                <CostCalculator
+                  t={t}
+                  onUse={(price) => {
+                    const input = document.querySelector(
+                      `form.bid-form[data-id="${s.id}"] input[name=price]`,
+                    );
+                    if (input) input.value = price;
+                  }}
+                />
                 <Field label="price" name="price" type="number" min="0.01" step="0.01" />
                 <Field label="days" name="days" type="number" min="1" max="365" step="1" />
                 <Field label="noteOptional" name="note" maxLength="500" optional />
+                <label className="field">
+                  <span>{t("delayGuarantee")}</span>
+                  <select name="delayPct" defaultValue="0">
+                    {[0, 1, 2, 3, 5].map((p) => (
+                      <option key={p} value={p}>
+                        {p ? t("delayPctOption").replace("{p}", p) : t("noGuarantee")}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <button className="button" disabled={busy}>
                   {t("bid")}
                 </button>
@@ -520,6 +588,15 @@ function ShipmentCard({ s, compact = false }) {
               ⏱ {t("autoCloseOn")}{" "}
               {new Date(s.autoCloseAt).toLocaleString(lang, { dateStyle: "medium", timeStyle: "short" })}
               {s.ownerId === user.id ? ` · ${t("autoCloseOwnerHint")}` : ""}
+            </p>
+          )}
+          {s.delayDiscount && (
+            <p className="auto-close-line">
+              🛡{" "}
+              {t("delayApplied")
+                .replace("{d}", s.delayDiscount.lateDays)
+                .replace("{p}", s.delayDiscount.pct)
+                .replace("{a}", money(s.delayDiscount.amount))}
             </p>
           )}
           {s.closedBy && s.closedBy !== "owner" && (
@@ -1083,6 +1160,7 @@ function App() {
                   navigate={setTab}
                   userId={user.id}
                 />
+                {user.accountType !== "individual" && <ReferralCard referral={data.referral} t={t} />}
               </>
             )}
             {activeTab === "guide" && (
@@ -1110,6 +1188,9 @@ function App() {
                   userId={user.id}
                 />
                 {admin && !user.demo && <NotesDueCard t={t} lang={lang} navigate={setTab} />}
+                {!admin && user.accountType !== "individual" && (
+                  <ReferralCard referral={data.referral} t={t} />
+                )}
                 <RoleDashboard
                   data={data}
                   t={t}
@@ -1345,7 +1426,10 @@ function App() {
             )}
             {activeTab === "kyb" &&
               (admin ? (
-                <ReviewQueue data={data} t={t} run={run} busy={busy} />
+                <>
+                  <ReviewQueue data={data} t={t} run={run} busy={busy} />
+                  <DriverReview data={data} t={t} run={run} busy={busy} />
+                </>
               ) : (
                 <VerificationPanel data={data} user={user} t={t} run={run} busy={busy} />
               ))}

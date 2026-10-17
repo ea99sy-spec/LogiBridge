@@ -132,3 +132,93 @@ test("return trips: traders see open trips and only their own requests", () => {
   assert.equal(trader[0].requests.length, 1);
   assert.equal(visibleTrips(s, { id: "c", role: "carrier" })[0].requests.length, 2);
 });
+
+import { applyDelayGuarantee } from "../server/domain.js";
+test("delay guarantee discount comes from the real arrival", () => {
+  const s = {
+    bids: [{ id: "b", price: 1000, days: 2, delayPct: 5 }],
+    escrows: [{ shipmentId: "x", amount: 1000, carrierNet: 1000 }],
+  };
+  const sh = {
+    id: "x",
+    bidId: "b",
+    date: "2026-10-01",
+    acceptedAt: "2026-09-30T10:00:00Z",
+    arrivedAt: "2026-10-05T10:00:00Z",
+  };
+  applyDelayGuarantee(s, sh);
+  assert.deepEqual(sh.delayDiscount, { lateDays: 2, pct: 10, amount: 100, perDay: 5 });
+  assert.equal(s.escrows[0].carrierNet, 900);
+  const late = { id: "y", bidId: "b", date: "2026-10-01", arrivedAt: "2026-10-30T10:00:00Z" };
+  applyDelayGuarantee({ ...s, escrows: [] }, late);
+  assert.equal(late.delayDiscount.pct, 30);
+  const onTime = { id: "z", bidId: "b", date: "2026-10-01", arrivedAt: "2026-10-03T10:00:00Z" };
+  applyDelayGuarantee({ ...s, escrows: [] }, onTime);
+  assert.equal(onTime.delayDiscount, undefined);
+});
+
+import { trustLevel } from "../server/insights.js";
+test("trust levels follow measured behaviour", () => {
+  const base = { rating: null, reviews: 0, onTimeCount: 0, onTimePct: null, payCount: 0, payDays: null };
+  assert.equal(trustLevel({ ...base, completed: 0 }), null);
+  assert.equal(trustLevel({ ...base, completed: 1 }), "bronze");
+  assert.equal(
+    trustLevel({ ...base, completed: 8, rating: 4.2, reviews: 3, onTimeCount: 8, onTimePct: 80 }),
+    "silver",
+  );
+  assert.equal(trustLevel({ ...base, completed: 8, onTimeCount: 8, onTimePct: 50 }), "bronze");
+  assert.equal(
+    trustLevel({ ...base, completed: 25, rating: 4.8, reviews: 10, onTimeCount: 25, onTimePct: 96 }),
+    "gold",
+  );
+});
+
+import { sharedMatches } from "../server/sharedTruck.js";
+test("small shipments on the same route and week are matched for a shared truck", () => {
+  const base = {
+    status: "open",
+    origin: "Gaziantep",
+    destination: "Aleppo",
+    date: "2026-11-01",
+    volume: 20,
+    weight: 5000,
+  };
+  const s = {
+    users: [{ id: "a" }, { id: "b" }, { id: "c" }],
+    shipments: [
+      { ...base, id: "1", ownerId: "a" },
+      { ...base, id: "2", ownerId: "b", date: "2026-11-03" },
+      { ...base, id: "3", ownerId: "c", date: "2026-11-10" },
+      { ...base, id: "4", ownerId: "c", volume: 70 },
+    ],
+  };
+  assert.deepEqual(
+    sharedMatches(s, s.shipments[0]).map((x) => x.id),
+    ["2"],
+  );
+});
+
+import { rewardReferral, referralCode, inviterFor } from "../server/referrals.js";
+import { addCrossingStat, crossingTimes } from "../shared/crossingTimes.js";
+test("referral reward and best crossing times", () => {
+  const s = {
+    users: [
+      { id: "inv", role: "merchant", accountType: "merchant" },
+      { id: "new", role: "carrier", accountType: "carrier", name: "New", referredBy: "inv" },
+      { id: "p", role: "merchant", accountType: "individual", referredBy: "inv" },
+    ],
+    notifications: [],
+  };
+  assert.equal(inviterFor(s, referralCode("inv")).id, "inv");
+  rewardReferral(s, s.users[1]);
+  rewardReferral(s, s.users[1]);
+  rewardReferral(s, s.users[2]);
+  assert.equal(s.users[0].subscription.rewardMonths, 1);
+  const t = {};
+  for (const lvl of [3, 3, 4]) addCrossingStat(t, "bab", lvl, "2026-10-19T05:00:00Z", false); // Monday morning
+  for (const lvl of [0, 1, 0]) addCrossingStat(t, "bab", lvl, "2026-10-20T13:00:00Z", false); // Tuesday afternoon
+  addCrossingStat(t, "bab", 0, "2026-10-21T13:00:00Z", true); // demo: ignored
+  const r = crossingTimes(t.crossingStats, "bab");
+  assert.equal(r.reports, 6);
+  assert.deepEqual([r.best[0].day, r.best[0].slot], [2, 2]);
+});

@@ -147,9 +147,13 @@ export function profileRoutes(app) {
       completed: s.shipments.filter(
         (sh) => sh.status === "delivered" && (sh.ownerId === u.id || sh.carrierId === u.id),
       ).length,
-      ...(({ onTimePct, onTimeCount, payDays, payCount }) => ({ onTimePct, onTimeCount, payDays, payCount }))(
-        reputationOf(s, u.id),
-      ),
+      ...(({ onTimePct, onTimeCount, payDays, payCount, level }) => ({
+        onTimePct,
+        onTimeCount,
+        payDays,
+        payCount,
+        level,
+      }))(reputationOf(s, u.id)),
       products: u.accountType === "supplier" ? s.products.filter((p) => p.supplierId === u.id) : [],
       groups:
         u.accountType === "carrier"

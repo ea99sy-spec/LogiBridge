@@ -49,7 +49,17 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
     const result = await run(
       register ? "/auth/register" : "/auth/login",
       register
-        ? { ...fields, accountType: type }
+        ? {
+            ...fields,
+            accountType: type,
+            ref: (() => {
+              try {
+                return localStorage.getItem("lb_ref") || "";
+              } catch {
+                return "";
+              }
+            })(),
+          }
         : { email: b.email, password: b.password, ...(needCode ? { code: b.code } : {}) },
       "POST",
       { onError: (err) => /Two-factor/.test(err.message) && setNeedCode(true) },

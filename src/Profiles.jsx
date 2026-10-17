@@ -232,6 +232,7 @@ export function Directory({ t, data, navigate }) {
     [activity, setActivity] = useState(""),
     [country, setCountry] = useState(""),
     [minRating, setMinRating] = useState(""),
+    [minLevel, setMinLevel] = useState(""),
     [sort, setSort] = useState("rating"),
     [error, setError] = useState("");
   useEffect(() => {
@@ -301,6 +302,18 @@ export function Directory({ t, data, navigate }) {
             </option>
           ))}
         </select>
+        <select
+          value={minLevel}
+          aria-label={t("trustLevelsTitle")}
+          onChange={(e) => setMinLevel(e.target.value)}
+        >
+          <option value="">{t("trustLevelsTitle")}</option>
+          {["gold", "silver", "bronze"].map((k) => (
+            <option key={k} value={k}>
+              {t("trust_" + k)} {k !== "gold" ? t("andAbove") : ""}
+            </option>
+          ))}
+        </select>
         <select value={sort} aria-label={t("sortBy")} onChange={(e) => setSort(e.target.value)}>
           {["rating", "completed", "name"].map((k) => (
             <option key={k} value={k}>
@@ -309,6 +322,10 @@ export function Directory({ t, data, navigate }) {
           ))}
         </select>
       </div>
+      <details className="trust-explain">
+        <summary>🥇 {t("trustLevelsTitle")}</summary>
+        <p className="small muted">{t("trustLevelsExplain")}</p>
+      </details>
       {error && <p role="alert">{error}</p>}
       <div className="cards">
         {items
@@ -317,6 +334,12 @@ export function Directory({ t, data, navigate }) {
           .filter((u) => kind !== "merchant" || !activity || u.activity === activity)
           .filter((u) => !country || u.country === country)
           .filter((u) => !minRating || (u.rating || 0) >= Number(minRating))
+          .filter(
+            (u) =>
+              !minLevel ||
+              ({ gold: 3, silver: 2, bronze: 1 }[u.level] || 0) >=
+                { gold: 3, silver: 2, bronze: 1 }[minLevel],
+          )
           .sort((a, b) =>
             sort === "name"
               ? a.name.localeCompare(b.name)

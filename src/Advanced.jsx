@@ -1,3 +1,4 @@
+import { DriverRegistry } from "./Drivers";
 import React, { useEffect, useState } from "react";
 import { waLink } from "../shared/wa";
 // Android driver app, rebuilt by GitHub Actions on every change in mobile/.
@@ -326,6 +327,7 @@ export function DriverManager({ data, t, run, busy }) {
     <>
       <h1>{t("drivers")}</h1>
       <p>{t("driverPrivacy")}</p>
+      <DriverRegistry data={data} t={t} run={run} busy={busy} />
       <form
         className="panel form-stack"
         onSubmit={async (e) => {

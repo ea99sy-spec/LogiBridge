@@ -37,11 +37,25 @@ export function paySpeedOf(s, userId) {
   };
 }
 
+// Trust level from measured behaviour (not paid, not chosen):
+// gold   — 20+ completed, rating 4.5+, 90%+ on time (carriers) / pays within 3 days (owners)
+// silver — 7+ completed, rating 4+, 75%+ on time / pays within 7 days
+// bronze — at least one completed operation on the platform.
+export function trustLevel(r) {
+  const okRating = (min) => r.rating === null || r.rating >= min;
+  const okOnTime = (min) => !r.onTimeCount || r.onTimePct >= min;
+  const okPay = (max) => !r.payCount || r.payDays <= max;
+  if (r.completed >= 20 && r.reviews >= 3 && okRating(4.5) && okOnTime(90) && okPay(3)) return "gold";
+  if (r.completed >= 7 && okRating(4) && okOnTime(75) && okPay(7)) return "silver";
+  if (r.completed >= 1) return "bronze";
+  return null;
+}
+
 export function reputationOf(s, userId) {
   const scores = (s.ratings || []).filter((r) => r.targetId === userId).map((r) => r.score);
   const t = onTimeOf(s, userId),
     p = paySpeedOf(s, userId);
-  return {
+  const r = {
     rating: scores.length ? round1(scores.reduce((a, b) => a + b, 0) / scores.length) : null,
     reviews: scores.length,
     completed: (s.shipments || []).filter(
@@ -52,6 +66,7 @@ export function reputationOf(s, userId) {
     payDays: p.avgDays,
     payCount: p.count,
   };
+  return { ...r, level: trustLevel(r) };
 }
 
 // Reputation of every account of the viewer's world (demo or registered), for offers and cards.

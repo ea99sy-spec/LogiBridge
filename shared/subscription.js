@@ -42,7 +42,9 @@ export function subscriptionOf(state, user, now = Date.now()) {
   const trialEnd = addMonths(start, FREE_MONTHS);
   const operations = completedOperations(state, user, start, trialEnd);
   const bonus = operations >= ACTIVE_OPERATIONS;
-  const freeUntil = bonus ? addMonths(start, FREE_MONTHS + BONUS_MONTHS) : trialEnd;
+  // Free months earned by inviting companies (referrals) extend the free period.
+  const reward = Number(user.subscription?.rewardMonths) || 0;
+  const freeUntil = addMonths(start, FREE_MONTHS + (bonus ? BONUS_MONTHS : 0) + reward);
   const paidUntil = user.subscription?.paidUntil || null;
   const endsAt = paidUntil && paidUntil > freeUntil ? paidUntil : freeUntil;
   const nowIso = new Date(now).toISOString();
@@ -55,6 +57,7 @@ export function subscriptionOf(state, user, now = Date.now()) {
     paidUntil,
     endsAt,
     bonus,
+    rewardMonths: reward,
     operations: Math.min(operations, ACTIVE_OPERATIONS),
     target: ACTIVE_OPERATIONS,
     // Operations only count toward the bonus during the first free months.

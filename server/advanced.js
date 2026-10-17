@@ -6,6 +6,7 @@ import { readState, mutate, id, subscribeState } from "./store.js";
 import { transitionShipment, positive, syncOrder } from "./domain.js";
 import { sameWorld, demoActive } from "./world.js";
 import { queueAdminEmail } from "./email.js";
+import { queueWhatsApp } from "./whatsapp.js";
 const hash = (v) => createHash("sha256").update(v).digest("hex");
 const text = (v, max = 300) => {
   if (typeof v !== "string" || !v.trim() || v.length > max) throw new Error("Invalid text");
@@ -19,8 +20,39 @@ const date = (v) => {
     throw new Error("Invalid date");
   return v;
 };
+// In-app events that also go to WhatsApp for accounts that turned WhatsApp notices on
+// (events already covered by the email/WhatsApp queue are not repeated here).
+const whatsappEvents = {
+  document_requested: "طُلبت منك وثيقة على شحنة",
+  document_uploaded: "رُفعت الوثيقة التي طلبتها",
+  crossing_arrived: "وصلت الشاحنة إلى المعبر",
+  crossing_left: "عبرت الشاحنة المعبر",
+  destination_arrived: "وصلت الشاحنة لمكان التسليم",
+  closed_by_code: "أُغلقت العملية بالتسليم برمز الاستلام",
+  closed_after_arrival: "أُغلقت العملية تلقائيًا بعد الوصول",
+  truck_stopped: "الشاحنة متوقفة منذ مدة",
+  tracking_stale: "توقف وصول موقع الشاحنة",
+  return_trip_match: "رحلة عودة أرخص على طريق شحنتك",
+  return_trip_request: "طلب جديد على رحلة العودة",
+  return_trip_accepted: "قبل الناقل طلبك على رحلة العودة",
+  shipment_rejected: "رفضت الإدارة طلب الشحن",
+  feedback_replied: "ردّت الإدارة على رسالتك",
+  shared_truck_suggestion: "يمكنك مشاركة شاحنة مع شحنة أخرى على نفس الطريق",
+  referral_reward: "حصلت على شهر مجاني لأن شركة دعوتها انضمت",
+  driver_verified: "تم توثيق السائق",
+};
 export function notice(s, userId, event, shipmentId, detail) {
   if (!userId) return;
+  const u = s.users?.find((x) => x.id === userId);
+  if (u && !u.demo && u.profile?.whatsappNotify === true && whatsappEvents[event]) {
+    const title = shipmentId ? s.shipments?.find((x) => x.id === shipmentId)?.title : "";
+    queueWhatsApp(
+      s,
+      u.details?.phone,
+      `LogiBridge: ${whatsappEvents[event]}${title ? ` — ${title}` : ""}${detail ? ` (${String(detail).slice(0, 120)})` : ""}`,
+      `wa/notice/${event}/${shipmentId || ""}/${userId}/${new Date().toISOString().slice(0, 13)}`,
+    );
+  }
   (s.notifications ||= []).push({
     id: id(),
     userId,

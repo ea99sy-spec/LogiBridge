@@ -14,6 +14,7 @@ import { requiresApproval } from "../shared/access.js";
 import { TERMS_VERSION } from "../shared/legal.js";
 import { ownerMissing } from "./documents.js";
 import { prohibitedRules } from "../shared/prohibited.js";
+import { addCrossingStat } from "../shared/crossingTimes.js";
 import { subscriptionOf, addMonths, pricingOf } from "../shared/subscription.js";
 const text = (value, max = 300) => {
   if (typeof value !== "string" || !value.trim() || value.length > max) throw new Error("Invalid text");
@@ -383,6 +384,7 @@ export function operationRoutes(app) {
         },
         ...(s.crossingReports || []).filter((r) => Date.now() - Date.parse(r.createdAt) < 86400000),
       ].slice(0, 300);
+      addCrossingStat(s, b.crossing, level, now, !!req.user.demo);
       // Long queues (6 hours or more): warn owners of orders still waiting to cross there.
       if (level >= 3)
         for (const o of s.shipments.filter(

@@ -107,6 +107,7 @@ export function transitionShipment(state, shipment, action, actor) {
     // Receipt confirmed: the operation is closed.
     shipment.status = "delivered";
     shipment.completedAt = new Date().toISOString();
+    applyDelayGuarantee(state, shipment);
     if (escrow.status === "held") escrow.status = escrow.simulated === false ? "payout_pending" : "released";
   } else if (
     action === "dispute" &&
@@ -179,6 +180,30 @@ export function closeDelivered(state, shipment, reason) {
   shipment.completedAt = new Date().toISOString();
   shipment.closedBy = reason;
   delete shipment.autoCloseAt;
+  applyDelayGuarantee(state, shipment);
   if (escrow.status === "held") escrow.status = escrow.simulated === false ? "payout_pending" : "released";
   return true;
+}
+
+// Delay guarantee: when the accepted offer promised a discount per late day, the discount is
+// worked out from the real arrival when the operation closes (at most MAX_DELAY_DISCOUNT %).
+export const MAX_DELAY_DISCOUNT = 30;
+export function applyDelayGuarantee(state, shipment) {
+  const bid = (state.bids || []).find((b) => b.id === shipment.bidId);
+  if (!bid?.delayPct || shipment.delayDiscount) return;
+  const arrived = Date.parse(shipment.arrivedAt || shipment.pod?.at || shipment.completedAt || "");
+  const start = Math.max(Date.parse(shipment.date || 0) || 0, Date.parse(shipment.acceptedAt || 0) || 0);
+  if (!arrived || !start) return;
+  const due = new Date(start + (Number(bid.days) || 0) * 86400000);
+  due.setUTCHours(23, 59, 59, 999);
+  const lateDays = Math.max(0, Math.ceil((arrived - due.getTime()) / 86400000));
+  if (!lateDays) return;
+  const pct = Math.min(MAX_DELAY_DISCOUNT, lateDays * bid.delayPct);
+  const amount = Math.round(bid.price * pct) / 100;
+  shipment.delayDiscount = { lateDays, pct, amount, perDay: bid.delayPct };
+  const escrow = (state.escrows || []).find((e) => e.shipmentId === shipment.id);
+  if (escrow) {
+    escrow.delayDiscount = amount;
+    escrow.carrierNet = Math.round(((escrow.carrierNet ?? escrow.amount) - amount) * 100) / 100;
+  }
 }

@@ -166,6 +166,74 @@ const install = S(
   ],
 );
 
+const referral = S(
+  "dashboard",
+  ["ادعُ شركة واربح شهرًا", "Invite a company, earn a month", "Şirket davet et, bir ay kazan"],
+  [
+    "في لوحتك بطاقة «ادعُ شركة» فيها رابطك. كل شركة تسجّل منه وتتم الموافقة عليها تضيف لك شهرًا مجانيًا (حتى 12 شهرًا).",
+    "Your dashboard has an 'Invite a company' card with your link. Every company that signs up through it and is approved adds a free month for you (up to 12).",
+    "Panonuzda bağlantınızı içeren 'Şirket davet et' kartı var. Bağlantınızla kaydolup onaylanan her şirket size bir ay ücretsiz ekler (en fazla 12).",
+  ],
+);
+const whatsappStep = S(
+  "profile",
+  ["إشعارات واتساب", "WhatsApp notices", "WhatsApp bildirimleri"],
+  [
+    "فعّل «إشعارات واتساب» في ملفك لتصلك الأحداث المهمة على رقمك: عرض جديد، وثيقة مطلوبة، وصول الشاحنة للمعبر أو للتسليم، إغلاق العملية.",
+    "Turn on 'WhatsApp notices' in your profile to get the important events on your number: new offer, requested document, truck at the crossing or delivery point, operation closed.",
+    "Önemli olayları numaranıza almak için profilinizde 'WhatsApp bildirimleri'ni açın: yeni teklif, istenen belge, araç kapıda veya teslim noktasında, işlem kapandı.",
+  ],
+);
+const bestTime = S(
+  "border",
+  ["أحسن وقت للعبور", "Best time to cross", "Geçiş için en iyi zaman"],
+  [
+    "في صفحة الحدود جدول لكل معبر يبيّن الأيام والأوقات التي يكون فيها الانتظار أقل عادة، من كل تقارير الزحمة ومواقع الشاحنات.",
+    "The border page has a chart for each crossing showing the days and times when the wait is usually shortest, from every queue report and truck position.",
+    "Sınır sayfasında her kapı için beklemenin genellikle en kısa olduğu günleri ve saatleri gösteren bir tablo var.",
+  ],
+);
+const driversStep = S(
+  "drivers",
+  ["وثّق سائقيك وشاحناتك", "Verify your drivers and trucks", "Sürücü ve araçlarınızı doğrulatın"],
+  [
+    "سجّل السائق مع اللوحة وصورة الرخصة والشاحنة. بعد التوثيق يظهر «سائق موثّق» على الشحنة عندما تختاره لها من بطاقة الشحنة.",
+    "Register the driver with the plate, licence and truck photos. Once verified, 'Verified driver' shows on the shipment when you choose the driver on its card.",
+    "Sürücüyü plaka, ehliyet ve araç fotoğraflarıyla kaydedin. Doğrulandıktan sonra sevkiyat kartında seçtiğinizde 'Doğrulanmış sürücü' görünür.",
+  ],
+);
+const guaranteeStep = S(
+  "jobs",
+  [
+    "ضمان التأخير وحاسبة التكلفة",
+    "Delay guarantee and cost calculator",
+    "Gecikme garantisi ve maliyet hesaplayıcı",
+  ],
+  [
+    "في نموذج العرض: «احسب تكلفة الرحلة» يعطيك أقل سعر بدون خسارة، و«ضمان التأخير» يميّز عرضك بخصم عن كل يوم تأخير يُحسب تلقائيًا من الوصول الفعلي.",
+    "In the offer form: 'Work out the trip cost' gives your lowest price without a loss, and the 'Delay guarantee' makes your offer stand out with a discount per late day, worked out from the real arrival.",
+    "Teklif formunda: 'Sefer maliyetini hesapla' zarar etmeden en düşük fiyatınızı verir; 'Gecikme garantisi' gerçek varıştan hesaplanan günlük indirimle teklifinizi öne çıkarır.",
+  ],
+);
+const trustStep = S(
+  "directory",
+  ["مستويات الثقة", "Trust levels", "Güven seviyeleri"],
+  [
+    "🥉🥈🥇 تُحسب تلقائيًا من العمليات المكتملة والتقييم والالتزام بالمواعيد وسرعة الدفع، وتظهر في الدليل وعلى العروض. فلتر الدليل حسب المستوى.",
+    "🥉🥈🥇 are worked out automatically from completed operations, rating, punctuality and payment speed, and show in the directory and on offers. Filter the directory by level.",
+    "🥉🥈🥇 tamamlanan işlemler, puan, dakiklik ve ödeme hızından otomatik hesaplanır; rehberde ve tekliflerde görünür. Rehberi seviyeye göre filtreleyin.",
+  ],
+);
+const sharedStep = S(
+  "shipments",
+  ["شارك الشاحنة ووفّر", "Share a truck and save", "Aracı paylaş, tasarruf et"],
+  [
+    "إذا كانت شحنتك صغيرة وفي شحنة أخرى على نفس الطريق بنفس الأسبوع يصلك إشعار. فعّل «أقبل مشاركة الشاحنة» ليراها الناقلون ويقدّموا سعرًا أقل.",
+    "If your shipment is small and another one is on the same route in the same week, you are notified. Turn on 'I accept sharing the truck' so carriers see it and offer a lower price.",
+    "Sevkiyatınız küçükse ve aynı hafta aynı güzergâhta başka biri varsa bildirim alırsınız. Taşıyıcılar görsün ve daha düşük fiyat versin diye 'Araç paylaşımını kabul ediyorum'u açın.",
+  ],
+);
+
 export const guide = {
   merchant: [
     profile,
@@ -224,6 +292,11 @@ export const guide = {
     returnTripsTrader,
     prices,
     install,
+    sharedStep,
+    trustStep,
+    bestTime,
+    whatsappStep,
+    referral,
     hub,
     feedback,
   ],
@@ -298,6 +371,12 @@ export const guide = {
     returnTripsCarrier,
     prices,
     install,
+    driversStep,
+    guaranteeStep,
+    trustStep,
+    bestTime,
+    whatsappStep,
+    referral,
     hub,
     feedback,
   ],
@@ -347,6 +426,10 @@ export const guide = {
     docsPrivacy,
     prices,
     install,
+    trustStep,
+    bestTime,
+    whatsappStep,
+    referral,
     hub,
     feedback,
   ],
@@ -383,6 +466,8 @@ export const guide = {
     documents,
     docsPrivacy,
     install,
+    whatsappStep,
+    referral,
     hub,
     feedback,
   ],
@@ -432,6 +517,10 @@ export const guide = {
     returnTripsTrader,
     prices,
     install,
+    sharedStep,
+    trustStep,
+    bestTime,
+    whatsappStep,
     hub,
     feedback,
   ],

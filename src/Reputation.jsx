@@ -26,6 +26,12 @@ export function ReputationChips({ rep, t, kind }) {
         💳 {t("paySpeedValue").replace("{d}", rep.payDays).replace("{n}", rep.payCount)}
       </span>,
     );
+  if (rep.level)
+    chips.unshift(
+      <span key="level" className={`trust-badge ${rep.level}`} title={t("trustLevelHint")}>
+        {{ gold: "🥇", silver: "🥈", bronze: "🥉" }[rep.level]} {t("trust_" + rep.level)}
+      </span>,
+    );
   if (!chips.length) return null;
   return <span className="rep-chips">{chips}</span>;
 }

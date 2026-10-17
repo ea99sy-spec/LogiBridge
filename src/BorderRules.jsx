@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { crossings, crossingKeys } from "../shared/crossings";
 import { HolidaySection } from "./Holidays";
+import { BestCrossingTimes } from "./CrossingTimes";
 
 // Türkiye–Syria border and customs rules that shape how shipments run on the platform.
 // Each rule has its date and public source. Update REVIEWED and the list when rules change;
@@ -186,6 +187,7 @@ export function BorderRules({ t, lang, notices = [], reports = [], admin, canRep
         </section>
       )}
       <HolidaySection t={t} lang={lang} />
+      <BestCrossingTimes t={t} lang={lang} />
       <section className="panel">
         <h2>{t("crossingStatus")}</h2>
         <div className="table-scroll">

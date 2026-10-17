@@ -48,6 +48,11 @@ import { reputationMap } from "./insights.js";
 import { priceIndexRoutes } from "./priceIndex.js";
 import { returnTripRoutes, visibleTrips } from "./returnTrips.js";
 import { commercialRoutes } from "./commercial.js";
+import { driverRoutes, driversFor, driverInfo } from "./drivers.js";
+import { sharedTruckRoutes, sharedMatches, suggestSharing } from "./sharedTruck.js";
+import { crossingTimes } from "../shared/crossingTimes.js";
+import { crossingKeys } from "../shared/crossings.js";
+import { inviterFor, rewardReferral, referralState } from "./referrals.js";
 import { checkGoods, prohibitedRules } from "../shared/prohibited.js";
 import { feedbackRoutes } from "./feedback.js";
 import { documentRoutes, documentVisible, requestVisible } from "./documents.js";
@@ -200,7 +205,12 @@ export async function createApp() {
   // Border and customs notices posted by the administration (public, like the rules page).
   app.get("/api/border", (req, res) => {
     const s = readState();
-    res.json({ notices: s.settings?.borderNotices || [], reports: crossingReports(s, false) });
+    res.json({
+      notices: s.settings?.borderNotices || [],
+      reports: crossingReports(s, false),
+      // Best time to cross, from all queue reports so far (registered accounts only).
+      times: Object.fromEntries(crossingKeys.map((k) => [k, crossingTimes(s.crossingStats, k)])),
+    });
   });
   async function sessionFor(user, res, respond = true) {
     const token = randomBytes(32).toString("hex"),
@@ -261,6 +271,8 @@ export async function createApp() {
     };
     await mutate((s) => {
       if (s.users.some((u) => u.email === email)) throw new Error("Email already registered");
+      const inviter = inviterFor(s, b.ref);
+      if (inviter) user.referredBy = inviter.id;
       s.users.push(user);
       queueEmailVerification(s, user);
       queueEmail(s, user.id, "registered");
@@ -449,6 +461,9 @@ export async function createApp() {
         shipmentDocuments: [],
         documentRequests: [],
         returnTrips: [],
+        drivers: [],
+        // Invite link works while the account waits for approval too.
+        referral: referralState(s, req.user),
         trackingEvents: [],
         driverLinks: [],
         equipmentBookings: [],
@@ -490,6 +505,9 @@ export async function createApp() {
       documentRequests: _documentRequests, // filtered per account below
       feedback: _feedback, // only through /api/feedback and /api/admin/feedback
       returnTrips: _returnTrips, // filtered per account below
+      crossingStats: _crossingStats, // public summary on /api/border only
+      drivers: _drivers, // own drivers (carrier) or all (admin), without documents, below
+      sharedPairs: _sharedPairs, // internal: suggestions already sent
       ...shared
     } = s;
     res.json({
@@ -508,7 +526,13 @@ export async function createApp() {
       shipments: visibleShipments(s, req.user).map((full) => {
         // Invoice and packing list live on the order; stages only say whether they exist.
         const root = full.parentId ? fullState.shipments.find((x) => x.id === full.parentId) : full;
-        const sh = { ...full, hasCommercialDocs: !!root?.commercialDocs };
+        const sh = {
+          ...full,
+          hasCommercialDocs: !!root?.commercialDocs,
+          driverInfo: driverInfo(fullState, full, req.user),
+          // Other small open shipments on the same route and week (shared-truck suggestion).
+          shareMatches: sharedMatches(fullState, full).length,
+        };
         const {
           privateDetails,
           commercialDocs,
@@ -531,6 +555,8 @@ export async function createApp() {
       // Measured reputation (on-time share, payment speed, stars) for offers and shipment cards.
       reputation: reputationMap(fullState, req.user),
       returnTrips: visibleTrips(fullState, req.user),
+      referral: referralState(fullState, req.user),
+      drivers: driversFor(fullState, req.user),
       documentRequests: (fullState.documentRequests || []).filter((r) =>
         requestVisible(fullState, req.user, r),
       ),
@@ -596,6 +622,8 @@ export async function createApp() {
   priceIndexRoutes(app);
   returnTripRoutes(app);
   commercialRoutes(app);
+  driverRoutes(app);
+  sharedTruckRoutes(app);
   trackingRoutes(app);
   paymentRoutes(app);
   advancedRoutes(app);
@@ -692,12 +720,16 @@ export async function createApp() {
           };
           shipment.legs.push(child.id);
           s.shipments.push(child);
-          if (leg.legType !== "clearance") matchRoutes(s, child);
+          if (leg.legType !== "clearance") {
+            matchRoutes(s, child);
+            suggestSharing(s, child);
+          }
         }
         s.shipments.push(shipment);
       } else {
         s.shipments.push(shipment);
         matchRoutes(s, shipment);
+        suggestSharing(s, shipment);
       }
       if (!req.user.demo)
         queueAdminEmail(s, "shipment_created", {
@@ -726,6 +758,9 @@ export async function createApp() {
       days = positive(b.days, "days"),
       note = b.note ? txt(b.note, 500) : "";
     if (!Number.isInteger(days) || days > 365) throw new Error("Invalid days");
+    // Optional delay guarantee: % of the price given back for every late day (capped in domain.js).
+    const delayPct = b.delayPct === undefined || b.delayPct === "" ? 0 : Number(b.delayPct);
+    if (![0, 1, 2, 3, 5].includes(delayPct)) throw new Error("Invalid request");
     await mutate((s) => {
       const target = s.shipments.find((x) => x.id === b.shipmentId);
       if (!target || !shipmentWorld(s, req.user, target)) throw new Error("Shipment unavailable");
@@ -750,6 +785,7 @@ export async function createApp() {
         price,
         days,
         note,
+        ...(delayPct ? { delayPct } : {}),
         createdAt: new Date().toISOString(),
       });
     });
@@ -1068,6 +1104,7 @@ export async function createApp() {
       owner.verified = b.status === "approved";
       if (owner.verified && !owner.demo && !owner.subscription?.startedAt)
         owner.subscription = { ...owner.subscription, startedAt: new Date().toISOString() };
+      if (owner.verified) rewardReferral(s, owner);
       owner.verificationStatus = b.status;
       owner.verificationLevel = owner.verified ? (owner.demo ? "demo" : "manual_review") : "none";
       queueEmail(

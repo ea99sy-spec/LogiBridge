@@ -638,3 +638,256 @@ svg.flag {
   font-weight: 700;
   cursor: pointer;
 }
+.referral-card {
+  display: grid;
+  gap: 10px;
+  border-top: 4px solid #facc15;
+}
+.referral-card h3 {
+  margin: 0;
+}
+.referral-link {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.referral-link input {
+  flex: 1;
+  min-width: 200px;
+}
+.referral-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 13px;
+  color: #6b7f9e;
+}
+.referral-stats b {
+  font-size: 20px;
+  color: #102a56;
+  margin-inline-end: 4px;
+}
+.best-times-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+}
+.best-time-card {
+  border: 1px solid #e3e9f2;
+  border-radius: 14px;
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.best-time-card h3 {
+  margin: 0;
+}
+.best-time-pick {
+  margin: 0;
+  color: #166534;
+}
+.time-grid-scroll {
+  overflow-x: auto;
+}
+.time-grid {
+  border-collapse: separate;
+  border-spacing: 3px;
+  font-size: 10px;
+}
+.time-grid th {
+  font-weight: 600;
+  color: #6b7f9e;
+  padding: 0 4px;
+  text-align: start;
+}
+.time-grid td {
+  width: 34px;
+  height: 18px;
+  border-radius: 4px;
+}
+.time-grid td.lvl-0,
+.time-legend i.lvl-0 {
+  background: #16a34a;
+}
+.time-grid td.lvl-1,
+.time-legend i.lvl-1 {
+  background: #86efac;
+}
+.time-grid td.lvl-2,
+.time-legend i.lvl-2 {
+  background: #facc15;
+}
+.time-grid td.lvl-3,
+.time-legend i.lvl-3 {
+  background: #fb923c;
+}
+.time-grid td.lvl-4,
+.time-legend i.lvl-4 {
+  background: #ef4444;
+}
+.time-grid td.none,
+.time-legend i.none {
+  background: #edf1f7;
+}
+.time-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  color: #6b7f9e;
+}
+.time-legend i {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+.driver-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+.driver-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 8px;
+}
+.driver-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px;
+  border-radius: 12px;
+  background: #f6f8fc;
+}
+.driver-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.driver-status {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #fff3c4;
+  color: #7a5c00;
+}
+.driver-status.verified {
+  background: #dcfce7;
+  color: #166534;
+}
+.driver-status.rejected {
+  background: #fee2e2;
+  color: #9b1c1c;
+}
+.shipment-driver {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  margin: 4px 0;
+}
+.shipment-driver select {
+  max-width: 260px;
+}
+.guarantee-chip {
+  display: inline-block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #ede9fe;
+  color: #5b21b6;
+}
+.trust-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.trust-badge.gold {
+  background: #fef3c7;
+  border-color: #f5b301;
+  color: #7a5c00;
+}
+.trust-badge.silver {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #334155;
+}
+.trust-badge.bronze {
+  background: #fdf2e9;
+  border-color: #d08b57;
+  color: #8a4b1c;
+}
+.cost-calc {
+  grid-column: 1 / -1;
+  border: 1px dashed #d5dde9;
+  border-radius: 12px;
+  padding: 8px 12px;
+  background: #fbfcfe;
+}
+.cost-calc summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: #173a6c;
+}
+.cost-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin: 8px 0;
+}
+.cost-grid label {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.cost-check {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  grid-column: 1 / -1;
+}
+.cost-result {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  font-size: 13px;
+}
+.cost-suggested b {
+  color: #166534;
+  font-size: 16px;
+}
+.shared-truck {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  align-items: center;
+  font-size: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #eef4ff;
+  color: #1e3a8a;
+  margin: 4px 0;
+}
+.shared-truck label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+.share-tag {
+  font-weight: 700;
+}

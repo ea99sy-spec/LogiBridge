@@ -8,6 +8,7 @@ import { transitionShipment, syncOrder, closeDelivered, AUTO_CLOSE_HOURS } from 
 import { readState, mutate } from "./store.js";
 import { subscriptionOf } from "../shared/subscription.js";
 import { queueEmail } from "./email.js";
+import { addCrossingStat } from "../shared/crossingTimes.js";
 
 // A truck within this distance of the delivery point has arrived.
 const ARRIVE_KM = 1.5;
@@ -108,6 +109,7 @@ function checkCrossing(s, sh, point, actorId, source) {
 }
 
 function addGpsReport(s, crossing, level, demo, at) {
+  addCrossingStat(s, crossing, level, at, demo);
   s.crossingReports = [
     { id: randomUUID(), crossing, level, note: "", userId: null, role: "gps", demo, createdAt: at },
     ...(s.crossingReports || []).filter((r) => Date.now() - Date.parse(r.createdAt) < 86400000),
