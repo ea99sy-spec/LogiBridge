@@ -44,8 +44,9 @@ import { whatsappConfigured, flushWhatsApp } from "./whatsapp.js";
 import { subscriptionOf, pricingOf } from "../shared/subscription.js";
 import { publicStats } from "./stats.js";
 import { noteRoutes } from "./notes.js";
+import { checkGoods, prohibitedRules } from "../shared/prohibited.js";
 import { feedbackRoutes } from "./feedback.js";
-import { documentRoutes, documentVisible, requestVisible, adminMayOpen } from "./documents.js";
+import { documentRoutes, documentVisible, requestVisible } from "./documents.js";
 import { accountsReportRoutes } from "./accountsReport.js";
 import { TERMS_VERSION, termsOutdated } from "../shared/legal.js";
 import { trackingRoutes, publicTrackingRoutes, newDeliveryCode, runTrackingWatch } from "./tracking.js";
@@ -370,7 +371,6 @@ export async function createApp() {
         "/profile",
         "/account/password",
         "/account/accept-terms",
-        "/account/document-privacy",
         "/feedback",
         "/fx",
         "/notifications/read",
@@ -523,8 +523,6 @@ export async function createApp() {
         .filter((d) => documentVisible(fullState, req.user, d))
         .map(({ encryptedContent, ...doc }) => ({
           ...doc,
-          // Shown to the administration as "uploaded" only, when the company keeps the content private.
-          ...(adminMayOpen(fullState, req.user, doc) ? {} : { locked: true }),
           // The operation a document belongs to (a 3-stage order groups all its stages).
           fileId:
             doc.orderId ||
@@ -589,6 +587,18 @@ export async function createApp() {
     const route = routeDetails(b);
     const hsCode = b.hsCode == null ? "" : String(b.hsCode).trim();
     if (!/^[0-9]{6,12}$/.test(hsCode)) throw new Error("HS Code is required and must contain 6 to 12 digits");
+    // Prohibited goods are refused before anything is saved; the administration is told.
+    const banned = checkGoods(
+      { hsCode, title: b.title, description: b.description },
+      prohibitedRules(readState().settings),
+    );
+    if (banned.length) {
+      await mutate((s) => {
+        for (const a of s.users.filter((u) => u.role === "admin" && !!u.demo === !!req.user.demo))
+          notice(s, a.id, "prohibited_attempt", undefined, `${req.user.name}: ${banned.join("، ")}`);
+      });
+      throw new Error("Prohibited goods: this request cannot be accepted");
+    }
     if (
       !["textiles", "food", "machinery", "packaging", "other"].includes(b.category) ||
       !/^\d{4}-\d{2}-\d{2}$/.test(b.date) ||

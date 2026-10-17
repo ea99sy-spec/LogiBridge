@@ -50,20 +50,28 @@ const documents = S(
 );
 const docsPrivacy = S(
   "documents",
-  ["خصوصية وثائقك", "Your documents' privacy", "Belgelerinizin gizliliği"],
   [
-    "أنت تختار: إدارة المنصة ترى دائمًا أن الوثيقة رُفعت ومتى ومن رفعها، لكنها لا تفتح محتواها إلا إذا فعّلت «السماح لإدارة المنصة بفتح محتوى وثائقي» في أعلى صفحة الوثائق. الشركات العاملة معك على الشحنة ترى الوثائق دائمًا.",
-    "You choose: the platform administration always sees that a document was uploaded, when and by whom, but opens its content only if you turn on 'Let the platform administration open my documents' at the top of the documents page. Companies working with you on the shipment always see the documents.",
-    "Siz seçersiniz: platform yönetimi belgenin yüklendiğini, ne zaman ve kimin yüklediğini her zaman görür; içeriği ise yalnızca belgeler sayfasının üstündeki 'Platform yönetimi belgelerimi açabilsin' seçeneğini açarsanız açabilir. Sevkiyatta sizinle çalışan şirketler belgeleri her zaman görür.",
+    "البضائع الممنوعة ومراجعة الوثائق",
+    "Prohibited goods and document review",
+    "Yasaklı ürünler ve belge incelemesi",
+  ],
+  [
+    "المنصة لا تقبل البضائع الممنوعة (أسلحة، ذخائر، متفجرات، مخدرات، مواد مشعة…): يُرفض الطلب تلقائيًا إذا دلّ رمز HS أو الوصف عليها. إدارة المنصة تطّلع على وثائق الشحنات للتأكد، ويحق لها رفض أي طلب مع ذكر السبب.",
+    "The platform does not accept prohibited goods (arms, ammunition, explosives, narcotics, radioactive materials…): a request is refused automatically when its HS code or description points to them. The administration reviews shipment documents to check, and may refuse any request with a stated reason.",
+    "Platform yasaklı ürünleri kabul etmez (silah, mühimmat, patlayıcı, uyuşturucu, radyoaktif madde…): HS kodu veya tanım bunlara işaret ederse talep otomatik reddedilir. Yönetim kontrol için sevkiyat belgelerini inceler ve gerekçesini belirterek her talebi reddedebilir.",
   ],
 );
 const adminDocs = S(
   "documents",
-  ["متابعة الوثائق", "Following documents", "Belgeleri takip"],
   [
-    "في «رفع الوثائق» ترى لكل عملية: أي وثيقة رُفعت، ومتى، ومن رفعها، وما هو مطلوب وما زال ناقصًا. المحتوى يُفتح فقط إذا سمحت الشركة (🔒 = خاص). يمكنك أيضًا طلب وثيقة من أي طرف على العملية.",
-    "In 'Upload documents' you see for every operation which document was uploaded, when and by whom, and what is requested and still missing. Content opens only if the company allows it (🔒 = private). You can also request a document from any party on the operation.",
-    "'Belge yükleme' bölümünde her işlem için hangi belgenin ne zaman ve kim tarafından yüklendiğini, nelerin istendiğini ve eksik kaldığını görürsünüz. İçerik yalnızca şirket izin verirse açılır (🔒 = gizli). İşlemdeki herhangi bir taraftan belge de isteyebilirsiniz.",
+    "مراجعة الوثائق والبضائع الممنوعة",
+    "Reviewing documents and prohibited goods",
+    "Belge incelemesi ve yasaklı ürünler",
+  ],
+  [
+    "في «رفع الوثائق» تفتح وثائق كل شحنة وترى متى رُفعت ومن رفعها. إذا دلّت على بضاعة ممنوعة، اضغط «رفض الطلب» على بطاقة الشحنة واكتب السبب. قائمة رموز HS والكلمات الممنوعة تعدّلها من «إعدادات الموقع»، ويصلك إشعار بكل محاولة رُفضت تلقائيًا.",
+    "In 'Upload documents' open each shipment's documents and see when and by whom they were uploaded. If they show prohibited goods, press 'Refuse request' on the shipment card and give the reason. Edit the prohibited HS codes and words in 'Site settings'; you are notified of every attempt refused automatically.",
+    "'Belge yükleme' bölümünde her sevkiyatın belgelerini açıp ne zaman ve kimin yüklediğini görün. Yasaklı ürün varsa sevkiyat kartında 'Talebi reddet'e basıp gerekçeyi yazın. Yasaklı HS kodlarını ve kelimeleri 'Site ayarları'ndan düzenleyin; otomatik reddedilen her girişim için bildirim alırsınız.",
   ],
 );
 

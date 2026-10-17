@@ -128,25 +128,17 @@ function DocLine({ d, t, user, name, run, busy, lang }) {
           {name(d.userId)} · {new Date(d.createdAt).toLocaleDateString(lang)}
         </small>
       </span>
-      {d.locked ? (
-        <small className="doc-locked" title={t("docLockedHint")}>
-          🔒 {t("docLocked")}
-        </small>
-      ) : (
-        <>
-          <a
-            className="text-button"
-            href={`/api/shipment-documents/${d.id}?view=1`}
-            target="_blank"
-            rel="noopener"
-          >
-            {t("view")}
-          </a>
-          <a className="text-button" href={`/api/shipment-documents/${d.id}`}>
-            {t("download")}
-          </a>
-        </>
-      )}
+      <a
+        className="text-button"
+        href={`/api/shipment-documents/${d.id}?view=1`}
+        target="_blank"
+        rel="noopener"
+      >
+        {t("view")}
+      </a>
+      <a className="text-button" href={`/api/shipment-documents/${d.id}`}>
+        {t("download")}
+      </a>
       {d.userId === user.id && !String(d.kind).startsWith("photo_") && (
         <button
           type="button"
@@ -516,26 +508,9 @@ export function DocumentCenter({ data, user, t, run, busy, navigate, lang }) {
           ↗
         </button>
       </div>
-      {user.role !== "admin" && !user.demo && (
-        <label className="consent doc-privacy">
-          <input
-            type="checkbox"
-            checked={!!user.docsAdminAccess}
-            disabled={busy}
-            onChange={(e) =>
-              run("/account/document-privacy", { shareWithAdmin: e.target.checked }, "POST", {
-                success: "saved",
-              })
-            }
-          />
-          <span>
-            <b>{t("docsShareWithAdmin")}</b>
-            <br />
-            <small>{t("docsShareWithAdminNote")}</small>
-          </span>
-        </label>
-      )}
-      {user.role === "admin" && <p className="muted small">{t("adminDocsPrivacyNote")}</p>}
+      <p className="muted small doc-review-note">
+        🛡 {t(user.role === "admin" ? "adminDocsReviewNote" : "docsReviewNote")}
+      </p>
       {mineTotal > 0 && (
         <p className="notice doc-alert" role="status">
           📎 {t("documentsAskedFromYou").replace("{n}", mineTotal)}

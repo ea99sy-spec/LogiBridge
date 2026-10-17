@@ -2185,33 +2185,7 @@ export const extraRows = {
     "Pick the document type, then upload:",
     "Belge türünü seçip yükleyin:",
   ],
-  docLocked: ["مرفوعة · المحتوى خاص", "Uploaded · content private", "Yüklendi · içerik gizli"],
-  docLockedHint: [
-    "الشركة اختارت عدم مشاركة محتوى وثائقها مع الإدارة. تظهر لك حالة الرفع وتاريخه فقط.",
-    "The company chose not to share its documents' content with the administration. You see only the upload status and date.",
-    "Şirket belge içeriğini yönetimle paylaşmamayı seçti. Yalnızca yükleme durumunu ve tarihini görürsünüz.",
-  ],
-  docsShareWithAdmin: [
-    "السماح لإدارة المنصة بفتح محتوى وثائقي",
-    "Let the platform administration open my documents",
-    "Platform yönetimi belgelerimi açabilsin",
-  ],
-  docsShareWithAdminNote: [
-    "الإدارة ترى دائمًا أن الوثيقة رُفعت ومتى ومن رفعها، لكنها لا تفتح محتواها إلا إذا فعّلت هذا الخيار. الشركات العاملة معك على الشحنة ترى الوثائق دائمًا. صور المراحل وإثبات التسليم تبقى متاحة للإدارة لحل النزاعات.",
-    "The administration always sees that a document was uploaded, when and by whom, but opens its content only if you turn this on. Companies working with you on the shipment always see the documents. Stage photos and proof of delivery stay available to the administration for disputes.",
-    "Yönetim belgenin yüklendiğini, ne zaman ve kimin yüklediğini her zaman görür; içeriği ise yalnızca bunu açarsanız açabilir. Sevkiyatta sizinle çalışan şirketler belgeleri her zaman görür. Aşama fotoğrafları ve teslim kanıtı anlaşmazlıklar için yönetime açık kalır.",
-  ],
-  adminDocsPrivacyNote: [
-    "ترى هنا كل الوثائق: هل رُفعت، ومتى، ومن رفعها. تفتح محتوى الوثيقة فقط إذا سمحت الشركة بذلك (🔒 = المحتوى خاص).",
-    "Here you see every document: whether it was uploaded, when and by whom. You can open a document's content only if the company allows it (🔒 = private content).",
-    "Burada tüm belgeleri görürsünüz: yüklenip yüklenmediğini, ne zaman ve kimin yüklediğini. İçeriği yalnızca şirket izin verirse açabilirsiniz (🔒 = gizli içerik).",
-  ],
   saved: ["تم الحفظ.", "Saved.", "Kaydedildi."],
-  "err_Document content is private": [
-    "محتوى هذه الوثيقة خاص بالشركة.",
-    "This document's content is private to the company.",
-    "Bu belgenin içeriği şirkete özeldir.",
-  ],
   destination_arrived: ["وصلت لمكان التسليم", "Reached the delivery point", "Teslim noktasına ulaştı"],
   event_destination_arrived: [
     "وصلت الشاحنة لمكان التسليم، وستُغلق العملية تلقائيًا في:",
@@ -2363,4 +2337,82 @@ export const extraRows = {
     "Bugün çok fazla mesaj gönderdiniz, lütfen yarın deneyin.",
   ],
   "err_Message unavailable": ["الرسالة غير موجودة.", "Message unavailable.", "Mesaj bulunamadı."],
+  docsReviewNote: [
+    "تطّلع إدارة المنصة على وثائق الشحنات للتأكد من أن البضاعة مسموحة. الشركات العاملة معك على الشحنة ترى الوثائق أيضًا.",
+    "The platform administration reviews shipment documents to make sure the goods are allowed. Companies working with you on the shipment also see the documents.",
+    "Platform yönetimi, ürünlerin izinli olduğundan emin olmak için sevkiyat belgelerini inceler. Sevkiyatta sizinle çalışan şirketler de belgeleri görür.",
+  ],
+  adminDocsReviewNote: [
+    "ترى هنا كل وثائق الشحنات وتستطيع فتحها. إذا دلّت الوثائق على بضاعة ممنوعة، ارفض الطلب من بطاقة الشحنة مع ذكر السبب.",
+    "Here you see and can open every shipment document. If the documents show prohibited goods, refuse the request from the shipment card with a reason.",
+    "Burada tüm sevkiyat belgelerini görebilir ve açabilirsiniz. Belgeler yasaklı ürün gösterirse, sevkiyat kartından gerekçeyle talebi reddedin.",
+  ],
+  prohibitedFormNote: [
+    "لا نقبل البضائع الممنوعة (أسلحة، ذخائر، متفجرات، مخدرات، مواد مشعة…). يُرفض الطلب تلقائيًا إذا دلّ رمز HS أو الوصف عليها، وتراجع الإدارة الوثائق.",
+    "Prohibited goods are not accepted (arms, ammunition, explosives, narcotics, radioactive materials…). The request is refused automatically if the HS code or description points to them, and the administration reviews documents.",
+    "Yasaklı ürünler kabul edilmez (silah, mühimmat, patlayıcı, uyuşturucu, radyoaktif madde…). HS kodu veya tanım bunlara işaret ederse talep otomatik reddedilir; yönetim belgeleri inceler.",
+  ],
+  prohibitedTitle: ["البضائع الممنوعة", "Prohibited goods", "Yasaklı ürünler"],
+  prohibitedNote: [
+    "أي طلب شحن يبدأ رمز HS فيه بأحد هذه الرموز، أو يحتوي عنوانه أو وصفه إحدى هذه الكلمات، يُرفض تلقائيًا ويصلك إشعار بالمحاولة. افصل بين القيم بفاصلة أو سطر جديد. القائمة الافتراضية نقطة بداية: راجعها مع مخلّص جمركي مرخّص.",
+    "Any shipment whose HS code starts with one of these codes, or whose title or description contains one of these words, is refused automatically and you are notified of the attempt. Separate values with commas or new lines. The default list is a starting point: review it with a licensed customs broker.",
+    "HS kodu bu kodlardan biriyle başlayan veya başlığı ya da tanımı bu kelimelerden birini içeren her sevkiyat otomatik reddedilir ve girişimden haberdar edilirsiniz. Değerleri virgül veya yeni satırla ayırın. Varsayılan liste bir başlangıçtır: lisanslı bir gümrük müşaviriyle gözden geçirin.",
+  ],
+  prohibitedHs: ["بدايات رموز HS الممنوعة", "Prohibited HS code prefixes", "Yasaklı HS kodu başlangıçları"],
+  prohibitedWords: [
+    "كلمات ممنوعة (عربي/إنكليزي/تركي)",
+    "Prohibited words (Arabic/English/Turkish)",
+    "Yasaklı kelimeler (Arapça/İngilizce/Türkçe)",
+  ],
+  rejectShipment: ["رفض الطلب", "Refuse request", "Talebi reddet"],
+  rejectShipmentPrompt: [
+    "اكتب سبب رفض الطلب (يظهر لصاحب الشحنة):",
+    "Write the reason for refusing the request (shown to the shipment owner):",
+    "Talebi reddetme gerekçesini yazın (sevkiyat sahibine gösterilir):",
+  ],
+  shipmentRejectedReason: [
+    "رفضت الإدارة هذا الطلب",
+    "The administration refused this request",
+    "Yönetim bu talebi reddetti",
+  ],
+  event_prohibited_attempt: [
+    "محاولة شحن بضاعة ممنوعة (رُفضت تلقائيًا)",
+    "Attempt to ship prohibited goods (refused automatically)",
+    "Yasaklı ürün gönderme girişimi (otomatik reddedildi)",
+  ],
+  event_shipment_rejected: [
+    "رفضت الإدارة طلب الشحن",
+    "The administration refused your shipment request",
+    "Yönetim sevkiyat talebinizi reddetti",
+  ],
+  event_shipment_rejected_provider: [
+    "أُلغي طلب شحن رفضته الإدارة",
+    "A shipment request was refused by the administration",
+    "Bir sevkiyat talebi yönetimce reddedildi",
+  ],
+  "err_Prohibited goods: this request cannot be accepted": [
+    "لا يمكن قبول هذا الطلب: البضاعة من البضائع الممنوعة على المنصة.",
+    "This request cannot be accepted: the goods are prohibited on the platform.",
+    "Bu talep kabul edilemez: ürün platformda yasaklıdır.",
+  ],
+  "err_Payment already started: open a dispute instead": [
+    "بدأ الدفع على هذه الشحنة، استخدم النزاع بدل الرفض.",
+    "Payment already started on this shipment; use a dispute instead.",
+    "Bu sevkiyatta ödeme başladı; ret yerine itiraz kullanın.",
+  ],
+  "err_Shipment already on the way": [
+    "الشحنة انطلقت بالفعل.",
+    "The shipment is already on the way.",
+    "Sevkiyat zaten yolda.",
+  ],
+  "err_HS codes must be 2 to 10 digits": [
+    "رموز HS يجب أن تكون من 2 إلى 10 أرقام.",
+    "HS codes must be 2 to 10 digits.",
+    "HS kodları 2-10 haneli olmalı.",
+  ],
+  "err_Each word must be 3 to 60 characters": [
+    "كل كلمة من 3 إلى 60 حرفًا.",
+    "Each word must be 3 to 60 characters.",
+    "Her kelime 3-60 karakter olmalı.",
+  ],
 };

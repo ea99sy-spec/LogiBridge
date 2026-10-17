@@ -62,3 +62,21 @@ test("arrival at the delivery point closes the stage after the waiting time", ()
   assert.equal(s.shipments[0].status, "delivered");
   assert.equal(s.escrows[0].status, "released");
 });
+
+import { checkGoods, prohibitedRules, DEFAULT_PROHIBITED } from "../shared/prohibited.js";
+test("prohibited goods are detected by HS code and words", () => {
+  const rules = prohibitedRules({});
+  assert.deepEqual(rules, DEFAULT_PROHIBITED);
+  assert.deepEqual(checkGoods({ hsCode: "930190", title: "Parts", description: "" }, rules), ["HS 93"]);
+  assert.ok(checkGoods({ hsCode: "520100", title: "شحنة أسلحة صيد", description: "" }, rules).length);
+  assert.ok(
+    checkGoods({ hsCode: "520100", title: "Cotton", description: "contains Captagon" }, rules).length,
+  );
+  assert.deepEqual(
+    checkGoods({ hsCode: "520100", title: "قطن خام", description: "Raw cotton bales" }, rules),
+    [],
+  );
+  const custom = prohibitedRules({ prohibited: { hs: ["2402"], words: ["tobacco"] } });
+  assert.ok(checkGoods({ hsCode: "240220", title: "", description: "" }, custom).length);
+  assert.deepEqual(checkGoods({ hsCode: "930190", title: "", description: "" }, custom), []);
+});

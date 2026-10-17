@@ -13,6 +13,7 @@ import { readState, mutate, id } from "./store.js";
 import { requiresApproval } from "../shared/access.js";
 import { TERMS_VERSION } from "../shared/legal.js";
 import { ownerMissing } from "./documents.js";
+import { prohibitedRules } from "../shared/prohibited.js";
 import { subscriptionOf, addMonths, pricingOf } from "../shared/subscription.js";
 const text = (value, max = 300) => {
   if (typeof value !== "string" || !value.trim() || value.length > max) throw new Error("Invalid text");
@@ -131,6 +132,7 @@ export function operationRoutes(app) {
       enforceSubscription: s.settings?.enforceSubscription === true,
       showStats: s.settings?.showStats !== false,
       company: s.settings?.company || {},
+      prohibited: prohibitedRules(s.settings),
       pricing: pricingOf(s),
       whatsappConfigured: whatsappConfigured(),
       recipient: adminRecipient(s),
@@ -194,6 +196,22 @@ export function operationRoutes(app) {
         throw new Error("Tax number must be 10 or 11 digits");
       if (company.kep && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(company.kep)) throw new Error("Invalid email");
     }
+    let prohibited;
+    if ("prohibited" in b) {
+      const list = (v, max) =>
+        [
+          ...new Set(
+            (Array.isArray(v) ? v : String(v || "").split(/[\n,،]+/))
+              .map((x) => String(x).trim())
+              .filter(Boolean),
+          ),
+        ].slice(0, max);
+      prohibited = { hs: list(b.prohibited?.hs, 200), words: list(b.prohibited?.words, 500) };
+      if (prohibited.hs.some((x) => !/^\d{2,10}$/.test(x)))
+        throw new Error("HS codes must be 2 to 10 digits");
+      if (prohibited.words.some((x) => x.length < 3 || x.length > 60))
+        throw new Error("Each word must be 3 to 60 characters");
+    }
     let adminWhatsapp;
     if ("adminWhatsapp" in b) {
       adminWhatsapp = String(b.adminWhatsapp || "").trim();
@@ -204,6 +222,7 @@ export function operationRoutes(app) {
       if (adminWhatsapp !== undefined) s.settings.adminWhatsapp = adminWhatsapp;
       if (publicWhatsapp !== undefined) s.settings.publicWhatsapp = publicWhatsapp;
       if (company) s.settings.company = company;
+      if (prohibited) s.settings.prohibited = prohibited;
       if (pricing) s.settings.pricing = pricing;
       if ("demoLogin" in b) s.settings.demoLogin = b.demoLogin;
       if ("activityEmails" in b) s.settings.activityEmails = b.activityEmails;
@@ -236,6 +255,42 @@ export function operationRoutes(app) {
         by: req.user.id,
       });
       notice(s, u.id, "subscription_paid", undefined, u.subscription.paidUntil.slice(0, 10));
+    });
+    res.json({ ok: true });
+  });
+  // The administration refuses a shipment request (for example prohibited goods found in its
+  // documents). Only before any money is held, so nothing needs refunding.
+  app.post("/api/admin/shipments/:id/reject", async (req, res) => {
+    if (req.user.role !== "admin") return res.status(403).json({ error: "Forbidden" });
+    const reason = String(req.body?.reason || "")
+      .trim()
+      .slice(0, 500);
+    if (reason.length < 3) throw new Error("Rejection reason required");
+    await mutate((s) => {
+      const sh = s.shipments.find((x) => x.id === req.params.id && !x.parentId);
+      if (!sh || !!s.users.find((u) => u.id === sh.ownerId)?.demo !== !!req.user.demo)
+        throw new Error("Shipment unavailable");
+      const parts = [sh, ...s.shipments.filter((x) => x.parentId === sh.id)];
+      if (
+        s.escrows.some(
+          (e) => parts.some((p) => p.id === e.shipmentId) && !["awaiting_funding"].includes(e.status),
+        )
+      )
+        throw new Error("Payment already started: open a dispute instead");
+      if (parts.some((p) => ["transit", "arrived", "delivered"].includes(p.status)))
+        throw new Error("Shipment already on the way");
+      const now = new Date().toISOString();
+      const people = new Set();
+      for (const p of parts) {
+        p.status = "rejected";
+        p.rejectedAt = now;
+        p.rejectionReason = reason;
+        if (p.carrierId) people.add(p.carrierId);
+        for (const bid of s.bids.filter((x) => x.shipmentId === p.id)) people.add(bid.carrierId);
+      }
+      s.escrows = s.escrows.filter((e) => !parts.some((p) => p.id === e.shipmentId));
+      notice(s, sh.ownerId, "shipment_rejected", sh.id, reason);
+      for (const u of people) notice(s, u, "shipment_rejected_provider", sh.id);
     });
     res.json({ ok: true });
   });

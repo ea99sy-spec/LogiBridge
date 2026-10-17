@@ -118,6 +118,7 @@ export function ShipmentEntry({ t, run, busy, onCreated }) {
             <span>{t("cargoDescription")}</span>
             <textarea name="description" rows="3" maxLength="2000" required />
           </label>
+          <p className="notice prohibited-note full-field">⛔ {t("prohibitedFormNote")}</p>
         </div>
         <h3>02 · {t("routeAndDate")}</h3>
         <div className="form-grid">

@@ -55,7 +55,7 @@ export function CompanyInfo({ company, t, compact = false }) {
 
 // Terms of use and privacy policy in the three interface languages.
 // Last updated date is shown on the page; update it whenever the text changes.
-const UPDATED = TERMS_VERSION;
+const UPDATED = TERMS_VERSION.slice(0, 10);
 
 const content = {
   terms: {
@@ -72,7 +72,7 @@ const content = {
         ],
         [
           "التزامات المستخدم",
-          "يلتزم المستخدم بنقل بضائع مشروعة فقط، وبتقديم وصف ورمز HS ووثائق صحيحة، وبالالتزام بأنظمة الجمارك والتصدير والاستيراد في بلدان المنشأ والعبور والوصول. يتحمّل صاحب الشحنة مسؤولية صحة بيانات بضاعته.",
+          "يلتزم المستخدم بنقل بضائع مشروعة فقط، وبتقديم وصف ورمز HS ووثائق صحيحة، وبالالتزام بأنظمة الجمارك والتصدير والاستيراد في بلدان المنشأ والعبور والوصول. يتحمّل صاحب الشحنة مسؤولية صحة بيانات بضاعته. لا تقبل المنصة البضائع الممنوعة (مثل الأسلحة والذخائر والمتفجرات والمخدرات والمواد المشعة): يُرفض الطلب تلقائيًا إذا دلّ رمز HS أو الوصف عليها، وتراجع إدارة المنصة وثائق الشحنات ويحق لها رفض أي طلب مع ذكر السبب وإيقاف الحساب المخالف.",
         ],
         [
           "العروض والاتفاق",
@@ -113,7 +113,7 @@ const content = {
         ],
         [
           "User obligations",
-          "Users may ship lawful goods only, must give a correct description, HS code and documents, and must comply with customs, export and import rules in the countries of origin, transit and destination. Shipment owners are responsible for the accuracy of their cargo data.",
+          "Users may ship lawful goods only, must give a correct description, HS code and documents, and must comply with customs, export and import rules in the countries of origin, transit and destination. Shipment owners are responsible for the accuracy of their cargo data. The platform does not accept prohibited goods (such as arms, ammunition, explosives, narcotics and radioactive materials): a request is refused automatically when its HS code or description points to them, and the administration reviews shipment documents and may refuse any request with a stated reason and suspend the account concerned.",
         ],
         [
           "Offers and agreement",
@@ -154,7 +154,7 @@ const content = {
         ],
         [
           "Kullanıcı yükümlülükleri",
-          "Yalnızca yasal ürünler taşınabilir; doğru tanım, HS kodu ve belgeler verilmeli, çıkış, transit ve varış ülkelerinin gümrük, ihracat ve ithalat kurallarına uyulmalıdır. Yük bilgilerinin doğruluğundan sevkiyat sahibi sorumludur.",
+          "Yalnızca yasal ürünler taşınabilir; doğru tanım, HS kodu ve belgeler verilmeli, çıkış, transit ve varış ülkelerinin gümrük, ihracat ve ithalat kurallarına uyulmalıdır. Yük bilgilerinin doğruluğundan sevkiyat sahibi sorumludur. Platform yasaklı ürünleri (silah, mühimmat, patlayıcı, uyuşturucu ve radyoaktif maddeler gibi) kabul etmez: HS kodu veya tanım bunlara işaret ederse talep otomatik reddedilir; yönetim sevkiyat belgelerini inceler, gerekçesini belirterek her talebi reddedebilir ve ilgili hesabı askıya alabilir.",
         ],
         [
           "Teklifler ve anlaşma",
@@ -205,7 +205,7 @@ const content = {
         ],
         [
           "من يرى بياناتك",
-          "يظهر للمستخدمين الآخرين اسمك وتعريفك وخدماتك وتقييمك فقط. تفاصيل المرسل والمستلم والعنوان تظهر للناقل المكلّف بالشحنة فقط. بريدك ورقمك الضريبي ووثائقك لا تظهر في الدليل. صور الشحنة وإثبات التسليم يراها صاحب الشحنة والناقل والإدارة فقط. رابط التتبع الذي ينشئه صاحب الشحنة للمستلم يعرض المرحلة وموقعًا تقريبيًا (نحو كيلومتر) لكل من يملك الرابط، ويمكن إيقافه في أي وقت. تقارير الزحمة تظهر بدون اسم من أرسلها.",
+          "يظهر للمستخدمين الآخرين اسمك وتعريفك وخدماتك وتقييمك فقط. تفاصيل المرسل والمستلم والعنوان تظهر للناقل المكلّف بالشحنة فقط. بريدك ورقمك الضريبي ووثائقك لا تظهر في الدليل. صور الشحنة وإثبات التسليم يراها صاحب الشحنة والناقل والإدارة فقط. وثائق الشحنات يراها الأطراف العاملون على الشحنة، وتطّلع عليها إدارة المنصة للتحقق من أن البضاعة مسموحة. رابط التتبع الذي ينشئه صاحب الشحنة للمستلم يعرض المرحلة وموقعًا تقريبيًا (نحو كيلومتر) لكل من يملك الرابط، ويمكن إيقافه في أي وقت. تقارير الزحمة تظهر بدون اسم من أرسلها.",
         ],
         [
           "مزوّدو الخدمة",
@@ -246,7 +246,7 @@ const content = {
         ],
         [
           "Who sees your data",
-          "Other users see only your name, introduction, services and rating. Sender, recipient and address details are visible only to the carrier assigned to the shipment. Your email, tax number and documents never appear in the directory. Shipment photos and proof of delivery are visible only to the shipment owner, the carrier and the administration. A tracking link the owner creates for the receiver shows the stage and an approximate position (about one kilometre) to anyone who has the link, and can be turned off at any time. Queue reports appear without the sender's name.",
+          "Other users see only your name, introduction, services and rating. Sender, recipient and address details are visible only to the carrier assigned to the shipment. Your email, tax number and documents never appear in the directory. Shipment photos and proof of delivery are visible only to the shipment owner, the carrier and the administration. Shipment documents are seen by the parties working on the shipment, and the platform administration reviews them to check that the goods are allowed. A tracking link the owner creates for the receiver shows the stage and an approximate position (about one kilometre) to anyone who has the link, and can be turned off at any time. Queue reports appear without the sender's name.",
         ],
         [
           "Service providers",
@@ -287,7 +287,7 @@ const content = {
         ],
         [
           "Verilerinizi kim görür",
-          "Diğer kullanıcılar yalnızca adınızı, tanıtımınızı, hizmetlerinizi ve puanınızı görür. Gönderici, alıcı ve adres bilgileri yalnızca sevkiyata atanan taşıyıcıya görünür. E-posta, vergi numarası ve belgeleriniz rehberde yer almaz. Sevkiyat fotoğraflarını ve teslim kanıtını yalnızca sevkiyat sahibi, taşıyıcı ve yönetim görür. Sevkiyat sahibinin alıcı için oluşturduğu takip bağlantısı, bağlantıya sahip herkese aşamayı ve yaklaşık konumu (yaklaşık bir kilometre) gösterir ve her an kapatılabilir. Kuyruk raporları gönderenin adı olmadan görünür.",
+          "Diğer kullanıcılar yalnızca adınızı, tanıtımınızı, hizmetlerinizi ve puanınızı görür. Gönderici, alıcı ve adres bilgileri yalnızca sevkiyata atanan taşıyıcıya görünür. E-posta, vergi numarası ve belgeleriniz rehberde yer almaz. Sevkiyat fotoğraflarını ve teslim kanıtını yalnızca sevkiyat sahibi, taşıyıcı ve yönetim görür. Sevkiyat belgelerini sevkiyatta çalışan taraflar görür; platform yönetimi de ürünlerin izinli olduğunu doğrulamak için inceler. Sevkiyat sahibinin alıcı için oluşturduğu takip bağlantısı, bağlantıya sahip herkese aşamayı ve yaklaşık konumu (yaklaşık bir kilometre) gösterir ve her an kapatılabilir. Kuyruk raporları gönderenin adı olmadan görünür.",
         ],
         [
           "Hizmet sağlayıcılar",

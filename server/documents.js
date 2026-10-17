@@ -90,15 +90,7 @@ export function requestVisible(s, user, r) {
   return (fileOf(s, r)?.parties || []).includes(user.id);
 }
 
-// Each company chooses whether the platform administration may open the content of the documents
-// it uploads. The administration always sees that a document was uploaded, by whom and when.
-// Stage photos and proof of delivery stay open to the administration for dispute decisions.
-export function adminMayOpen(s, user, doc) {
-  if (user.role !== "admin") return true;
-  if (String(doc.kind || "").startsWith("photo_")) return true;
-  return s.users.find((u) => u.id === doc.userId)?.docsAdminAccess === true;
-}
-
+// The administration may open every shipment document, to check that the goods are allowed.
 // Can this account see a document? Administrators see every document of their own world.
 export function documentVisible(s, user, doc) {
   const uploader = s.users.find((u) => u.id === doc.userId);
@@ -161,8 +153,6 @@ export function documentRoutes(app) {
       doc = s.shipmentDocuments.find((x) => x.id === req.params.id);
     if (!doc) return res.sendStatus(404);
     if (!documentVisible(s, req.user, doc)) return res.sendStatus(403);
-    if (!adminMayOpen(s, req.user, doc))
-      return res.status(403).json({ error: "Document content is private" });
     const ext = { "application/pdf": "pdf", "image/png": "png", "image/jpeg": "jpg" }[doc.mime] || "bin";
     const name =
       String(doc.filename || "document")
@@ -235,14 +225,6 @@ export function documentRoutes(app) {
       if (!r || r.status !== "open") throw new Error("Document request unavailable");
       if (r.requestedBy !== req.user.id) throw new Error("Only the requester can cancel this request");
       r.status = "cancelled";
-    });
-    res.json({ ok: true });
-  });
-  app.post("/api/account/document-privacy", async (req, res) => {
-    if (typeof req.body?.shareWithAdmin !== "boolean") throw new Error("Invalid request");
-    await mutate((s) => {
-      const u = s.users.find((x) => x.id === req.user.id);
-      if (u) u.docsAdminAccess = req.body.shareWithAdmin;
     });
     res.json({ ok: true });
   });

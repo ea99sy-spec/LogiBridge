@@ -721,6 +721,39 @@ export function AdminSiteSettings({ data, t, run, busy }) {
         </button>
       </form>
       <form
+        className="form-stack prohibited-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const f = new FormData(e.currentTarget);
+          save({ prohibited: { hs: f.get("hs"), words: f.get("words") } });
+        }}
+      >
+        <h3>⛔ {t("prohibitedTitle")}</h3>
+        <small className="muted">{t("prohibitedNote")}</small>
+        <label className="field">
+          <span>{t("prohibitedHs")}</span>
+          <textarea
+            name="hs"
+            rows={2}
+            dir="ltr"
+            defaultValue={(settings.prohibited?.hs || []).join(", ")}
+            key={"hs" + (settings.prohibited?.hs || []).join()}
+          />
+        </label>
+        <label className="field">
+          <span>{t("prohibitedWords")}</span>
+          <textarea
+            name="words"
+            rows={4}
+            defaultValue={(settings.prohibited?.words || []).join(", ")}
+            key={"w" + (settings.prohibited?.words || []).join()}
+          />
+        </label>
+        <button className="button" disabled={busy}>
+          {t("save")}
+        </button>
+      </form>
+      <form
         className="form-stack company-info-form"
         onSubmit={(e) => {
           e.preventDefault();

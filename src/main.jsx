@@ -126,6 +126,7 @@ function OrderCard({ s, compact }) {
         <span className={`badge ${s.status}`}>{t(s.status)}</span>
       </div>
       <DocsLink s={s} />
+      <RejectControls s={s} />
       <h3>{s.title}</h3>
       <div className="route">
         <span>
@@ -181,6 +182,33 @@ function OrderCard({ s, compact }) {
     </article>
   );
 }
+// Rejected request (reason shown to the owner and administration) and the administration's
+// "refuse request" button, used when the documents show prohibited goods.
+function RejectControls({ s }) {
+  const { user, t, run, busy } = useWorkspace();
+  if (s.parentId) return null;
+  if (s.status === "rejected")
+    return (
+      <p className="notice error rejected-line">
+        ⛔ {t("shipmentRejectedReason")}: {s.rejectionReason || "—"}
+      </p>
+    );
+  if (user.role !== "admin" || !["open", "coordinating", "assigned"].includes(s.status)) return null;
+  return (
+    <button
+      type="button"
+      className="button ghost small-button danger-text reject-shipment"
+      disabled={busy}
+      onClick={() => {
+        const reason = window.prompt(t("rejectShipmentPrompt"));
+        if (reason && reason.trim().length >= 3)
+          run(`/admin/shipments/${s.id}/reject`, { reason: reason.trim() });
+      }}
+    >
+      ⛔ {t("rejectShipment")}
+    </button>
+  );
+}
 // "Documents" shortcut on a shipment card: opens that shipment's documents folder.
 function DocsLink({ s }) {
   const { data, user, t, openDocuments } = useWorkspace();
@@ -233,6 +261,7 @@ function ShipmentCard({ s, compact = false }) {
         {badge(s.status)}
       </div>
       <DocsLink s={s} />
+      <RejectControls s={s} />
       <h3>{s.title}</h3>
       {s.parentId && (
         <p className="stage-label">
