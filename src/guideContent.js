@@ -39,6 +39,34 @@ const border = S(
   ],
 );
 
+const documents = S(
+  "documents",
+  ["الوثائق: ارفع واطلب", "Documents: upload and request", "Belgeler: yükleyin ve isteyin"],
+  [
+    "لكل شحنة ملف وثائق خاص. اختر نوع الوثيقة من الخيارات وارفعها بضغطة، أو اطلب من الطرف الآخر وثائق معيّنة (يمكن اختيار أكثر من وثيقة). المنصة لا تفرض أي وثيقة: المطلوب هو ما تطلبه الشركات فقط. يصل الطلب كإشعار، ولا يُرسل طلب الشحنة قبل رفع ما طُلب من صاحبها.",
+    "Each shipment has its own documents folder. Pick the document type from the options and upload in one tap, or ask the other party for specific documents (several at once). The platform imposes no documents: only what the companies ask for is required. Requests arrive as notifications, and a shipment request is sent only after its owner uploads what was requested.",
+    "Her sevkiyatın kendi belge klasörü vardır. Seçeneklerden belge türünü seçip tek dokunuşla yükleyin veya karşı taraftan belirli belgeleri isteyin (birden fazla seçilebilir). Platform belge dayatmaz: yalnızca şirketlerin istedikleri gereklidir. İstekler bildirim olarak gelir; sevkiyat talebi, sahibi istenenleri yüklemeden gönderilmez.",
+  ],
+);
+const docsPrivacy = S(
+  "documents",
+  ["خصوصية وثائقك", "Your documents' privacy", "Belgelerinizin gizliliği"],
+  [
+    "أنت تختار: إدارة المنصة ترى دائمًا أن الوثيقة رُفعت ومتى ومن رفعها، لكنها لا تفتح محتواها إلا إذا فعّلت «السماح لإدارة المنصة بفتح محتوى وثائقي» في أعلى صفحة الوثائق. الشركات العاملة معك على الشحنة ترى الوثائق دائمًا.",
+    "You choose: the platform administration always sees that a document was uploaded, when and by whom, but opens its content only if you turn on 'Let the platform administration open my documents' at the top of the documents page. Companies working with you on the shipment always see the documents.",
+    "Siz seçersiniz: platform yönetimi belgenin yüklendiğini, ne zaman ve kimin yüklediğini her zaman görür; içeriği ise yalnızca belgeler sayfasının üstündeki 'Platform yönetimi belgelerimi açabilsin' seçeneğini açarsanız açabilir. Sevkiyatta sizinle çalışan şirketler belgeleri her zaman görür.",
+  ],
+);
+const adminDocs = S(
+  "documents",
+  ["متابعة الوثائق", "Following documents", "Belgeleri takip"],
+  [
+    "في «رفع الوثائق» ترى لكل عملية: أي وثيقة رُفعت، ومتى، ومن رفعها، وما هو مطلوب وما زال ناقصًا. المحتوى يُفتح فقط إذا سمحت الشركة (🔒 = خاص). يمكنك أيضًا طلب وثيقة من أي طرف على العملية.",
+    "In 'Upload documents' you see for every operation which document was uploaded, when and by whom, and what is requested and still missing. Content opens only if the company allows it (🔒 = private). You can also request a document from any party on the operation.",
+    "'Belge yükleme' bölümünde her işlem için hangi belgenin ne zaman ve kim tarafından yüklendiğini, nelerin istendiğini ve eksik kaldığını görürsünüz. İçerik yalnızca şirket izin verirse açılır (🔒 = gizli). İşlemdeki herhangi bir taraftan belge de isteyebilirsiniz.",
+  ],
+);
+
 export const guide = {
   merchant: [
     profile,
@@ -88,16 +116,9 @@ export const guide = {
         "Yük gelince teslimi onaylayıp işlemi kapatın, sonra taşıyıcıyı değerlendirin. Her tamamlanan işlem sizi 3 ek ücretsiz aya yaklaştırır.",
       ],
     ),
-    S(
-      "documents",
-      ["ارفع الوثائق", "Upload documents", "Belgeleri yükleyin"],
-      [
-        "الفاتورة وشهادة المنشأ وقائمة التعبئة لكل شحنة، في مكان واحد يراه الناقل والمخلّص.",
-        "Invoice, certificate of origin and packing list for each shipment, in one place the carrier and broker can see.",
-        "Her sevkiyat için fatura, menşe belgesi ve çeki listesi; taşıyıcı ve müşavirin görebileceği tek yerde.",
-      ],
-    ),
     border,
+    documents,
+    docsPrivacy,
     hub,
   ],
   carrier: [
@@ -166,6 +187,8 @@ export const guide = {
         "Yaklaşan bir sefer için aracınızdaki boş alanı sunun; tüccarlar ve bireyler bir kısmını ayırtır.",
       ],
     ),
+    documents,
+    docsPrivacy,
     hub,
   ],
   broker: [
@@ -198,15 +221,6 @@ export const guide = {
       ],
     ),
     S(
-      "documents",
-      ["الوثائق", "Documents", "Belgeler"],
-      [
-        "اطّلع على فاتورة الشحنة وشهادة المنشأ وارفع بيان الجمارك.",
-        "Check the shipment's invoice and certificate of origin, and upload the customs declaration.",
-        "Sevkiyatın faturasını ve menşe belgesini inceleyin, gümrük beyannamesini yükleyin.",
-      ],
-    ),
-    S(
       "border",
       [
         "بلّغ عن الزحمة وتابع القرارات",
@@ -219,6 +233,8 @@ export const guide = {
         "Her gün kapıdasınız: bekleme raporlarınız herkese yardım eder, yeni kararlar size anında ulaşır.",
       ],
     ),
+    documents,
+    docsPrivacy,
     hub,
   ],
   supplier: [
@@ -251,6 +267,8 @@ export const guide = {
         "Çakışma olmasın diye her ekipmanın ne zaman dolu olduğunu görün.",
       ],
     ),
+    documents,
+    docsPrivacy,
     hub,
   ],
   individual: [
@@ -292,6 +310,8 @@ export const guide = {
         "Aracı haritada izleyin; varınca teslimi onaylayıp taşıyıcıyı değerlendirin.",
       ],
     ),
+    documents,
+    docsPrivacy,
     hub,
   ],
   admin: [
@@ -322,6 +342,7 @@ export const guide = {
         "Kapı kapandı mı, yeni karar mı var? Kaynağıyla yayınlayın; tüm şirketlere bildirim, e-posta ve açanlara WhatsApp ile ulaşır.",
       ],
     ),
+    adminDocs,
     S(
       "admin",
       ["إعدادات الموقع", "Site settings", "Site ayarları"],

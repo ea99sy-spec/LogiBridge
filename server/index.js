@@ -44,7 +44,7 @@ import { whatsappConfigured, flushWhatsApp } from "./whatsapp.js";
 import { subscriptionOf, pricingOf } from "../shared/subscription.js";
 import { publicStats } from "./stats.js";
 import { noteRoutes } from "./notes.js";
-import { documentRoutes, documentVisible, requestVisible } from "./documents.js";
+import { documentRoutes, documentVisible, requestVisible, adminMayOpen } from "./documents.js";
 import { accountsReportRoutes } from "./accountsReport.js";
 import { TERMS_VERSION, termsOutdated } from "../shared/legal.js";
 import { trackingRoutes, publicTrackingRoutes, newDeliveryCode, runTrackingWatch } from "./tracking.js";
@@ -369,6 +369,7 @@ export async function createApp() {
         "/profile",
         "/account/password",
         "/account/accept-terms",
+        "/account/document-privacy",
         "/fx",
         "/notifications/read",
         "/account/2fa/setup",
@@ -519,6 +520,8 @@ export async function createApp() {
         .filter((d) => documentVisible(fullState, req.user, d))
         .map(({ encryptedContent, ...doc }) => ({
           ...doc,
+          // Shown to the administration as "uploaded" only, when the company keeps the content private.
+          ...(adminMayOpen(fullState, req.user, doc) ? {} : { locked: true }),
           // The operation a document belongs to (a 3-stage order groups all its stages).
           fileId:
             doc.orderId ||

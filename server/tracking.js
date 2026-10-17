@@ -4,11 +4,13 @@ import { distanceKm, ZONE_KM, LEAVE_KM, waitLevel, parsePoint } from "../shared/
 import { notice, shipmentNotice } from "./advanced.js";
 import { readPosition, requirePosition } from "./position.js";
 import { validateDocument, encryptDocument } from "./identity.js";
-import { transitionShipment, syncOrder } from "./domain.js";
+import { transitionShipment, syncOrder, closeDelivered, AUTO_CLOSE_HOURS } from "./domain.js";
 import { readState, mutate } from "./store.js";
 import { subscriptionOf } from "../shared/subscription.js";
 import { queueEmail } from "./email.js";
 
+// A truck within this distance of the delivery point has arrived.
+const ARRIVE_KM = 1.5;
 const TRACK_LIMIT = 400,
   PHOTO_LIMIT = 15,
   PHOTO_BYTES = 350000;
@@ -43,6 +45,34 @@ export function recordPosition(s, sh, position, at, actorId, source) {
   if (!sh.lastPosition || when >= sh.lastPosition.at) sh.lastPosition = { ...position, at: when };
   delete sh.staleNoticeAt;
   checkCrossing(s, sh, { ...position, at: when }, actorId, source);
+  checkDestination(s, sh, { ...position, at: when }, actorId, source);
+}
+
+// Arrival at the delivery point (when the owner or carrier set it): the stage becomes "arrived"
+// and closes by itself after AUTO_CLOSE_HOURS unless the owner opens a dispute.
+function checkDestination(s, sh, point, actorId, source) {
+  const dest = sh.destinationPoint;
+  if (!dest?.lat || sh.status !== "transit" || sh.isOrder || sh.legType === "clearance") return;
+  if (distanceKm(point, dest) > ARRIVE_KM) return;
+  sh.status = "arrived";
+  sh.arrivedAt = point.at;
+  sh.arrivedByGps = true;
+  sh.autoCloseAt = new Date(Date.parse(point.at) + AUTO_CLOSE_HOURS * 3600000).toISOString();
+  event(s, sh, "destination_arrived", { actorId, source });
+  for (const u of people(s, sh))
+    notice(s, u, "destination_arrived", sh.id, sh.autoCloseAt.slice(0, 16).replace("T", " ") + " UTC");
+  queueEmail(s, sh.ownerId, "arrived", { shipment: sh.title }, `arrived/${sh.id}`);
+  if (sh.parentId) syncOrder(s, sh.parentId);
+}
+
+// After an operation closes by itself: notices, emails, and the order's overall status.
+function afterAutoClose(s, sh, reason) {
+  event(s, sh, "confirm", { source: "platform", note: reason });
+  for (const u of people(s, sh)) {
+    notice(s, u, reason === "delivery_code" ? "closed_by_code" : "closed_after_arrival", sh.id);
+    queueEmail(s, u, "operation_completed", { shipment: sh.title }, `shipment/${sh.id}/${u}/auto`);
+  }
+  if (sh.parentId) syncOrder(s, sh.parentId);
 }
 
 function checkCrossing(s, sh, point, actorId, source) {
@@ -87,6 +117,14 @@ function addGpsReport(s, crossing, level, demo, at) {
 // Alerts for trucks that stopped sending positions or stand still away from a crossing.
 export function trackingWatch(s, now = Date.now()) {
   let changed = false;
+  // Arrived with proof (GPS at the delivery point or a delivery proof) and no dispute: close.
+  for (const sh of s.shipments.filter((x) => x.status === "arrived" && x.autoCloseAt)) {
+    if (Date.parse(sh.autoCloseAt) > now) continue;
+    if (closeDelivered(s, sh, "auto_after_arrival")) {
+      afterAutoClose(s, sh, "auto_after_arrival");
+      changed = true;
+    } else delete sh.autoCloseAt;
+  }
   for (const sh of s.shipments.filter(
     (x) => x.status === "transit" && !x.isOrder && x.legType !== "clearance",
   )) {
@@ -207,6 +245,11 @@ export function saveProof(s, sh, b, userId, byDriver) {
   };
   if (sh.status === "transit") transitionShipment(s, sh, "arrive", { id: sh.carrierId, role: "carrier" });
   if (sh.parentId) syncOrder(s, sh.parentId);
+  // The receiver's code proves the goods reached the right person: close the operation now.
+  // Without the code, it closes by itself after the waiting time unless the owner disputes.
+  if (sh.pod.codeVerified && closeDelivered(s, sh, "delivery_code")) afterAutoClose(s, sh, "delivery_code");
+  else if (sh.status === "arrived")
+    sh.autoCloseAt ||= new Date(Date.now() + AUTO_CLOSE_HOURS * 3600000).toISOString();
   event(s, sh, "delivery_proof", {
     actorId: userId,
     note: recipient,

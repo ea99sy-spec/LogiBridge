@@ -1,13 +1,10 @@
-// Required documents of an operation ("file"): the documents the owner must always upload, plus
-// any document another party requested. Used by the server (to block sending an incomplete
+// Required documents of an operation ("file"): the documents the companies working on it
+// requested from each other. Used by the server (to block sending an incomplete
 // request) and by the documents page (checklist and progress).
 
-// Always required: the trader's commercial documents for a shipment, the supplier's invoice
-// for an equipment order.
-export const DEFAULT_REQUIRED = {
-  shipment: ["invoice", "packing", "origin"],
-  order: ["invoice"],
-};
+// No document is imposed by the platform: the required list is exactly what the companies on the
+// operation asked for. (Kept as an empty map so a default can be added later if ever needed.)
+export const DEFAULT_REQUIRED = { shipment: [], order: [] };
 export const requestableKinds = [
   "invoice",
   "packing",

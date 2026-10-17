@@ -578,7 +578,7 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
     ).status,
     201,
   );
-  assert.equal((await call("business", `/shipments/${paidShipment.id}/submit`, {})).status, 400);
+  // No document is imposed by the platform: an invoice upload is optional here.
   assert.equal(
     (
       await call("business", "/shipment-documents", {
@@ -589,14 +589,6 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
     ).status,
     201,
   );
-  // Still incomplete: packing list and certificate of origin are required too.
-  assert.equal((await call("business", `/shipments/${paidShipment.id}/submit`, {})).status, 400);
-  for (const kind of ["packing", "origin"])
-    assert.equal(
-      (await call("business", "/shipment-documents", { ...document, kind, shipmentId: paidShipment.id }))
-        .status,
-      201,
-    );
   // Only people working on the shipment can request documents (the carrier has only bid so far).
   assert.equal(
     (await call("realCarrier", "/document-requests", { shipmentId: paidShipment.id, kind: "customs" }))
@@ -612,15 +604,17 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
     (
       await call("realCarrier", "/document-requests", {
         shipmentId: paidShipment.id,
-        kind: "other",
+        kinds: ["other", "customs"],
         title: "Driver authorisation letter",
       })
     ).status,
     201,
   );
-  const askedFor = (await call("business", "/state")).body.documentRequests.find(
+  const asked = (await call("business", "/state")).body.documentRequests.filter(
     (r) => r.shipmentId === paidShipment.id,
   );
+  assert.equal(asked.length, 2);
+  const askedFor = asked.find((r) => r.kind === "other");
   assert.equal(askedFor.status, "open");
   assert.equal(
     (

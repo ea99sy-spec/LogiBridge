@@ -334,3 +334,56 @@
 .doc-layout > .panel {
   margin: 0;
 }
+.doc-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.doc-options legend {
+  margin-bottom: 4px;
+}
+.doc-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid #d5dde9;
+  background: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.doc-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.doc-option.on {
+  background: #facc15;
+  border-color: #facc15;
+  color: #102a56;
+  font-weight: 700;
+}
+.doc-option:focus-within {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+.doc-extra-upload {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+.doc-locked {
+  color: #6b7f9e;
+}
+.doc-privacy {
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #f6f8fc;
+  border: 1px solid #e3e9f2;
+}

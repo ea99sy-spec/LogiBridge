@@ -76,6 +76,7 @@ export function publicUser(user, own = false) {
           termsAcceptedAt: user.termsAcceptedAt || null,
           termsVersion: user.termsVersion || null,
           termsOutdated: termsOutdated(user),
+          docsAdminAccess: user.docsAdminAccess === true,
         }
       : {}),
   };

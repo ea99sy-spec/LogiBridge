@@ -93,9 +93,10 @@ export function transitionShipment(state, shipment, action, actor) {
     ["held", "direct_paid"].includes(escrow?.status)
   )
     shipment.status = "transit";
-  else if (action === "arrive" && actor.id === shipment.carrierId && shipment.status === "transit")
+  else if (action === "arrive" && actor.id === shipment.carrierId && shipment.status === "transit") {
     shipment.status = "arrived";
-  else if (
+    shipment.arrivedAt = new Date().toISOString();
+  } else if (
     action === "confirm" &&
     actor.id === shipment.ownerId &&
     shipment.status === "arrived" &&
@@ -163,4 +164,19 @@ export function cancelOrder(state, order, actor) {
   order.status = "cancelled";
   order.cancelledAt = new Date().toISOString();
   return legs;
+}
+
+// Closes an operation that reached its delivery place, without waiting for the owner's click:
+// right away when the receiver's delivery code was entered, or after the waiting time once
+// arrival was proven by GPS or a delivery proof. Same effect as the owner's confirmation.
+export const AUTO_CLOSE_HOURS = 24;
+export function closeDelivered(state, shipment, reason) {
+  const escrow = state.escrows.find((e) => e.shipmentId === shipment.id);
+  if (shipment.status !== "arrived" || !["held", "direct_paid"].includes(escrow?.status)) return false;
+  shipment.status = "delivered";
+  shipment.completedAt = new Date().toISOString();
+  shipment.closedBy = reason;
+  delete shipment.autoCloseAt;
+  if (escrow.status === "held") escrow.status = escrow.simulated === false ? "payout_pending" : "released";
+  return true;
 }

@@ -2038,9 +2038,9 @@ export const extraRows = {
   docKind_warranty: ["كفالة / ضمان", "Warranty", "Garanti belgesi"],
   docKind_other: ["وثيقة أخرى", "Other document", "Diğer belge"],
   documentsIntroNew: [
-    "لكل شحنة أو طلب ملف وثائق خاص فيه. ارفع الوثائق المطلوبة بضغطة، أو اطلب وثيقة من الطرف الآخر. لا يُرسل طلب الشحنة إلا بعد اكتمال وثائقك المطلوبة.",
-    "Every shipment or order has its own documents folder. Upload required documents in one tap, or ask the other party for a document. A shipment request is sent only when your required documents are complete.",
-    "Her sevkiyatın veya siparişin kendi belge klasörü vardır. Gerekli belgeleri tek dokunuşla yükleyin veya karşı taraftan belge isteyin. Sevkiyat talebi ancak gerekli belgeleriniz tamamlanınca gönderilir.",
+    "لكل شحنة أو طلب ملف وثائق خاص فيه. اختر نوع الوثيقة وارفعها بضغطة، أو اطلب من الطرف الآخر الوثائق التي تحتاجها. المنصة لا تفرض وثائق: المطلوب هو ما تطلبه الشركات فقط، ولا يُرسل طلب الشحنة قبل رفع ما طُلب منك.",
+    "Every shipment or order has its own documents folder. Pick the document type and upload it in one tap, or ask the other party for the documents you need. The platform imposes no documents: only what the companies request is required, and a shipment request is sent only after you upload what was requested from you.",
+    "Her sevkiyatın veya siparişin kendi belge klasörü vardır. Belge türünü seçip tek dokunuşla yükleyin veya ihtiyacınız olan belgeleri karşı taraftan isteyin. Platform belge dayatmaz: yalnızca şirketlerin istedikleri gereklidir ve sevkiyat talebi sizden istenenler yüklenmeden gönderilmez.",
   ],
   documentsAskedFromYou: [
     "مطلوب منك {n} وثيقة. الملفات التي تحتاجك ظاهرة أولًا.",
@@ -2113,8 +2113,12 @@ export const extraRows = {
     "No other party on this shipment yet. You can ask for documents once a carrier's or broker's offer is accepted.",
     "Bu sevkiyatta henüz başka taraf yok. Bir taşıyıcı veya müşavir teklifi kabul edilince belge isteyebilirsiniz.",
   ],
-  otherDocuments: ["وثائق إضافية", "Additional documents", "Ek belgeler"],
-  noOtherDocuments: ["لا توجد وثائق إضافية.", "No additional documents.", "Ek belge yok."],
+  otherDocuments: ["رفع وثيقة", "Upload a document", "Belge yükle"],
+  noOtherDocuments: [
+    "لا توجد وثائق أخرى مرفوعة.",
+    "No other documents uploaded.",
+    "Yüklenmiş başka belge yok.",
+  ],
   stagePhotos: [
     "صور المراحل وإثبات التسليم",
     "Stage photos and proof of delivery",
@@ -2166,4 +2170,78 @@ export const extraRows = {
     "Bu sevkiyatta çok fazla açık istek var.",
   ],
   "err_Order unavailable": ["الطلب غير متاح.", "Order unavailable.", "Sipariş bulunamadı."],
+  chooseDocuments: [
+    "اختر الوثائق المطلوبة (يمكن أكثر من وثيقة)",
+    "Choose the documents you need (several allowed)",
+    "İstediğiniz belgeleri seçin (birden fazla olabilir)",
+  ],
+  noRequiredDocuments: [
+    "لا توجد وثائق مطلوبة على هذه العملية حاليًا. عندما تطلب شركة وثيقة تظهر هنا مع من يرفعها.",
+    "No documents are requested on this operation yet. When a company asks for one it appears here with who should upload it.",
+    "Bu işlemde henüz istenen belge yok. Bir şirket belge istediğinde, kimin yükleyeceğiyle birlikte burada görünür.",
+  ],
+  pickDocumentType: [
+    "اختر نوع الوثيقة ثم ارفعها:",
+    "Pick the document type, then upload:",
+    "Belge türünü seçip yükleyin:",
+  ],
+  docLocked: ["مرفوعة · المحتوى خاص", "Uploaded · content private", "Yüklendi · içerik gizli"],
+  docLockedHint: [
+    "الشركة اختارت عدم مشاركة محتوى وثائقها مع الإدارة. تظهر لك حالة الرفع وتاريخه فقط.",
+    "The company chose not to share its documents' content with the administration. You see only the upload status and date.",
+    "Şirket belge içeriğini yönetimle paylaşmamayı seçti. Yalnızca yükleme durumunu ve tarihini görürsünüz.",
+  ],
+  docsShareWithAdmin: [
+    "السماح لإدارة المنصة بفتح محتوى وثائقي",
+    "Let the platform administration open my documents",
+    "Platform yönetimi belgelerimi açabilsin",
+  ],
+  docsShareWithAdminNote: [
+    "الإدارة ترى دائمًا أن الوثيقة رُفعت ومتى ومن رفعها، لكنها لا تفتح محتواها إلا إذا فعّلت هذا الخيار. الشركات العاملة معك على الشحنة ترى الوثائق دائمًا. صور المراحل وإثبات التسليم تبقى متاحة للإدارة لحل النزاعات.",
+    "The administration always sees that a document was uploaded, when and by whom, but opens its content only if you turn this on. Companies working with you on the shipment always see the documents. Stage photos and proof of delivery stay available to the administration for disputes.",
+    "Yönetim belgenin yüklendiğini, ne zaman ve kimin yüklediğini her zaman görür; içeriği ise yalnızca bunu açarsanız açabilir. Sevkiyatta sizinle çalışan şirketler belgeleri her zaman görür. Aşama fotoğrafları ve teslim kanıtı anlaşmazlıklar için yönetime açık kalır.",
+  ],
+  adminDocsPrivacyNote: [
+    "ترى هنا كل الوثائق: هل رُفعت، ومتى، ومن رفعها. تفتح محتوى الوثيقة فقط إذا سمحت الشركة بذلك (🔒 = المحتوى خاص).",
+    "Here you see every document: whether it was uploaded, when and by whom. You can open a document's content only if the company allows it (🔒 = private content).",
+    "Burada tüm belgeleri görürsünüz: yüklenip yüklenmediğini, ne zaman ve kimin yüklediğini. İçeriği yalnızca şirket izin verirse açabilirsiniz (🔒 = gizli içerik).",
+  ],
+  saved: ["تم الحفظ.", "Saved.", "Kaydedildi."],
+  "err_Document content is private": [
+    "محتوى هذه الوثيقة خاص بالشركة.",
+    "This document's content is private to the company.",
+    "Bu belgenin içeriği şirkete özeldir.",
+  ],
+  destination_arrived: ["وصلت لمكان التسليم", "Reached the delivery point", "Teslim noktasına ulaştı"],
+  event_destination_arrived: [
+    "وصلت الشاحنة لمكان التسليم، وستُغلق العملية تلقائيًا في:",
+    "The truck reached the delivery point; the operation closes automatically on:",
+    "Araç teslim noktasına ulaştı; işlem otomatik olarak şu tarihte kapanacak:",
+  ],
+  event_closed_by_code: [
+    "أُغلقت العملية: تم التسليم برمز الاستلام",
+    "Operation closed: delivered with the receiver's code",
+    "İşlem kapandı: alıcı koduyla teslim edildi",
+  ],
+  event_closed_after_arrival: [
+    "أُغلقت العملية تلقائيًا بعد الوصول لمكان التسليم",
+    "Operation closed automatically after arrival",
+    "İşlem varıştan sonra otomatik kapandı",
+  ],
+  autoCloseOn: ["تُغلق تلقائيًا في", "Closes automatically on", "Otomatik kapanış"],
+  autoCloseOwnerHint: [
+    "إذا في مشكلة افتح نزاعًا قبلها",
+    "if something is wrong, open a dispute before then",
+    "sorun varsa bundan önce itiraz açın",
+  ],
+  closedBy_delivery_code: [
+    "أُغلقت عند التسليم برمز الاستلام",
+    "Closed at delivery with the receiver's code",
+    "Alıcı koduyla teslimde kapandı",
+  ],
+  closedBy_auto_after_arrival: [
+    "أُغلقت تلقائيًا بعد الوصول لمكان التسليم",
+    "Closed automatically after reaching the delivery point",
+    "Teslim noktasına varıştan sonra otomatik kapandı",
+  ],
 };

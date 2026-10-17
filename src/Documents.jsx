@@ -128,17 +128,25 @@ function DocLine({ d, t, user, name, run, busy, lang }) {
           {name(d.userId)} · {new Date(d.createdAt).toLocaleDateString(lang)}
         </small>
       </span>
-      <a
-        className="text-button"
-        href={`/api/shipment-documents/${d.id}?view=1`}
-        target="_blank"
-        rel="noopener"
-      >
-        {t("view")}
-      </a>
-      <a className="text-button" href={`/api/shipment-documents/${d.id}`}>
-        {t("download")}
-      </a>
+      {d.locked ? (
+        <small className="doc-locked" title={t("docLockedHint")}>
+          🔒 {t("docLocked")}
+        </small>
+      ) : (
+        <>
+          <a
+            className="text-button"
+            href={`/api/shipment-documents/${d.id}?view=1`}
+            target="_blank"
+            rel="noopener"
+          >
+            {t("view")}
+          </a>
+          <a className="text-button" href={`/api/shipment-documents/${d.id}`}>
+            {t("download")}
+          </a>
+        </>
+      )}
       {d.userId === user.id && !String(d.kind).startsWith("photo_") && (
         <button
           type="button"
@@ -158,20 +166,22 @@ function DocLine({ d, t, user, name, run, busy, lang }) {
 
 function RequestForm({ file, t, user, name, run, busy }) {
   const others = [...new Set(file.parties)].filter((p) => p !== user.id);
-  const [kind, setKind] = useState("customs");
+  const [kinds, setKinds] = useState([]);
   if (!others.length) return <p className="muted small">{t("requestNoParties")}</p>;
+  const toggle = (k) => setKinds((v) => (v.includes(k) ? v.filter((x) => x !== k) : [...v, k]));
   return (
     <form
       className="doc-request-form"
       onSubmit={async (e) => {
         e.preventDefault();
+        if (!kinds.length) return;
         const form = e.currentTarget;
         const f = new FormData(form);
         await run(
           "/document-requests",
           {
             ...(file.type === "order" ? { orderId: file.id } : { shipmentId: file.id }),
-            kind: f.get("kind"),
+            kinds,
             title: f.get("title") || "",
             note: f.get("note") || "",
             from: f.get("from"),
@@ -180,28 +190,26 @@ function RequestForm({ file, t, user, name, run, busy }) {
           { success: "documentRequested" },
         );
         form.reset();
-        setKind("customs");
+        setKinds([]);
       }}
     >
-      <label>
-        <small>{t("documentKind")}</small>
-        <select name="kind" value={kind} onChange={(e) => setKind(e.target.value)}>
-          {requestableKinds.map((k) => (
-            <option key={k} value={k}>
-              {kindLabel(t, k)}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        <small>{t(kind === "other" ? "documentNameRequired" : "documentNameOptional")}</small>
-        <input
-          name="title"
-          maxLength={120}
-          required={kind === "other"}
-          placeholder={t("documentNameExample")}
-        />
-      </label>
+      <fieldset className="wide doc-options">
+        <legend>
+          <small>{t("chooseDocuments")}</small>
+        </legend>
+        {requestableKinds.map((k) => (
+          <label key={k} className={`doc-option ${kinds.includes(k) ? "on" : ""}`}>
+            <input type="checkbox" checked={kinds.includes(k)} onChange={() => toggle(k)} />
+            {kindLabel(t, k)}
+          </label>
+        ))}
+      </fieldset>
+      {kinds.includes("other") && (
+        <label>
+          <small>{t("documentNameRequired")}</small>
+          <input name="title" maxLength={120} required placeholder={t("documentNameExample")} />
+        </label>
+      )}
       <label>
         <small>{t("requestFrom")}</small>
         <select name="from" defaultValue={file.ownerId !== user.id ? file.ownerId : others[0]}>
@@ -217,8 +225,9 @@ function RequestForm({ file, t, user, name, run, busy }) {
         <small>{t("requestNote")}</small>
         <input name="note" maxLength={300} placeholder={t("requestNoteExample")} />
       </label>
-      <button className="button" disabled={busy}>
+      <button className="button" disabled={busy || !kinds.length}>
         {t("requestDocument")}
+        {kinds.length > 1 ? ` (${kinds.length})` : ""}
       </button>
     </form>
   );
@@ -290,7 +299,7 @@ function FileView({ file, data, user, t, run, busy, lang, setError }) {
         </div>
         <span className={`badge ${file.status}`}>{t(file.status)}</span>
       </header>
-      <div className="doc-progress" aria-label={t("documentsProgress")}>
+      <div className="doc-progress" aria-label={t("documentsProgress")} hidden={!file.items.length}>
         <div>
           <span style={{ width: pct + "%" }} />
         </div>
@@ -301,6 +310,7 @@ function FileView({ file, data, user, t, run, busy, lang, setError }) {
       </div>
 
       <h3>{t("requiredDocuments")}</h3>
+      {!file.items.length && <p className="muted small doc-none">{t("noRequiredDocuments")}</p>}
       <ul className="doc-checklist">
         {file.items.map((i) => {
           const mineToUpload = i.from === user.id && !i.done;
@@ -411,22 +421,31 @@ function FileView({ file, data, user, t, run, busy, lang, setError }) {
 
       <h3>{t("otherDocuments")}</h3>
       {party && (
-        <div className="doc-extra-upload" {...drop("extra", extraKind)}>
-          <select
-            value={extraKind}
-            onChange={(e) => setExtraKind(e.target.value)}
-            aria-label={t("documentKind")}
-          >
+        <div
+          className={`doc-extra-upload ${dragKey === "extra" ? "drag" : ""}`}
+          {...drop("extra", extraKind)}
+        >
+          <small>{t("pickDocumentType")}</small>
+          <div className="doc-options" role="radiogroup" aria-label={t("documentKind")}>
             {requestableKinds.map((k) => (
-              <option key={k} value={k}>
+              <label key={k} className={`doc-option ${extraKind === k ? "on" : ""}`}>
+                <input
+                  type="radio"
+                  name="extraKind"
+                  checked={extraKind === k}
+                  onChange={() => setExtraKind(k)}
+                />
                 {kindLabel(t, k)}
-              </option>
+              </label>
             ))}
-          </select>
+          </div>
           <UploadButton
             t={t}
+            primary
             busy={busy || !!uploading}
-            label={uploading === "extra" ? t("uploading") : t("uploadDocument")}
+            label={
+              uploading === "extra" ? t("uploading") : `${t("uploadDocument")}: ${kindLabel(t, extraKind)}`
+            }
             onFiles={(list) => upload(list, extraKind, null, "extra")}
           />
         </div>
@@ -497,6 +516,26 @@ export function DocumentCenter({ data, user, t, run, busy, navigate, lang }) {
           ↗
         </button>
       </div>
+      {user.role !== "admin" && !user.demo && (
+        <label className="consent doc-privacy">
+          <input
+            type="checkbox"
+            checked={!!user.docsAdminAccess}
+            disabled={busy}
+            onChange={(e) =>
+              run("/account/document-privacy", { shareWithAdmin: e.target.checked }, "POST", {
+                success: "saved",
+              })
+            }
+          />
+          <span>
+            <b>{t("docsShareWithAdmin")}</b>
+            <br />
+            <small>{t("docsShareWithAdminNote")}</small>
+          </span>
+        </label>
+      )}
+      {user.role === "admin" && <p className="muted small">{t("adminDocsPrivacyNote")}</p>}
       {mineTotal > 0 && (
         <p className="notice doc-alert" role="status">
           📎 {t("documentsAskedFromYou").replace("{n}", mineTotal)}

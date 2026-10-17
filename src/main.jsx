@@ -347,6 +347,16 @@ function ShipmentCard({ s, compact = false }) {
               </form>
             )}
           </div>
+          {s.status === "arrived" && s.autoCloseAt && (
+            <p className="auto-close-line">
+              ⏱ {t("autoCloseOn")}{" "}
+              {new Date(s.autoCloseAt).toLocaleString(lang, { dateStyle: "medium", timeStyle: "short" })}
+              {s.ownerId === user.id ? ` · ${t("autoCloseOwnerHint")}` : ""}
+            </p>
+          )}
+          {s.closedBy && s.closedBy !== "owner" && (
+            <p className="auto-close-line done">✓ {t("closedBy_" + s.closedBy)}</p>
+          )}
           {escrow && (
             <div className="escrow-line">
               <span>

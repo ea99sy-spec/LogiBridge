@@ -90,6 +90,15 @@ export function requestVisible(s, user, r) {
   return (fileOf(s, r)?.parties || []).includes(user.id);
 }
 
+// Each company chooses whether the platform administration may open the content of the documents
+// it uploads. The administration always sees that a document was uploaded, by whom and when.
+// Stage photos and proof of delivery stay open to the administration for dispute decisions.
+export function adminMayOpen(s, user, doc) {
+  if (user.role !== "admin") return true;
+  if (String(doc.kind || "").startsWith("photo_")) return true;
+  return s.users.find((u) => u.id === doc.userId)?.docsAdminAccess === true;
+}
+
 // Can this account see a document? Administrators see every document of their own world.
 export function documentVisible(s, user, doc) {
   const uploader = s.users.find((u) => u.id === doc.userId);
@@ -152,6 +161,8 @@ export function documentRoutes(app) {
       doc = s.shipmentDocuments.find((x) => x.id === req.params.id);
     if (!doc) return res.sendStatus(404);
     if (!documentVisible(s, req.user, doc)) return res.sendStatus(403);
+    if (!adminMayOpen(s, req.user, doc))
+      return res.status(403).json({ error: "Document content is private" });
     const ext = { "application/pdf": "pdf", "image/png": "png", "image/jpeg": "jpg" }[doc.mime] || "bin";
     const name =
       String(doc.filename || "document")
@@ -184,9 +195,12 @@ export function documentRoutes(app) {
   // Ask another party of the operation for a document (the administrator can ask anyone on it).
   app.post("/api/document-requests", async (req, res) => {
     const b = req.body;
-    if (!requestableKinds.includes(b.kind)) throw new Error("Invalid document kind");
+    // One or several document types chosen from the list (plus a named "other" document).
+    const kinds = [...new Set(Array.isArray(b.kinds) ? b.kinds : [b.kind])].filter(Boolean);
+    if (!kinds.length || kinds.length > 9 || kinds.some((k) => !requestableKinds.includes(k)))
+      throw new Error("Invalid document kind");
     const title = text(b.title, 120);
-    if (b.kind === "other" && !title) throw new Error("Write the document name");
+    if (kinds.includes("other") && !title) throw new Error("Write the document name");
     await mutate((s) => {
       const file = fileOf(s, b.orderId ? { orderId: b.orderId } : { shipmentId: b.shipmentId });
       const admin = req.user.role === "admin";
@@ -196,20 +210,22 @@ export function documentRoutes(app) {
       const from = b.from || (req.user.id === file.ownerId ? "" : file.ownerId);
       if (!from || from === req.user.id || !file.parties.includes(from))
         throw new Error("Choose who should upload it");
-      if (file.requests.filter((r) => r.status === "open").length >= 50) throw new Error("Too many requests");
-      const request = {
-        id: id(),
-        ...file.key,
-        kind: b.kind,
-        title,
-        note: text(b.note, 300),
-        from,
-        requestedBy: req.user.id,
-        status: "open",
-        createdAt: new Date().toISOString(),
-      };
-      (s.documentRequests ||= []).push(request);
-      notice(s, from, "document_requested", file.key.shipmentId, title || "");
+      if (file.requests.filter((r) => r.status === "open").length + kinds.length > 50)
+        throw new Error("Too many requests");
+      const now = new Date().toISOString();
+      for (const kind of kinds)
+        (s.documentRequests ||= []).push({
+          id: id(),
+          ...file.key,
+          kind,
+          title: kind === "other" ? title : "",
+          note: text(b.note, 300),
+          from,
+          requestedBy: req.user.id,
+          status: "open",
+          createdAt: now,
+        });
+      notice(s, from, "document_requested", file.key.shipmentId, String(kinds.length));
     });
     res.status(201).json({ ok: true });
   });
@@ -219,6 +235,14 @@ export function documentRoutes(app) {
       if (!r || r.status !== "open") throw new Error("Document request unavailable");
       if (r.requestedBy !== req.user.id) throw new Error("Only the requester can cancel this request");
       r.status = "cancelled";
+    });
+    res.json({ ok: true });
+  });
+  app.post("/api/account/document-privacy", async (req, res) => {
+    if (typeof req.body?.shareWithAdmin !== "boolean") throw new Error("Invalid request");
+    await mutate((s) => {
+      const u = s.users.find((x) => x.id === req.user.id);
+      if (u) u.docsAdminAccess = req.body.shareWithAdmin;
     });
     res.json({ ok: true });
   });

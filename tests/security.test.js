@@ -890,7 +890,9 @@ test("truck tracking: crossing detection, receiver link, photos and proof of del
   );
   mine = (await call("merchant", "/state")).body;
   const done = mine.shipments.find((s) => s.id === legId);
-  assert.equal(done.status, "arrived");
+  // The receiver's delivery code closes the stage right away.
+  assert.equal(done.status, "delivered");
+  assert.equal(done.closedBy, "delivery_code");
   assert.equal(done.pod.codeVerified, true);
   assert.equal(
     mine.shipmentDocuments.filter((d) => d.shipmentId === legId && d.kind.startsWith("photo_")).length,
