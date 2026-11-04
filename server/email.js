@@ -200,6 +200,7 @@ export async function flushEmails(limit = 3) {
 const adminSubjects = {
   account_registered: "حساب جديد بانتظار موافقتك",
   feedback_new: "تقييم أو شكوى أو اقتراح جديد",
+  rules_source_changed: "صفحة مصدر قرارات الحدود تغيّرت، راجعها وانشر إشعارًا إذا لزم",
   verification_submitted: "طلب توثيق جديد بانتظار المراجعة",
   shipment_created: "طلب شحن جديد",
   bid_accepted: "تم قبول عرض نقل",

@@ -23,6 +23,9 @@ export async function handler(event) {
   await runRecurringWatch().catch(() => false);
   const { runMonthlyWatch } = await import("../../server/monthlyReport.js");
   await runMonthlyWatch().catch(() => false);
+  // Border and customs source pages: checked once a day, alerts the administration when they change.
+  const { runRuleWatch } = await import("../../server/ruleWatch.js");
+  await runRuleWatch().catch(() => false);
   if (!mailConfigured() && !whatsappConfigured())
     return { statusCode: 200, body: JSON.stringify({ configured: false, sent: 0 }) };
   const email = await flushEmails(1);

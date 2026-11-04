@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { crossings, crossingKeys } from "../shared/crossings";
+import { crossingSources } from "../shared/borderSources";
 import { HolidaySection } from "./Holidays";
 import { BestCrossingTimes } from "./CrossingTimes";
 
@@ -124,10 +125,6 @@ const rules = [
   },
 ];
 
-const crossingSources = [
-  "https://logcluster.org/en/alerts/syria-border-crossings-airports-and-ports-updates-9-march-2026",
-  "https://english.enabbaladi.net/archives/2026/08/turkey-continues-upgrading-syria-border-crossings/",
-];
 
 const host = (url) => {
   try {

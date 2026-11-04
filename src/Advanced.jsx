@@ -276,7 +276,7 @@ export function NotificationBell({ data, t, run, navigate }) {
                                     ? "dashboard"
                                     : n.event.startsWith("return_trip_")
                                       ? "returnTrips"
-                                      : n.event === "prohibited_attempt"
+                                      : ["prohibited_attempt", "rules_source_changed"].includes(n.event)
                                         ? "admin"
                                         : n.event === "feedback_new"
                                           ? "feedbackAdmin"
