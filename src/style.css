@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @theme {
-  --font-sans: "Segoe UI", Tahoma, Arial, sans-serif;
+  --font-sans: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 .plan-banner {
   display: flex;
@@ -19,7 +20,8 @@
   font-size: 9px;
 }
 :root {
-  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  font-family: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+  letter-spacing: 0;
   color: #262f3d;
   background: #f5f7f6;
   font-synthesis: none;
