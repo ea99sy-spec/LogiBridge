@@ -34,6 +34,9 @@ test("team roles limit what an employee can change", () => {
   assert.ok(!asMember.includes("team") && !asMember.includes("security") && !asMember.includes("kyb"));
 });
 
+// Dates are relative to today so this test keeps working in any month.
+const day = (n) => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
+
 test("recurring dates and publication", () => {
   assert.equal(nextOf("2026-01-31", "monthly"), "2026-02-28");
   assert.equal(nextOf("2026-10-20", "weekly"), "2026-10-27");
@@ -56,7 +59,7 @@ test("recurring dates and publication", () => {
         active: true,
         every: "weekly",
         leadDays: 3,
-        nextDate: "2026-10-21",
+        nextDate: day(30),
         preferredCarrierId: "c",
         agreedPrice: 800,
         template: {
@@ -74,16 +77,16 @@ test("recurring dates and publication", () => {
     ],
   };
   // Too early: nothing happens.
-  assert.equal(recurringWatch(s, "2026-10-17"), false);
+  assert.equal(recurringWatch(s, day(26)), false);
   assert.equal(s.shipments.length, 0);
   // Three days before: published once, next date moves a week ahead.
-  assert.equal(recurringWatch(s, "2026-10-18"), true);
+  assert.equal(recurringWatch(s, day(27)), true);
   assert.equal(s.shipments.length, 1);
-  assert.equal(s.shipments[0].date, "2026-10-21");
+  assert.equal(s.shipments[0].date, day(30));
   assert.equal(s.shipments[0].recurringId, "r1");
-  assert.equal(s.recurring[0].nextDate, "2026-10-28");
+  assert.equal(s.recurring[0].nextDate, day(37));
   assert.ok(s.notifications.some((n) => n.userId === "c" && n.event === "recurring_invite"));
-  assert.equal(recurringWatch(s, "2026-10-18"), false);
+  assert.equal(recurringWatch(s, day(27)), false);
 });
 
 test("monthly report counts only that month", () => {
