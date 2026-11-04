@@ -8,7 +8,8 @@ import { notice } from "./advanced.js";
 import { queueAdminEmail } from "./email.js";
 import { crossingSources } from "../shared/borderSources.js";
 
-const DAY = 86400000;
+// Border and customs rules change slowly: the sources are checked once a month.
+const CHECK_EVERY = 30 * 86400000;
 
 // Visible text only, so layout, scripts and styles do not count as a change.
 export function pageText(html) {
@@ -62,10 +63,10 @@ async function fetchPage(url) {
   return r.text();
 }
 
-// Called from the scheduled function. Checks at most once a day, and downloads outside the store lock.
+// Called from the scheduled function. Checks at most once a month, and downloads outside the store lock.
 export async function runRuleWatch(now = new Date()) {
   const last = readState().settings?.ruleWatch?.checkedAt;
-  if (last && now - Date.parse(last) < DAY) return false;
+  if (last && now - Date.parse(last) < CHECK_EVERY) return false;
   const pages = {};
   for (const url of crossingSources) {
     try {
