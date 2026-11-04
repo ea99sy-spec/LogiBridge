@@ -1,6 +1,7 @@
 import { readState } from "./store.js";
 import { faqKnowledge, searchFaq } from "../shared/supportFaq.js";
 import { pricingOf } from "../shared/subscription.js";
+import { DEFAULT_SUPPORT_EMAIL } from "../shared/contact.js";
 
 // Support assistant. With ANTHROPIC_API_KEY set in the hosting settings it answers with Claude,
 // grounded on the help-centre answers; without it, it returns the closest help-centre answers.
@@ -80,7 +81,7 @@ export function supportRoutes(app, { sessionUser }) {
     res.json({
       ai: aiConfigured(),
       whatsapp: s.settings?.publicWhatsapp || "",
-      email: s.supportEmail || process.env.MAIL_REPLY_TO || "",
+      email: s.supportEmail || process.env.MAIL_REPLY_TO || DEFAULT_SUPPORT_EMAIL,
     });
   });
   app.post("/api/support/ask", async (req, res) => {

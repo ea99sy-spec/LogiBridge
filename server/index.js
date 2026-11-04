@@ -1,6 +1,7 @@
 import express from "express";
 import { randomBytes } from "node:crypto";
 import { createClient } from "redis";
+import { DEFAULT_SUPPORT_EMAIL } from "../shared/contact.js";
 import { initialize, readState, mutate, id } from "./store.js";
 import { splitCrossBorder } from "../shared/crossings.js";
 import {
@@ -195,7 +196,7 @@ export async function createApp() {
     res.json({
       ok: true,
       demo: DEMO_NOW(),
-      supportEmail: readState().supportEmail || process.env.MAIL_REPLY_TO || "",
+      supportEmail: readState().supportEmail || process.env.MAIL_REPLY_TO || DEFAULT_SUPPORT_EMAIL,
       emailConfigured: mailConfigured(),
       // Platform WhatsApp for visitors (set by the administrator; empty = no button).
       whatsapp: readState().settings?.publicWhatsapp || "",
@@ -516,7 +517,7 @@ export async function createApp() {
         emailConfigured: mailConfigured(),
         whatsappConfigured: whatsappConfigured(),
         borderNotices: s.settings?.borderNotices || [],
-        supportEmail: s.supportEmail || "",
+        supportEmail: s.supportEmail || DEFAULT_SUPPORT_EMAIL,
         demo: DEMO_NOW(),
         flags: s.flags,
         kyb: s.kyb.filter((d) => d.userId === req.user.id).map(({ content, encryptedContent, ...d }) => d),
@@ -599,7 +600,7 @@ export async function createApp() {
       pricing: pricingOf(readState()).visible ? pricingOf(readState()) : null,
       borderNotices: s.settings?.borderNotices || [],
       crossingReports: crossingReports(s, !!req.user.demo),
-      supportEmail: s.supportEmail || "",
+      supportEmail: s.supportEmail || DEFAULT_SUPPORT_EMAIL,
       realtime: !cloudEnabled(),
       ...advancedState(s, req.user),
       ...paymentState(s, req.user),
