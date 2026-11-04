@@ -931,3 +931,17 @@ svg.flag {
   border: 0;
 }
 .pay-consent{display:flex;gap:8px;align-items:flex-start;font-size:.88rem;margin:6px 0}
+
+/* Top bar: currency select and its rate note sit side by side without overlapping. */
+.header-tools label:has(.currency-select) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.header-tools .fx-date {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
