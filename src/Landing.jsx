@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./public-pages.css";
 import { LegalLinks, CompanyInfo } from "./Legal";
-import { LiveBorderStrip, ProductPreview, PlatformStats } from "./LandingLive";
+import { LiveBorderStrip, PlatformStats } from "./LandingLive";
 import { QuickPrice } from "./Prices";
 import { DRIVER_APP_URL } from "./Advanced";
 import { waLink } from "../shared/wa";
@@ -100,7 +100,18 @@ export default function Landing({ t, langSelect, user }) {
         <section className="landing-hero">
           <div>
             <span className="access-chip">
-              {t("heroChip")} <i />
+              {t("heroChip")}{" "}
+              <svg
+                className="hero-globe"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M2 12h20M12 2c3 3.5 3 16.5 0 20M12 2c-3 3.5-3 16.5 0 20" />
+              </svg>
             </span>
             <h1>
               {t("globalHero")}
@@ -118,15 +129,17 @@ export default function Landing({ t, langSelect, user }) {
                 {t(health.demo ? "heroTry" : "navHow")}
               </a>
             </div>
-            <div className="access-benefits">
-              <span>✓ {t("benefitVerified")}</span>
-              <span>✓ {t("benefitProtected")}</span>
-              <span>✓ {t("benefitTracking")}</span>
-              <span>✓ {t("benefitNoCommission")}</span>
-              <span>✓ AR / EN / TR</span>
-            </div>
+            <p className="hero-signin">
+              {t("haveAccount")} <a href="/login">{t("signIn")}</a>
+            </p>
           </div>
-          <ProductPreview t={t} />
+          <div className="access-benefits hero-benefits">
+            <span>✓ {t("benefitVerified")}</span>
+            <span>✓ {t("benefitProtected")}</span>
+            <span>✓ {t("benefitTracking")}</span>
+            <span>✓ {t("benefitNoCommission")}</span>
+            <span>✓ AR / EN / TR</span>
+          </div>
         </section>
         <LiveBorderStrip t={t} lang={document.documentElement.lang} />
         <PlatformStats t={t} />
@@ -135,7 +148,6 @@ export default function Landing({ t, langSelect, user }) {
         {/* 2. Why use the platform */}
         <section id="why" className="landing-section">
           <h2>{t("whyTitle")}</h2>
-          <p className="section-lead">{t("whyLead")}</p>
           <div className="compare">
             <div className="compare-head">
               <span />
@@ -155,7 +167,6 @@ export default function Landing({ t, langSelect, user }) {
         {/* 3. How a shipment to Syria runs */}
         <section id="how" className="landing-section">
           <h2>{t("howTitle")}</h2>
-          <p className="section-lead">{t("howLead")}</p>
           <ol className="about-steps">
             {["howStep1", "howStep2", "howStep3", "howStep4"].map((k, i) => (
               <li key={k}>
@@ -165,27 +176,6 @@ export default function Landing({ t, langSelect, user }) {
               </li>
             ))}
           </ol>
-          <div className="corridor">
-            <h3>{t("corridorTitle")}</h3>
-            <div className="corridor-steps">
-              {[
-                ["🚚", "leg_origin_leg", "corridorLeg1"],
-                ["⚖", "leg_clearance", "corridorLeg2"],
-                ["🚚", "leg_destination_leg", "corridorLeg3"],
-              ].map(([icon, title, text], i) => (
-                <div key={title} className="corridor-step">
-                  <span className="corridor-icon">{icon}</span>
-                  <b>
-                    {i + 1}. {t(title)}
-                  </b>
-                  <small>{t(text)}</small>
-                </div>
-              ))}
-            </div>
-            <p className="muted">
-              {t("corridorNote")} <a href="/border">{t("borderRulesTitle")} ↗</a>
-            </p>
-          </div>
         </section>
 
         {/* 4. What you get */}
@@ -238,18 +228,8 @@ export default function Landing({ t, langSelect, user }) {
               </article>
             ))}
           </div>
-          {health.demo && (
-            <p className="muted small">
-              {t("tryPlatformNote")}{" "}
-              <button className="text-button" disabled={!!busy} onClick={() => tryAs("admin")}>
-                {t("tryAdminDemo")}
-              </button>
-            </p>
-          )}
+          {health.demo && <p className="muted small">{t("tryPlatformNote")}</p>}
           {error && <p role="alert">{error}</p>}
-          <p className="muted small">
-            {t("haveAccount")} <a href="/login">{t("signIn")}</a>
-          </p>
         </section>
 
         {/* 6. Trust */}

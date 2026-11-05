@@ -113,7 +113,6 @@ export function QuickPrice({ t }) {
   return (
     <section className="landing-section quick-price" id="quick-price">
       <h2>{t("quickPriceTitle")}</h2>
-      <p>{t("quickPriceIntro")}</p>
       <form
         className="quick-price-form"
         onSubmit={async (e) => {

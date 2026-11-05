@@ -927,3 +927,34 @@
     font-size: 12px;
   }
 }
+
+/* Hero: the globe next to the route chip, and the trust points in the visual column */
+.hero-globe {
+  display: inline-block;
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: -0.2em;
+  margin-inline-start: 6px;
+  color: #facc15;
+}
+.landing-hero .hero-benefits {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  align-self: center;
+}
+.landing-hero .hero-benefits {
+  align-items: flex-start;
+}
+.landing-hero .hero-benefits span {
+  width: auto;
+  display: inline-flex;
+}
+.landing-hero .hero-signin {
+  margin-top: 18px;
+}
+.landing-hero .hero-signin a {
+  color: #facc15;
+  font-weight: 700;
+}
