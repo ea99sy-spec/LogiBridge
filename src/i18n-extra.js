@@ -1869,7 +1869,11 @@ export const extraRows = {
   statCompleted: ["شحنة مكتملة", "completed shipments", "tamamlanan sevkiyat"],
   statActive: ["شحنة جارية الآن", "shipments under way", "devam eden sevkiyat"],
   statCountries: ["دولة", "countries", "ülke"],
-  statCrossings: ["المعابر المفتوحة التي نغطيها", "Open crossings we cover", "Hizmet verdiğimiz açık sınır kapıları"],
+  statCrossings: [
+    "المعابر المفتوحة التي نغطيها",
+    "Open crossings we cover",
+    "Hizmet verdiğimiz açık sınır kapıları",
+  ],
   showStats: [
     "إظهار أرقام المنصة في الصفحة الرئيسية",
     "Show platform numbers on the home page",
@@ -3528,5 +3532,11 @@ export const extraRows = {
     "أسئلة كثيرة خلال وقت قصير، حاول بعد قليل أو تواصل على واتساب.",
     "Too many questions in a short time — try again shortly or use WhatsApp.",
     "Kısa sürede çok fazla soru — biraz sonra deneyin veya WhatsApp'ı kullanın.",
+  ],
+  suggestPassword: ["اقترح كلمة مرور قوية", "Suggest a strong password", "Güçlü bir parola öner"],
+  suggestedPasswordNote: [
+    "احفظها بمكان آمن قبل إكمال التسجيل.",
+    "Save it somewhere safe before you finish.",
+    "Tamamlamadan önce güvenli bir yere kaydedin.",
   ],
 };

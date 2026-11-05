@@ -8,7 +8,11 @@ export function validCountry(code) {
   return typeof code === "string" && supported.has(code);
 }
 // Names chosen by the platform where the default label is not the one we use.
-const customNames = { PS: { ar: "فلسطين", en: "Palestine", tr: "Filistin" } };
+const customNames = {
+  TR: { ar: "تركيا", en: "Turkey", tr: "Türkiye" },
+  SY: { ar: "سوريا", en: "Syria", tr: "Suriye" },
+  PS: { ar: "فلسطين", en: "Palestine", tr: "Filistin" },
+};
 export function countryName(code, lang = "en") {
   if (!validCountry(code)) return code;
   const custom = customNames[code];

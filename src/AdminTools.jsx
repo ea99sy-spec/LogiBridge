@@ -153,7 +153,7 @@ export function ErrorLog({ t, lang, demo }) {
           🐞 {t("errorLog")}{" "}
           {errors?.length ? <span className="badge cancelled">{errors.length}</span> : null}
         </h3>
-        <div>
+        <div className="error-log-actions">
           <button className="text-button" onClick={() => setOpen(!open)}>
             {t(open ? "hide" : "show")}
           </button>

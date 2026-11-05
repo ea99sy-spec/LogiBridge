@@ -129,7 +129,20 @@ export function operationRoutes(app) {
     const day = new Date().toISOString().slice(0, 10);
     res.set("Content-Type", "application/json; charset=utf-8");
     res.set("Content-Disposition", `attachment; filename="logibridge-backup-${day}.json"`);
-    res.send(JSON.stringify({ exportedAt: new Date().toISOString(), state: readState() }));
+    // Passwords, two-factor secrets and recovery codes never leave the server, even in a backup.
+    const secret = /hash|salt|secret|twofactor|backupcode|token/i;
+    const clean = (value) =>
+      Array.isArray(value)
+        ? value.map(clean)
+        : value && typeof value === "object"
+          ? Object.fromEntries(
+              Object.entries(value)
+                .filter(([k]) => !secret.test(k))
+                .map(([k, v]) => [k, clean(v)]),
+            )
+          : value;
+    const state = clean(readState());
+    res.send(JSON.stringify({ exportedAt: new Date().toISOString(), state }, null, 2));
   });
   // Platform settings the owner controls from the admin workspace.
   app.get("/api/admin/settings", (req, res) => {

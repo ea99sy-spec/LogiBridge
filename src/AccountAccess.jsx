@@ -6,6 +6,15 @@ import { crossingKeys } from "../shared/crossings";
 import { LegalLinks } from "./Legal";
 const accounts = ["merchant", "carrier", "broker", "supplier", "individual", "admin"];
 const symbols = { merchant: "▤", carrier: "⇄", broker: "⚖", supplier: "▧", individual: "◉", admin: "◇" };
+// A random password of 20 characters from letters, digits and symbols. Filled into both fields.
+function suggestPassword(form, setSuggested) {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*";
+  const values = crypto.getRandomValues(new Uint32Array(20));
+  const password = Array.from(values, (v) => chars[v % chars.length]).join("");
+  form.password.value = password;
+  form.confirmPassword.value = password;
+  setSuggested(password);
+}
 export default function AccountAccess({ t, langSelect, run, busy, toast, onEntered, user }) {
   const segment = window.location.pathname.split("/").filter(Boolean),
     type = accounts.includes(segment[1]) ? segment[1] : null;
@@ -24,7 +33,8 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
     [country, setCountry] = useState(""),
     [needCode, setNeedCode] = useState(false),
     [brokerCrossings, setBrokerCrossings] = useState([]),
-    [forgotResult, setForgotResult] = useState(null);
+    [forgotResult, setForgotResult] = useState(null),
+    [suggested, setSuggested] = useState("");
   useEffect(() => {
     fetch("/api/health")
       .then((r) => r.json())
@@ -338,6 +348,23 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
                       />
                       {register && <small>{t("passwordRule")}</small>}
                     </label>
+                  )}
+                  {register && !forgot && (
+                    <div className="password-suggest">
+                      <button
+                        type="button"
+                        className="text-button small-button"
+                        onClick={(e) => suggestPassword(e.currentTarget.form, setSuggested)}
+                      >
+                        {t("suggestPassword")}
+                      </button>
+                      {suggested && (
+                        <p className="small">
+                          <code dir="ltr">{suggested}</code>{" "}
+                          <span className="muted">{t("suggestedPasswordNote")}</span>
+                        </p>
+                      )}
+                    </div>
                   )}
                   {needCode && !register && !forgot && (
                     <label className="field">

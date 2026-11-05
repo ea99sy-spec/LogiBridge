@@ -110,3 +110,11 @@
 .live-strip + .platform-stats {
   margin-top: 28px;
 }
+
+/* Error log: the show/hide and clear-all actions are separated. */
+.error-log-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
