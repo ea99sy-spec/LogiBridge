@@ -242,10 +242,7 @@ export function FloatingHelp() {
   }, []);
   const t = (k) => translate(lang, k);
   // Not on the driver app, sign-in links and the support page itself (it has the full version).
-  if (
-    /^\/(driver|team-invite|reset-password|verify-email|t\/|login|register|accounts)/.test(path) ||
-    path === "/workspace/support"
-  )
+  if (/^\/(driver|team-invite|reset-password|verify-email|t\/)/.test(path) || path === "/workspace/support")
     return null;
   const wa = info?.whatsapp ? waLink(info.whatsapp, t("waSupportHello")) : "";
   return (
