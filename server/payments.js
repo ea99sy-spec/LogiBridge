@@ -1,3 +1,4 @@
+import { downloadable } from "./fileOutput.js";
 import { readState, mutate, id } from "./store.js";
 import { validateDocument, encryptDocument, decryptDocument } from "./identity.js";
 import { notice, shipmentNotice } from "./advanced.js";
@@ -84,14 +85,15 @@ export function paymentRoutes(app) {
     });
     res.status(201).json({ ok: true });
   });
-  app.get("/api/payments/:id/document", (req, res) => {
+  app.get("/api/payments/:id/document", async (req, res) => {
     const p = (readState().payments || []).find((x) => x.id === req.params.id);
     if (!p) return res.sendStatus(404);
     if (req.user.id !== p.userId && (req.user.role !== "admin" || req.user.demo)) return res.sendStatus(403);
+    const out = await downloadable(decryptDocument(p.encryptedContent), p.mime);
     res
-      .type(p.mime)
-      .set("Content-Disposition", 'attachment; filename="payment-receipt"')
-      .send(decryptDocument(p.encryptedContent));
+      .type(out.mime)
+      .set("Content-Disposition", `attachment; filename="payment-receipt.${out.ext}"`)
+      .send(out.bytes);
   });
   app.post("/api/payments/:id/review", async (req, res) => {
     admin(req.user);

@@ -1,3 +1,4 @@
+import { downloadable } from "./fileOutput.js";
 import { readState, mutate, id } from "./store.js";
 import { notice } from "./advanced.js";
 import { validateDocument, encryptDocument, decryptDocument } from "./identity.js";
@@ -100,15 +101,16 @@ export function driverRoutes(app) {
     });
     res.json({ ok: true });
   });
-  app.get("/api/drivers/:id/file/:kind", (req, res) => {
+  app.get("/api/drivers/:id/file/:kind", async (req, res) => {
     const s = readState();
     const d = (s.drivers || []).find((x) => x.id === req.params.id);
     const f = d?.files?.[req.params.kind];
     if (!f) return res.sendStatus(404);
     if (d.carrierId !== req.user.id && !(req.user.role === "admin" && !!d.demo === !!req.user.demo))
       return res.sendStatus(403);
-    res.set("Content-Type", f.mime).set("Content-Disposition", "inline");
-    res.send(decryptDocument(f.encryptedContent));
+    const out = await downloadable(decryptDocument(f.encryptedContent), f.mime);
+    res.set("Content-Type", out.mime).set("Content-Disposition", "inline");
+    res.send(out.bytes);
   });
   app.delete("/api/drivers/:id", async (req, res) => {
     await mutate((s) => {

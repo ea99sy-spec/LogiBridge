@@ -1,3 +1,4 @@
+import { downloadable } from "./fileOutput.js";
 import express from "express";
 import { randomBytes } from "node:crypto";
 import { createClient } from "redis";
@@ -1060,15 +1061,16 @@ export async function createApp() {
     });
     res.json({ ok: true, completed: true });
   });
-  app.get("/api/kyb/:id/document", (req, res) => {
+  app.get("/api/kyb/:id/document", async (req, res) => {
     role(req.user, "admin");
     const doc = readState().kyb.find((x) => x.id === req.params.id);
     if (!doc) return res.sendStatus(404);
     if (req.user.demo && !readState().users.find((u) => u.id === doc.userId)?.demo)
       return res.sendStatus(403);
-    res.set("Content-Type", doc.mime);
-    res.set("Content-Disposition", 'attachment; filename="verification-document"');
-    res.send(decryptDocument(doc.encryptedContent));
+    const out = await downloadable(decryptDocument(doc.encryptedContent), doc.mime);
+    res.set("Content-Type", out.mime);
+    res.set("Content-Disposition", `attachment; filename="verification-document.${out.ext}"`);
+    res.send(out.bytes);
   });
   app.post("/api/kyb/:id/review", async (req, res) => {
     role(req.user, "admin");
