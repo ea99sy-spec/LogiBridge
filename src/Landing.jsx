@@ -11,7 +11,13 @@ const symbols = { merchant: "▤", carrier: "⇄", broker: "⚖", supplier: "▧
 
 // Public facts the page needs: whether demo accounts are on, and the support email.
 function useHealth() {
-  const [health, setHealth] = useState({ demo: false, supportEmail: "", pricing: null, whatsapp: "" });
+  const [health, setHealth] = useState({
+    demo: false,
+    supportEmail: "",
+    pricing: null,
+    whatsapp: "",
+    homeVerification: true,
+  });
   useEffect(() => {
     fetch("/api/health")
       .then((r) => r.json())
@@ -61,6 +67,7 @@ export default function Landing({ t, langSelect, user }) {
   ];
   return (
     <div className="landing">
+      <BackToTop t={t} />
       <header className="landing-header">
         <a className="brand" href="/">
           <span className="brand-icon">⇄</span>LogiBridge
@@ -154,25 +161,8 @@ export default function Landing({ t, langSelect, user }) {
         <PlatformStats t={t} />
         <QuickPrice t={t} />
 
-        {/* 2. Why use the platform */}
-        <section id="why" className="landing-section">
-          <h2>{t("whyTitle")}</h2>
-          <div className="compare">
-            <div className="compare-head">
-              <span />
-              <b>{t("compareUsual")}</b>
-              <b className="ours">{t("compareOurs")}</b>
-            </div>
-            {["Offers", "Price", "Visibility", "Rules", "Payment"].map((k) => (
-              <div className="compare-row" key={k}>
-                <span className="compare-topic">{t("compareTopic" + k)}</span>
-                <span className="compare-usual">{t("compareUsual" + k)}</span>
-                <span className="compare-ours">✓ {t("compareOurs" + k)}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
+        {/* 8. Who we are */}
+        <About t={t} />
         {/* 3. How a shipment to Syria runs */}
         <section id="how" className="landing-section">
           <h2>{t("howTitle")}</h2>
@@ -185,6 +175,31 @@ export default function Landing({ t, langSelect, user }) {
               </li>
             ))}
           </ol>
+        </section>
+
+        {/* 5. Who it is for: register, or try a demo account */}
+        <section id="accounts" className="landing-section">
+          <h2>{t("accountsTitle")}</h2>
+          <p className="section-lead">{t(health.demo ? "accountsLeadDemo" : "accountsLead")}</p>
+          <div className="landing-account-cards">
+            {types.map((type) => (
+              <article key={type}>
+                <span className="access-symbol">{symbols[type]}</span>
+                <h3>{t(type)}</h3>
+                <p>{t(`short_${type}`)}</p>
+                <a className="button" href={`/register/${type}`}>
+                  {t("createAccount")} ↗
+                </a>
+                {health.demo && (
+                  <button className="button ghost" disabled={!!busy} onClick={() => tryAs(type)}>
+                    {busy === type ? t("loading") : t("tryDemo")}
+                  </button>
+                )}
+              </article>
+            ))}
+          </div>
+          {health.demo && <p className="muted small">{t("tryPlatformNote")}</p>}
+          {error && <p role="alert">{error}</p>}
         </section>
 
         {/* 4. What you get */}
@@ -216,52 +231,48 @@ export default function Landing({ t, langSelect, user }) {
           </div>
         </section>
 
-        {/* 5. Who it is for: register, or try a demo account */}
-        <section id="accounts" className="landing-section">
-          <h2>{t("accountsTitle")}</h2>
-          <p className="section-lead">{t(health.demo ? "accountsLeadDemo" : "accountsLead")}</p>
-          <div className="landing-account-cards">
-            {types.map((type) => (
-              <article key={type}>
-                <span className="access-symbol">{symbols[type]}</span>
-                <h3>{t(type)}</h3>
-                <p>{t(`short_${type}`)}</p>
-                <a className="button" href={`/register/${type}`}>
-                  {t("createAccount")} ↗
-                </a>
-                {health.demo && (
-                  <button className="button ghost" disabled={!!busy} onClick={() => tryAs(type)}>
-                    {busy === type ? t("loading") : t("tryDemo")}
-                  </button>
-                )}
-              </article>
-            ))}
-          </div>
-          {health.demo && <p className="muted small">{t("tryPlatformNote")}</p>}
-          {error && <p role="alert">{error}</p>}
-        </section>
-
-        {/* 6. Trust */}
-        <section id="verification" className="landing-verification">
-          <div>
-            <h2>{t("globalVerification")}</h2>
-            <p>{t("globalVerificationDesc")}</p>
-            <a className="button yellow-button" href={user ? "/workspace/kyb" : "/accounts"}>
-              {t("openVerification")} ↗
-            </a>
-          </div>
-          <div className="landing-verification-steps">
-            {["verificationInfo", "verificationUpload", "verificationReview"].map((key, i) => (
-              <div key={key}>
-                <span>{i + 1}</span>
-                <b>{t(key)}</b>
+        {/* 2. Why use the platform */}
+        <section id="why" className="landing-section">
+          <h2>{t("whyTitle")}</h2>
+          <div className="compare">
+            <div className="compare-head">
+              <span />
+              <b>{t("compareUsual")}</b>
+              <b className="ours">{t("compareOurs")}</b>
+            </div>
+            {["Offers", "Price", "Visibility", "Rules", "Payment"].map((k) => (
+              <div className="compare-row" key={k}>
+                <span className="compare-topic">{t("compareTopic" + k)}</span>
+                <span className="compare-usual">{t("compareUsual" + k)}</span>
+                <span className="compare-ours">✓ {t("compareOurs" + k)}</span>
               </div>
             ))}
           </div>
         </section>
 
+        {/* 6. Trust */}
+        {health.homeVerification !== false && (
+          <section id="verification" className="landing-verification">
+            <div>
+              <h2>{t("globalVerification")}</h2>
+              <p>{t("globalVerificationDesc")}</p>
+              <a className="button yellow-button" href={user ? "/workspace/kyb" : "/accounts"}>
+                {t("openVerification")} ↗
+              </a>
+            </div>
+            <div className="landing-verification-steps">
+              {["verificationInfo", "verificationUpload", "verificationReview"].map((key, i) => (
+                <div key={key}>
+                  <span>{i + 1}</span>
+                  <b>{t(key)}</b>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* 7. Cost and questions */}
-        <section id="faq" className="landing-section">
+        <section id="pricing" className="landing-section">
           <div className="pricing-card">
             <h2>{t("pricingTitle")}</h2>
             <ul>
@@ -292,6 +303,9 @@ export default function Landing({ t, langSelect, user }) {
               </>
             )}
           </div>
+        </section>
+
+        <section id="faq" className="landing-section">
           <h2>{t("faqTitle")}</h2>
           <div className="faq">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
@@ -302,9 +316,6 @@ export default function Landing({ t, langSelect, user }) {
             ))}
           </div>
         </section>
-
-        {/* 8. Who we are */}
-        <About t={t} />
       </main>
 
       <footer className="landing-footer">
@@ -376,5 +387,28 @@ function About({ t }) {
         </div>
       </details>
     </section>
+  );
+}
+
+// Shows a button to go back to the top once the visitor has scrolled down.
+function BackToTop({ t }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShow(window.scrollY > 600);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  if (!show) return null;
+  return (
+    <button
+      type="button"
+      className="back-to-top"
+      aria-label={t("backToTop")}
+      title={t("backToTop")}
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+    >
+      ↑
+    </button>
   );
 }

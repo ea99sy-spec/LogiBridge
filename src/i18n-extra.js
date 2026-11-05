@@ -2902,6 +2902,12 @@ export const extraRows = {
     "🥉 Bronze: at least one completed operation. 🥈 Silver: 7 completed, rating 4+, 75%+ on time or paying within 7 days. 🥇 Gold: 20 completed, rating 4.5+, 90%+ on time or paying within 3 days.",
     "🥉 Bronz: en az bir tamamlanan işlem. 🥈 Gümüş: 7 işlem, 4+ puan, %75+ zamanında veya 7 gün içinde ödeme. 🥇 Altın: 20 işlem, 4,5+ puan, %90+ zamanında veya 3 gün içinde ödeme.",
   ],
+  showHomeVerification: [
+    "عرض قسم التوثيق في الصفحة الرئيسية",
+    "Show the verification section on the home page",
+    "Ana sayfada doğrulama bölümünü göster",
+  ],
+  backToTop: ["للأعلى", "Back to top", "Yukarı"],
   costCalcTitle: [
     "حاسبة تقريبية لتكلفة الرحلة",
     "Approximate trip cost calculator",

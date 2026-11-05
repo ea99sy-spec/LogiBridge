@@ -991,3 +991,25 @@
   margin-top: 14px;
   justify-content: center;
 }
+
+.back-to-top {
+  position: fixed;
+  bottom: 76px;
+  inset-inline-end: 14px;
+  z-index: 60;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 0;
+  background: #0b1f3a;
+  color: #facc15;
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.25);
+}
+@media print {
+  .back-to-top {
+    display: none;
+  }
+}

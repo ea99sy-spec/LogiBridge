@@ -632,6 +632,17 @@ export function AdminSiteSettings({ data, t, run, busy }) {
       <label className="consent">
         <input
           type="checkbox"
+          checked={settings.showHomeVerification}
+          disabled={busy}
+          onChange={(e) => save({ showHomeVerification: e.target.checked })}
+        />
+        <span>
+          <b>{t("showHomeVerification")}</b>
+        </span>
+      </label>
+      <label className="consent">
+        <input
+          type="checkbox"
           checked={settings.requireEmailVerification}
           disabled={busy || (!settings.emailConfigured && !settings.requireEmailVerification)}
           onChange={(e) => save({ requireEmailVerification: e.target.checked })}

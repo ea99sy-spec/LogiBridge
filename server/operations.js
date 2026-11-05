@@ -209,6 +209,7 @@ export function operationRoutes(app) {
       publicWhatsapp: s.settings?.publicWhatsapp || "",
       enforceSubscription: s.settings?.enforceSubscription === true,
       showStats: s.settings?.showStats !== false,
+      showHomeVerification: s.settings?.showHomeVerification !== false,
       company: s.settings?.company || {},
       prohibited: prohibitedRules(s.settings),
       pricing: pricingOf(s),
@@ -226,6 +227,7 @@ export function operationRoutes(app) {
       "requireEmailVerification",
       "enforceSubscription",
       "showStats",
+      "showHomeVerification",
     ])
       if (k in b && typeof b[k] !== "boolean") throw new Error("Invalid request");
     let notifyEmail;
@@ -307,6 +309,7 @@ export function operationRoutes(app) {
       if ("requireEmailVerification" in b) s.settings.requireEmailVerification = b.requireEmailVerification;
       if ("enforceSubscription" in b) s.settings.enforceSubscription = b.enforceSubscription;
       if ("showStats" in b) s.settings.showStats = b.showStats;
+      if ("showHomeVerification" in b) s.settings.showHomeVerification = b.showHomeVerification;
       if (notifyEmail !== undefined) s.settings.notifyEmail = notifyEmail;
     });
     res.json({ ok: true });
