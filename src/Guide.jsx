@@ -47,7 +47,7 @@ export function GuidePage({ kind, t, lang, navigate, modules }) {
 }
 
 // Small "start here" card on the dashboard until the user hides it.
-export function StartHereCard({ kind, t, lang, navigate, userId }) {
+export function StartHereCard({ kind, t, lang, navigate, userId, modules = [] }) {
   const key = "lb_guide_hidden_" + userId;
   const [hidden, setHidden] = useState(() => {
     try {
@@ -79,7 +79,13 @@ export function StartHereCard({ kind, t, lang, navigate, userId }) {
       <ol>
         {steps.map((s, n) => (
           <li key={n}>
-            <b>{s.title[i]}</b>
+            {modules.includes(s.tab) ? (
+              <button type="button" className="start-here-link" onClick={() => navigate(s.tab)}>
+                {s.title[i]} ↗
+              </button>
+            ) : (
+              <b>{s.title[i]}</b>
+            )}
           </li>
         ))}
       </ol>

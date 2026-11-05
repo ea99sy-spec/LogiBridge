@@ -1233,6 +1233,7 @@ function App() {
                   lang={lang}
                   navigate={setTab}
                   userId={user.id}
+                  modules={modules}
                 />
                 {user.accountType !== "individual" && <ReferralCard referral={data.referral} t={t} />}
               </>
@@ -1260,6 +1261,7 @@ function App() {
                   lang={lang}
                   navigate={setTab}
                   userId={user.id}
+                  modules={modules}
                 />
                 {admin && !user.demo && <NotesDueCard t={t} lang={lang} navigate={setTab} />}
                 {!admin && user.accountType !== "individual" && (

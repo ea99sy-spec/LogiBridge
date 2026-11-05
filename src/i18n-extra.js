@@ -1382,9 +1382,9 @@ export const extraRows = {
   navFaq: ["الأسعار والأسئلة", "Pricing & FAQ", "Fiyat ve SSS"],
   heroChip: ["تركيا ⇄ سوريا · ودوليًا", "Türkiye ⇄ Syria · and worldwide", "Türkiye ⇄ Suriye · ve dünya"],
   heroValue: [
-    "انشر شحنتك مرة واحدة، وتصلك عروض من ناقلين ومخلّصين جمركيين موثّقين. قارن الأسعار، وتابع كل مرحلة من التحميل إلى المعبر حتى التسليم، وادفع بأمان.",
-    "Post your shipment once and receive offers from verified carriers and customs brokers. Compare prices, follow every stage from loading to the crossing to delivery, and pay safely.",
-    "Sevkiyatınızı bir kez yayınlayın, doğrulanmış taşıyıcı ve gümrük müşavirlerinden teklif alın. Fiyatları karşılaştırın, yüklemeden kapıya ve teslimata kadar her aşamayı izleyin, güvenle ödeyin.",
+    "LogiBridge منصة تواصل بين الشركات: اطلب أسعار شحنتك، واستقبل عروضًا من عدة شركات موثّقة، واعرض أنت خدماتك. قارن واختر، وتابع كل مرحلة حتى التسليم.",
+    "LogiBridge is a platform connecting companies: request shipping prices, receive offers from several verified companies, and present your own services. Compare, choose, and follow every stage until delivery.",
+    "LogiBridge şirketleri buluşturan bir platform: sevkiyat fiyatı isteyin, birden fazla doğrulanmış şirketten teklif alın ve kendi hizmetlerinizi sunun. Karşılaştırın, seçin ve teslimata kadar her aşamayı izleyin.",
   ],
   heroPostShipment: ["انشر شحنتك", "Post a shipment", "Sevkiyat yayınlayın"],
   heroTry: ["جرّب بدون تسجيل", "Try without signing up", "Kayıt olmadan deneyin"],
