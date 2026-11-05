@@ -14,7 +14,7 @@ const rows = {
   companyEmailPreference: [
     "استقبال رسائل تعريف بالشركات المعتمدة الجديدة وخدماتها",
     "Receive introductions to newly approved companies and their services",
-    "Yeni onaylı şirket ve hizmet tanıtımlarını al",
+    "Yeni onaylanmış şirketler ve hizmetleri hakkında tanıtım e-postaları al",
   ],
   profilePrivacyNote: [
     "تظهر النبذة والخدمات في الدليل بعد اعتماد الشركة. البريد والرقم الضريبي والوثائق لا تظهر في الدليل.",
@@ -28,8 +28,8 @@ const rows = {
   ],
   searchServices: [
     "ابحث باسم الحساب أو الخدمة أو المدينة",
-    "Search name, service or city",
-    "Ad, hizmet veya şehir ara",
+    "Search by name, service or city",
+    "Ad, hizmet veya şehre göre ara",
   ],
   accountAwaitingApproval: [
     "حساب الشركة بانتظار موافقة المسؤول",
@@ -38,8 +38,8 @@ const rows = {
   ],
   approvalRestrictionNote: [
     "لا يمكنك استخدام خدمات المنصة قبل موافقة إدارة المنصة على حسابك. يمكنك الآن استكمال التعريف ورفع وثائق التوثيق فقط.",
-    "Platform services are locked until the administration approves your account. Meanwhile you can complete your profile and upload verification documents.",
-    "Hesabınız yönetim tarafından onaylanana kadar hizmetler kapalıdır. Bu sırada profilinizi tamamlayıp doğrulama belgelerini yükleyebilirsiniz.",
+    "Platform services are unavailable until the platform administration approves your account. In the meantime, you can complete your profile and upload verification documents.",
+    "Hesabınız platform yönetimi tarafından onaylanana kadar platform hizmetleri kullanılamaz. Bu süreçte profilinizi tamamlayabilir ve doğrulama belgelerinizi yükleyebilirsiniz.",
   ],
   reviewEmailNote: [
     "سيتم تقييم طلبك والوثائق، وسنرد بالقبول أو الرفض على بريدك الإلكتروني.",
@@ -49,11 +49,11 @@ const rows = {
   completeApplication: [
     "استكمال طلب التوثيق",
     "Complete verification application",
-    "Doğrulama başvurusunu tamamla",
+    "Doğrulama başvurusunu tamamlayın",
   ],
   rejectedAccountNext: [
     "راجع سبب الرفض في طلب التوثيق، ثم استكمل البيانات والوثائق وأعد التقديم.",
-    "Read the rejection reason, correct your details and documents, then submit again.",
+    "Review the rejection reason, correct your details and documents, and submit again.",
     "Ret nedenini okuyun, bilgi ve belgeleri düzeltip yeniden başvurun.",
   ],
   contactEmail: ["بريد التواصل", "Contact email", "İletişim e-postası"],
@@ -66,12 +66,12 @@ const rows = {
   emailServiceReady: [
     "خدمة إرسال البريد مهيأة؛ تتم معالجة الرسائل المجدولة تلقائيًا.",
     "Email sending is configured; queued messages are processed automatically.",
-    "E-posta hizmeti ayarlı; kuyruktaki iletiler otomatik işlenir.",
+    "E-posta hizmeti yapılandırılmış; kuyruktaki iletiler otomatik olarak işlenir.",
   ],
   emailServiceMissing: [
     "الإرسال غير مفعّل بعد. أضف RESEND_API_KEY وMAIL_FROM من إعدادات البيئة في Netlify، ثم أعد النشر. عنوان المرسل يجب أن يكون موثّقًا لدى خدمة البريد.",
-    "Sending is not active. Add RESEND_API_KEY and MAIL_FROM to Netlify environment settings and redeploy. Sender must be verified by the email provider.",
-    "Gönderim etkin değil. Netlify ortamına RESEND_API_KEY ve MAIL_FROM ekleyip yeniden dağıtın. Gönderen e-posta hizmetinde doğrulanmış olmalı.",
+    "Sending is not enabled yet. Add RESEND_API_KEY and MAIL_FROM to the Netlify environment settings, then redeploy. The sender address must be verified with the email provider.",
+    "E-posta gönderimi henüz etkin değil. Netlify ortam ayarlarına RESEND_API_KEY ve MAIL_FROM değerlerini ekleyip yeniden dağıtım yapın. Gönderen adresin e-posta hizmet sağlayıcısında doğrulanmış olması gerekir.",
   ],
   emailQueue: ["رسائل بانتظار الإرسال", "Queued messages", "Kuyruktaki iletiler"],
   emailSent: ["قبلتها خدمة البريد", "Accepted by email service", "E-posta hizmetince kabul edildi"],
@@ -79,8 +79,8 @@ const rows = {
   retryEmail: ["إعادة محاولة الإرسال", "Retry email sending", "E-posta gönderimini yeniden dene"],
   applicationComplete: [
     "اكتمل تقديم طلبك والملفات. سنقيّم الطلب ونرد بالبريد الإلكتروني.",
-    "Your application and files were submitted. We will review and email the decision.",
-    "Başvurunuz ve dosyalar alındı. İnceleme kararı e-posta ile iletilecek.",
+    "Your application and files have been submitted. We will review them and notify you by email.",
+    "Başvurunuz ve dosyalarınız alındı. Değerlendirme sonucu e-posta ile bildirilecektir.",
   ],
   shipmentCreatedNext: [
     "تم حفظ معلومات الشحنة. ارفع الملفات ثم اضغط إنهاء تقديم الطلب.",
@@ -89,16 +89,20 @@ const rows = {
   ],
   shipmentComplete: [
     "اكتمل تقديم الطلب والملفات. في حال وصول عروض سنرسل إشعارًا على بريدك الإلكتروني.",
-    "Request and files submitted. New offers will be notified by email.",
-    "Başvuru ve dosyalar alındı. Yeni teklifler e-posta ile bildirilecek.",
+    "Request and files submitted. You will be notified by email when new offers arrive.",
+    "Başvurunuz ve dosyalarınız alındı. Yeni teklifler e-posta ile bildirilecektir.",
   ],
-  completeShipmentRequest: ["إكمال طلب الشحنة", "Complete shipment request", "Sevkiyat başvurusunu tamamla"],
-  finishRequest: ["إنهاء تقديم الطلب", "Finish submitting request", "Başvuruyu tamamla"],
+  completeShipmentRequest: [
+    "إكمال طلب الشحنة",
+    "Complete shipment request",
+    "Sevkiyat başvurusunu tamamlayın",
+  ],
+  finishRequest: ["إنهاء تقديم الطلب", "Finish submitting the request", "Başvuruyu tamamlayın"],
   requestComplete: ["اكتمل الطلب", "Request completed", "Başvuru tamamlandı"],
   finishRequestNote: [
     "بعد رفع الملفات اضغط إنهاء تقديم الطلب. عروض النقل الجديدة ترسل إشعارًا بالبريد الإلكتروني.",
     "After uploading files, finish submitting the request. New transport offers trigger email notifications.",
-    "Dosyaları yükledikten sonra başvuruyu tamamlayın. Yeni teklifler e-posta bildirimi oluşturur.",
+    "Dosyaları yükledikten sonra başvurunuzu tamamlayın. Yeni taşıma teklifleri e-posta bildirimi tetikler.",
   ],
 
   close: ["إغلاق", "Close", "Kapat"],
@@ -129,18 +133,18 @@ const rows = {
   ],
   bankPaymentNote: [
     "حوّل المبلغ ثم ارفع الإيصال. لا يعتمد الدفع إلا بعد تأكد المسؤول من وصول المال فعليًا للحساب البنكي.",
-    "Transfer the amount and upload the receipt. Payment requires administrator confirmation of actual bank receipt.",
+    "Transfer the amount and upload the receipt. The payment is confirmed only after the administrator verifies that the funds have reached the bank account.",
     "Tutarı havale edip dekont yükleyin. Yönetici bankaya ulaşan ödemeyi doğrulamalıdır.",
   ],
   bankSetupNote: [
     "حدد حساب شركتك لاستقبال أجور النقل بالدولار. تأكد أن الحساب يقبل تحويلات USD.",
-    "Configure your company account for USD freight transfers. Verify it accepts USD.",
-    "USD taşıma ödemeleri için şirket hesabınızı ayarlayın. USD kabul ettiğini doğrulayın.",
+    "Configure your company account to receive freight payments in USD. Confirm that the account accepts USD transfers.",
+    "USD cinsinden taşıma ödemelerini almak için şirket hesabınızı ayarlayın. Hesabın USD havalelerini kabul ettiğini doğrulayın.",
   ],
   bankPayoutNote: [
     "إرسال أجور الناقل أو رد الأموال يتم بتحويل بنكي خارج الموقع. تأكيد التسليم يسجل استحقاقًا ولا يرسل المال تلقائيًا.",
-    "Carrier payouts and refunds require external bank transfers. Delivery confirmation records the payable amount without automatically transferring money.",
-    "Taşıyıcı ödemeleri ve iadeler bankadan yapılır. Teslim onayı borcu kaydeder; otomatik para göndermez.",
+    "Carrier payouts and refunds are made by external bank transfer. Delivery confirmation records the payable amount without transferring funds automatically.",
+    "Taşıyıcı ödemeleri ve iadeler platform dışında, banka havalesiyle yapılır. Teslim onayı ödenecek tutarı kaydeder; para otomatik olarak gönderilmez.",
   ],
   bankPaymentLedger: [
     "دفعة بنكية مؤكدة يدويًا",
@@ -184,12 +188,12 @@ const rows = {
   ],
   payout_pending: [
     "أجور الناقل بانتظار تحويل بنكي",
-    "Carrier payout awaiting bank transfer",
+    "Carrier payout pending bank transfer",
     "Taşıyıcı ödemesi banka havalesini bekliyor",
   ],
   refund_pending: [
     "الاسترداد بانتظار تحويل بنكي",
-    "Refund awaiting bank transfer",
+    "Refund pending bank transfer",
     "İade banka havalesini bekliyor",
   ],
   event_payment_pending: [
@@ -203,7 +207,7 @@ const rows = {
     "Banka ödemeniz doğrulandı",
   ],
   event_payment_rejected: ["تم رفض إيصال الدفع", "Payment receipt rejected", "Ödeme dekontu reddedildi"],
-  event_account_registered: ["حساب جديد مسجل", "New registered account", "Yeni kayıtlı hesap"],
+  event_account_registered: ["حساب جديد مسجل", "New account registered", "Yeni hesap kaydedildi"],
 
   taxId: ["الرقم الضريبي للشركة", "Company tax number", "Şirket vergi numarası"],
   accountDetails: ["فتح ملف الحساب", "Open account profile", "Hesap profilini aç"],
@@ -214,8 +218,8 @@ const rows = {
   ],
   documentsRequiredForApproval: [
     "لم يرفع الحساب وثائق التوثيق بعد. يجب رفعها قبل مراجعة الموافقة.",
-    "No verification documents yet. Upload them before approval review.",
-    "Henüz doğrulama belgesi yok. Onay incelemesinden önce yüklenmeli.",
+    "No verification documents uploaded yet. Upload them before the approval review.",
+    "Henüz doğrulama belgesi yüklenmemiş. Onay incelemesinden önce belgelerin yüklenmesi gerekir.",
   ],
   transportType: ["نوع النقل", "Transport type", "Taşıma türü"],
   domesticTR: ["نقل داخلي في تركيا", "Domestic transport in Türkiye", "Türkiye içi taşıma"],
@@ -233,12 +237,12 @@ const rows = {
   calendarConflict: [
     "هذه المعدة محجوزة ضمن الفترة المختارة. اختر أيامًا أخرى.",
     "Equipment is booked during these dates. Choose another period.",
-    "Ekipman bu tarihlerde rezerve. Başka dönem seçin.",
+    "Ekipman bu tarihlerde rezerve edilmiş. Lütfen başka bir dönem seçin.",
   ],
   rentalDatesError: [
     "تحقق من بداية ونهاية الإيجار؛ الموعد لا يكون في الماضي والمدة لا تتجاوز سنة.",
-    "Check rental dates: no past dates and maximum one year.",
-    "Kira tarihlerini kontrol edin: geçmiş tarih yok, en fazla bir yıl.",
+    "Check the rental dates. Dates cannot be in the past, and the rental period cannot exceed one year.",
+    "Kiralama tarihlerini kontrol edin. Geçmiş tarih seçilemez ve kiralama süresi bir yılı aşamaz.",
   ],
   drivers: ["روابط السائقين", "Driver links", "Sürücü bağlantıları"],
   calendar: ["تقويم تأجير المعدات", "Rental calendar", "Kiralama takvimi"],
@@ -248,12 +252,12 @@ const rows = {
   driverPrivacy: [
     "واجهة محدودة للشحنة المسندة فقط، دون بيانات مالية أو صلاحيات إدارة الأسطول.",
     "Assigned shipment only, without finances or fleet management.",
-    "Yalnızca atanmış sevkiyat; finans veya filo yönetimi yok.",
+    "Yalnızca atanan sevkiyat görüntülenir; finans ve filo yönetimine erişim yoktur.",
   ],
   driverName: ["اسم السائق", "Driver name", "Sürücü adı"],
   driverExpiry: [
     "الرابط صالح 24 ساعة ويمكن إلغاؤه. أرسله للسائق المعني فقط.",
-    "Valid for 24 hours and revocable. Share only with the assigned driver.",
+    "Valid for 24 hours and can be revoked. Share it only with the assigned driver.",
     "24 saat geçerli, iptal edilebilir. Yalnızca ilgili sürücüyle paylaşın.",
   ],
   createDriverLink: ["إنشاء رابط للسائق", "Create driver link", "Sürücü bağlantısı oluştur"],
@@ -263,7 +267,7 @@ const rows = {
   revoke: ["إلغاء الوصول", "Revoke access", "Erişimi iptal et"],
   manualLocation: [
     "المدينة أو الإحداثيات يدويًا",
-    "City or coordinates, manually",
+    "Enter city or coordinates manually",
     "Şehir veya koordinatları elle girin",
   ],
   locationOnly: ["تحديث الموقع فقط", "Location update only", "Yalnızca konum güncelle"],
@@ -309,22 +313,26 @@ const rows = {
   event_settlement_accepted: ["تم قبول التسوية", "Settlement accepted", "Uzlaşma kabul edildi"],
   event_settlement_rejected: ["تم رفض التسوية", "Settlement declined", "Uzlaşma reddedildi"],
   event_dispute_escalated: ["نزاع يحتاج مراجعة المسؤول", "Dispute escalated", "İhtilaf yönetime iletildi"],
-  month: ["الشهر (اتركه فارغًا لكل الأشهر)", "Month (empty for all months)", "Ay (tümü için boş bırakın)"],
+  month: [
+    "الشهر (اتركه فارغًا لكل الأشهر)",
+    "Month (leave empty for all months)",
+    "Ay (tümü için boş bırakın)",
+  ],
   rentalNote: [
     "سعر الإيجار يومي بالدولار. الأيام الصفراء محجوزة أو غير متاحة.",
     "Daily rental in USD. Yellow days are booked or blocked.",
-    "Günlük kira USD. Sarı günler rezerve veya kapalı.",
+    "Günlük kira bedeli USD cinsindendir. Sarı günler rezerve edilmiş veya kapalıdır.",
   ],
-  unavailable: ["غير متاح", "Unavailable", "Uygun değil"],
+  unavailable: ["غير متاح", "Unavailable", "Müsait değil"],
   rentalStart: ["بداية الإيجار", "Rental start", "Kira başlangıcı"],
   rentalEnd: ["نهاية الإيجار", "Rental end", "Kira bitişi"],
   blockDates: ["حجب هذه الأيام", "Block these dates", "Tarihleri kapat"],
   bookEquipment: [
     "حجز المعدة بهذه التواريخ",
     "Reserve equipment for these dates",
-    "Bu tarihler için ekipman ayırt",
+    "Bu tarihler için ekipmanı rezerve edin",
   ],
-  requestInsurance: ["طلب تأمين على الشحنة", "Request shipment insurance", "Sevkiyat sigortası talep et"],
+  requestInsurance: ["طلب تأمين على الشحنة", "Request shipment insurance", "Sevkiyat sigortası talep edin"],
   insuranceNote: [
     "طلب مبدئي فقط؛ لا يصدر وثيقة تأمين ولا يوفر تغطية أو يحتسب قسطًا.",
     "Preliminary request only; no policy, coverage or premium.",
@@ -338,7 +346,7 @@ const rows = {
   settlement: ["تفاوض وتسوية النزاع", "Dispute negotiation", "İhtilaf uzlaşması"],
   settlementNote: [
     "اقترح نسبة رد من أجرة النقل إلى التاجر. الاتفاق يطبق على الضمان التجريبي بعد موافقة الطرف الآخر.",
-    "Propose a freight refund percentage. Applies to demo escrow after counterparty acceptance.",
+    "Propose a freight refund percentage. It applies to the demo escrow after the counterparty accepts.",
     "Taşıma ücretinden iade oranı önerin. Karşı taraf kabul ederse demo emanete uygulanır.",
   ],
   refundToMerchant: ["رد للتاجر", "Refund to merchant", "Tüccara iade"],
@@ -374,8 +382,8 @@ const rows = {
   createApiKey: ["إنشاء مفتاح API", "Create API key", "API anahtarı oluştur"],
   keyOnce: [
     "يظهر المفتاح مرة واحدة. احفظه بأمان؛ يمكنك إلغاؤه من القائمة.",
-    "Key shown once. Store securely; revoke from the list.",
-    "Anahtar bir kez gösterilir. Güvenli saklayın; listeden iptal edebilirsiniz.",
+    "The key is shown only once. Store it securely; you can revoke it from the list.",
+    "Anahtar yalnızca bir kez gösterilir. Güvenli bir yerde saklayın; listeden iptal edebilirsiniz.",
   ],
   currencyDisplay: ["عملة العرض", "Display currency", "Görüntüleme para birimi"],
   fxStale: ["سعر مخزن أو غير متاح", "Cached or unavailable rate", "Önbellek veya kullanılamayan kur"],
@@ -417,7 +425,7 @@ const rows = {
     "Doğrulama başvurularını, hesapları ve ihtilafları izleyip platform özelliklerini yönetin.",
   ],
   priority_merchant: ["أولوية التاجر", "Merchant priority", "Tüccar önceliği"],
-  priority_individual: ["شحن بسيط للأفراد", "Simple personal shipping", "Kolay kişisel gönderi"],
+  priority_individual: ["شحن بسيط للأفراد", "Simple personal shipping", "Basit kişisel gönderi"],
   priority_carrier: ["فرص ومهام النقل", "Transport opportunities and jobs", "Taşıma fırsatları ve işleri"],
   priority_supplier: [
     "معداتك وطلبات المشترين",
@@ -455,7 +463,11 @@ const rows = {
   receivedOffers: ["العروض المستلمة", "Received offers", "Alınan teklifler"],
   myReservations: ["حجوزاتي", "My reservations", "Rezervasyonlarım"],
   myHeldFunds: ["ضماني المحجوز التجريبي", "My demo held funds", "Demo emanetim"],
-  readyToReceive: ["شحنات بانتظار استلامي", "Ready for my receipt", "Teslim almamı bekleyenler"],
+  readyToReceive: [
+    "شحنات بانتظار استلامي",
+    "Shipments awaiting my receipt",
+    "Teslim almamı bekleyen sevkiyatlar",
+  ],
   myDocuments: ["وثائق شحناتي", "My shipment documents", "Sevkiyat belgelerim"],
   assignedJobs: ["المهام النشطة المسندة", "Active assigned jobs", "Aktif atanmış işler"],
   availableJobs: ["فرص النقل المتاحة", "Available transport jobs", "Mevcut taşıma işleri"],
@@ -478,7 +490,7 @@ const rows = {
   myAssignedJobs: ["مهامي المسندة", "My assigned jobs", "Atanmış işlerim"],
   noAssignedJobs: [
     "لا توجد مهام مسندة بعد. قدّم عرضًا على فرصة نقل متاحة.",
-    "No assigned jobs yet. Bid on an available transport job.",
+    "No jobs assigned yet. Submit an offer for an available transport job.",
     "Henüz atanmış iş yok. Mevcut taşıma işine teklif verin.",
   ],
   noPersonalShipments: [
@@ -496,11 +508,11 @@ const rows = {
   supplierOrdersIntro: [
     "أكد طلبات معداتك أو أكملها أو ألغها. جميع العمليات المالية في هذه النسخة تجريبية.",
     "Confirm, complete or cancel orders for your equipment. Financial operations in this version are simulated.",
-    "Ekipman siparişlerini onaylayın, tamamlayın veya iptal edin. Bu sürümde ödemeler demodur.",
+    "Ekipman siparişlerini onaylayın, tamamlayın veya iptal edin. Bu sürümdeki finansal işlemler demo niteliğindedir.",
   ],
   confirmOrder: ["تأكيد الطلب", "Confirm order", "Siparişi onayla"],
   completeOrder: ["إكمال الطلب", "Complete order", "Siparişi tamamla"],
-  demo_reserved: ["حجز تجريبي جديد", "New demo reservation", "Yeni demo rezervasyon"],
+  demo_reserved: ["حجز تجريبي جديد", "New demo reservation", "Yeni demo rezervasyonu"],
   confirmed: ["طلب مؤكد", "Confirmed order", "Onaylanan sipariş"],
   completed: ["مكتمل", "Completed", "Tamamlandı"],
   documents: ["رفع الوثائق", "Upload documents", "Belge yükleme"],
@@ -527,8 +539,8 @@ const rows = {
   destinationCountry: ["بلد الوصول", "Destination country", "Varış ülkesi"],
   corridorShipmentNote: [
     "معابر القائمة للممر التركي السوري؛ النقل في مسارات أخرى يحتاج تحديدًا ومراجعة تشغيلية قبل التنفيذ.",
-    "Listed crossings are for the Türkiye–Syria corridor; other routes require operational review before fulfillment.",
-    "Listelenen kapılar Türkiye–Suriye koridoruna aittir; diğer güzergâhlar uygulama öncesi operasyonel inceleme gerektirir.",
+    "Listed border crossings are for the Türkiye–Syria corridor; other routes require operational review before fulfillment.",
+    "Listelenen sınır kapıları Türkiye–Suriye koridoruna aittir; diğer güzergâhlar uygulama öncesi operasyonel inceleme gerektirir.",
   ],
   contactInformation: [
     "معلومات المرسل والمستلم",
@@ -577,8 +589,8 @@ const rows = {
   ],
   trackingSearch: [
     "ابحث باسم الشحنة أو رقمها أو المدينة",
-    "Search shipment name, reference or city",
-    "Sevkiyat adı, numarası veya şehir ara",
+    "Search by shipment name, reference or city",
+    "Sevkiyat adı, numarası veya şehre göre ara",
   ],
   shipmentReference: ["رقم الشحنة", "Shipment reference", "Sevkiyat numarası"],
   lastKnownLocation: ["آخر موقع مسجل", "Last reported location", "Son bildirilen konum"],
@@ -589,7 +601,11 @@ const rows = {
     "Bu taşıyıcı bildirimi, otomatik GPS ölçümü değildir.",
   ],
   reportLocation: ["إضافة تحديث للموقع", "Report location update", "Konum güncellemesi bildir"],
-  currentLocation: ["المدينة أو المعبر الحالي", "Current city or crossing", "Mevcut şehir veya kapı"],
+  currentLocation: [
+    "المدينة أو المعبر الحالي",
+    "Current city or border crossing",
+    "Mevcut şehir veya sınır kapısı",
+  ],
   saveLocation: ["حفظ تحديث الموقع", "Save location update", "Konum güncellemesini kaydet"],
   shipmentHistory: ["سجل حركة الشحنة", "Shipment history", "Sevkiyat geçmişi"],
   location_update: ["تحديث الموقع", "Location update", "Konum güncellemesi"],
@@ -612,19 +628,23 @@ const rows = {
     "İnceleme bekleyen başvurular",
   ],
   verifiedAccounts: ["حسابات موثقة", "Verified accounts", "Doğrulanmış hesaplar"],
-  searchAccounts: ["ابحث باسم الشركة أو البريد", "Search company or email", "Şirket veya e-posta ara"],
+  searchAccounts: [
+    "ابحث باسم الشركة أو البريد",
+    "Search by company name or email",
+    "Şirket adı veya e-postaya göre ara",
+  ],
   accountCategory: ["نوع الحساب", "Account type", "Hesap türü"],
   emailPrivate: ["البريد خاص", "Email is private", "E-posta gizli"],
   demoAdminRestriction: [
     "أنت في حساب مسؤول العرض: الوثائق المتاحة تخص حسابات العرض فقط. استخدم حساب المسؤول المسجل لمراجعة الشركات المسجلة.",
-    "You are using the demo administrator: only demo documents are available. Use the registered administrator account to review registered companies.",
+    "You are signed in as the demo administrator, so only demo documents are available. Use the registered administrator account to review registered companies.",
     "Demo yöneticisini kullanıyorsunuz: yalnızca demo belgeleri görünür. Kayıtlı şirketleri incelemek için kayıtlı yönetici hesabını kullanın.",
   ],
   mainNavigation: ["التنقل الرئيسي", "Main navigation", "Ana gezinme"],
   ourServices: ["خدماتنا", "Our services", "Hizmetlerimiz"],
   myWorkspace: ["مساحة عملي", "My workspace", "Çalışma alanım"],
   siteHome: ["الموقع الرئيسي", "Website home", "Ana sayfa"],
-  searchCountry: ["ابحث عن البلد أو رمزه", "Search country or code", "Ülke veya kod ara"],
+  searchCountry: ["ابحث عن البلد أو رمزه", "Search by country or code", "Ülke adı veya koduna göre ara"],
   internationalCountries: [
     "تركيا وسوريا وجميع الدول والمناطق المدرجة",
     "Türkiye, Syria and all listed countries and territories",
@@ -711,7 +731,7 @@ const rows = {
   access_supplier: [
     "اعرض معداتك للبيع أو الإيجار وتواصل مع الشركات التي تحتاجها في رحلتها القادمة.",
     "Offer equipment for sale or rent and connect with companies preparing their next journey.",
-    "Ekipmanınızı satın veya kiralayın; sonraki yolculuğa hazırlanan şirketlerle buluşun.",
+    "Ekipmanınızı satış veya kiralama için sunun; bir sonraki yolculuğuna hazırlanan şirketlerle buluşun.",
   ],
   access_individual: [
     "اشحن احتياجاتك واحجز المساحة المناسبة، بحساب شخصي ومسار مراجعة لجواز السفر.",
@@ -752,7 +772,7 @@ const rows = {
   createAccount: ["إنشاء حساب", "Create account", "Hesap oluştur"],
   email: ["البريد الإلكتروني", "Email address", "E-posta adresi"],
   password: ["كلمة المرور", "Password", "Parola"],
-  confirmPassword: ["تأكيد كلمة المرور", "Confirm password", "Parolayı doğrula"],
+  confirmPassword: ["تأكيد كلمة المرور", "Confirm password", "Parolayı yeniden girin"],
   passwordRule: [
     "12 حرفًا على الأقل، وبحد أقصى 128 حرفًا.",
     "At least 12 characters, up to 128.",
@@ -760,7 +780,7 @@ const rows = {
   ],
   passwordMismatch: ["كلمتا المرور غير متطابقتين.", "Passwords do not match.", "Parolalar eşleşmiyor."],
   alreadyAccount: ["لديك حساب؟", "Already have an account?", "Hesabınız var mı?"],
-  noAccount: ["ليس لديك حساب؟", "New here?", "Yeni misiniz?"],
+  noAccount: ["ليس لديك حساب؟", "Don't have an account?", "Hesabınız yok mu?"],
   tryDemo: ["تجربة حساب العرض", "Try a demo account", "Demo hesabını dene"],
   accountLoginNote: [
     "استخدم بيانات حسابك المسجّل لهذه الفئة.",
@@ -918,7 +938,7 @@ const rows = {
   dashboard: ["نظرة عامة", "Overview", "Genel bakış"],
   shipments: ["الشحنات والعروض", "Shipments & offers", "Sevkiyatlar ve teklifler"],
   groups: ["الشحن الجزئي", "Shared capacity", "Parsiyel taşımacılık"],
-  customs: ["المستشار الجمركي", "Customs advisor", "Gümrük danışmanı"],
+  customs: ["المستشار الجمركي", "Customs advisor", "Gümrük müşaviri"],
   hub: ["غرفة التواصل", "Networking hub", "İletişim merkezi"],
   kyb: ["توثيق الشركات", "Company verification", "Şirket doğrulama"],
   border: ["الحدود والجمارك", "Border & customs", "Sınır ve gümrük"],
@@ -969,7 +989,7 @@ const rows = {
   publish: ["نشر الطلب", "Publish request", "Talebi yayınla"],
   cancel: ["إلغاء", "Cancel", "İptal"],
   save: ["حفظ", "Save", "Kaydet"],
-  search: ["ابحث بالمدينة أو عنوان الشحنة", "Search city or shipment", "Şehir veya sevkiyat ara"],
+  search: ["ابحث بالمدينة أو عنوان الشحنة", "Search by city or shipment", "Şehre veya sevkiyata göre ara"],
   all: ["الكل", "All", "Tümü"],
   open: ["بانتظار العروض", "Open for offers", "Teklif bekliyor"],
   assigned: ["تم تعيين الناقل", "Carrier assigned", "Taşıyıcı atandı"],
@@ -1027,7 +1047,7 @@ const rows = {
   ],
   available: ["المتاح", "Available", "Mevcut"],
   perM3: ["لكل م³", "per m³", "m³ başına"],
-  reserve: ["حجز المساحة", "Reserve space", "Alan ayırt"],
+  reserve: ["حجز المساحة", "Reserve space", "Alan rezerve et"],
   reservations: ["حجوزاتي", "My reservations", "Rezervasyonlarım"],
   total: ["الإجمالي", "Total", "Toplam"],
   customsDesc: [
@@ -1093,7 +1113,7 @@ const rows = {
   rateShipment: ["تقييم شحنة مكتملة", "Rate a delivered shipment", "Teslim edilmiş sevkiyatı değerlendir"],
   score: ["التقييم من 1 إلى 5", "Score from 1 to 5", "1 ile 5 arası puan"],
   comment: ["تعليق", "Comment", "Yorum"],
-  order: ["حجز تجريبي", "Demo reservation", "Demo rezervasyon"],
+  order: ["حجز تجريبي", "Demo reservation", "Demo rezervasyonu"],
   quantity: ["العدد / أيام الإيجار", "Quantity / rental days", "Adet / kiralama günü"],
   sale: ["بيع", "Sale", "Satış"],
   rental: ["إيجار", "Rental", "Kiralama"],
@@ -1145,7 +1165,7 @@ const rows = {
   invalidFile: [
     "اختر ملف PDF أو صورة PNG/JPEG أصغر من 2 MB",
     "Choose a PDF or PNG/JPEG image under 2 MB",
-    "2 MB altı PDF veya PNG/JPEG seçin",
+    "2 MB'tan küçük bir PDF veya PNG/JPEG dosyası seçin",
   ],
 };
 Object.assign(rows, extraRows);

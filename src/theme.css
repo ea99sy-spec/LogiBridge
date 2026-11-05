@@ -39,3 +39,9 @@
   border-color: #f4bd4c66;
   color: #ffe2a0;
 }
+
+/* One size scale for the hero title, on every screen width. */
+.landing-hero h1 {
+  font-size: clamp(32px, 3.6vw, 46px);
+  font-weight: 700;
+}

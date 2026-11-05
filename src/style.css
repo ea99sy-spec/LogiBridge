@@ -1343,7 +1343,7 @@ progress::-webkit-progress-value {
     max-width: 95px;
   }
   .stat-foot {
-    font-size: 8px;
+    font-size: 11px;
   }
   .stat-icon {
     width: 24px;

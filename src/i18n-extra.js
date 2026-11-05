@@ -4,13 +4,17 @@ export const extraRows = {
   companyContact: ["التواصل", "Contact", "İletişim"],
   companyPage: ["صفحة الشركة", "Company page", "Şirket sayfası"],
   viewProfile: ["عرض صفحة الشركة", "View profile", "Profili görüntüle"],
-  viewMyPage: ["كيف تظهر صفحتي للأعضاء", "See my page as members see it", "Sayfamı üyeler gibi gör"],
+  viewMyPage: [
+    "كيف تظهر صفحتي للأعضاء",
+    "See my page as members see it",
+    "Sayfamın üyelere nasıl göründüğünü görün",
+  ],
   companyLogo: ["شعار الشركة (PNG أو JPEG)", "Company logo (PNG or JPEG)", "Şirket logosu (PNG veya JPEG)"],
   removeLogo: ["حذف الشعار", "Remove logo", "Logoyu kaldır"],
   logoInvalid: [
     "اختر صورة PNG أو JPEG أصغر من 5 ميغابايت.",
     "Choose a PNG or JPEG image under 5 MB.",
-    "5 MB altı PNG veya JPEG seçin.",
+    "5 MB'dan küçük bir PNG veya JPEG görseli seçin.",
   ],
   contactEmailRequired: [
     "إيميل التواصل (يظهر للأعضاء)",
@@ -35,8 +39,8 @@ export const extraRows = {
   customerReviews: ["تقييمات العملاء", "Customer reviews", "Müşteri değerlendirmeleri"],
   noContactYet: [
     "لم تُضف بيانات تواصل بعد. استخدم زر المراسلة.",
-    "No contact details yet. Use the message button.",
-    "Henüz iletişim bilgisi yok. Mesaj düğmesini kullanın.",
+    "No contact details have been added yet. Use the message button.",
+    "Henüz iletişim bilgisi eklenmemiş. Mesaj düğmesini kullanın.",
   ],
   profileUnavailable: [
     "هذه الصفحة غير متاحة.",
@@ -45,8 +49,8 @@ export const extraRows = {
   ],
   completeProfileFirst: [
     "الخطوة الأولى: أكمل صفحة التعريف (النبذة والخدمات وإيميل التواصل). بعدها ارفع وثائق التوثيق ليراجعها المسؤول مع صفحتك.",
-    "Step one: complete your profile (introduction, services and contact email). Then upload your verification documents so the administrator reviews them together.",
-    "İlk adım: profilinizi tamamlayın (tanıtım, hizmetler ve iletişim e-postası). Ardından doğrulama belgelerinizi yükleyin; yönetici birlikte inceler.",
+    "First, complete your profile (introduction, services and contact email). Then upload your verification documents for the administrator to review together with your page.",
+    "İlk adım: profilinizi tamamlayın (tanıtım, hizmetler ve iletişim e-postası). Ardından doğrulama belgelerinizi yükleyin; yönetici bunları sayfanızla birlikte inceler.",
   ],
   "err_Complete your company profile first": [
     "أكمل صفحة التعريف أولًا (النبذة والخدمات وإيميل التواصل).",
@@ -93,7 +97,7 @@ export const extraRows = {
   ],
   tryAs_individual: [
     "أرسل طردًا شخصيًا بسهولة.",
-    "Send a personal parcel easily.",
+    "Send a personal parcel with ease.",
     "Kişisel kolinizi kolayca gönderin.",
   ],
   tryAs_admin: [
@@ -166,13 +170,13 @@ export const extraRows = {
   ],
   taxHint_other: [
     "أدخل الرقم كما يظهر في وثيقة السجل التجاري. تتحقق منه الإدارة يدويًا.",
-    "Enter the number as shown on your registry document. The administration checks it manually.",
-    "Numarayı sicil belgenizdeki gibi girin. Yönetim elle kontrol eder.",
+    "Enter the number as shown on your registry document. The administrator checks it manually.",
+    "Numarayı sicil belgenizde yer aldığı şekilde girin. Yönetici numarayı elle kontrol eder.",
   ],
   officialTaxCheck: [
     "التحقق من الموقع الرسمي (يُنسخ الرقم تلقائيًا)",
-    "Verify on the official site (number copied)",
-    "Resmî sitede doğrula (numara kopyalanır)",
+    "Verify on the official website (number copied automatically)",
+    "Resmî sitede doğrulayın (numara otomatik olarak kopyalanır)",
   ],
   taxMethod_gcc_format: [
     "(الصيغة صحيحة — أكّد الشركة من الموقع الرسمي)",
@@ -199,7 +203,7 @@ export const extraRows = {
     "Once on, signing in also asks for a code from an authenticator app on your phone (Google or Microsoft Authenticator). Strongly recommended for the administrator.",
     "Açıldığında girişte parolaya ek olarak telefonunuzdaki doğrulama uygulamasından (Google veya Microsoft Authenticator) bir kod istenir. Yönetici için önemle önerilir.",
   ],
-  twoFactorStart: ["بدء التفعيل", "Start setup", "Kurulumu başlat"],
+  twoFactorStart: ["بدء التفعيل", "Start setup", "Kurulumu başlatın"],
   twoFactorScan: [
     "امسح الرمز بتطبيق المصادقة، ثم اكتب الرمز المكوّن من 6 أرقام الظاهر فيه.",
     "Scan the code with your authenticator app, then enter the 6-digit code it shows.",
@@ -210,7 +214,7 @@ export const extraRows = {
     "Or enter this key manually",
     "Veya bu anahtarı elle girin",
   ],
-  twoFactorConfirm: ["تأكيد وتفعيل", "Confirm and turn on", "Onayla ve aç"],
+  twoFactorConfirm: ["تأكيد وتفعيل", "Confirm and turn on", "Onaylayın ve açın"],
   twoFactorCode: [
     "رمز التحقق (6 أرقام) أو رمز احتياطي",
     "Verification code (6 digits) or backup code",
@@ -223,7 +227,7 @@ export const extraRows = {
   ],
   twoFactorOn: ["التحقق بخطوتين مفعّل", "Two-step sign-in is on", "İki adımlı giriş açık"],
   twoFactorEnabled: ["تم تفعيل التحقق بخطوتين", "Two-step sign-in turned on", "İki adımlı giriş açıldı"],
-  twoFactorDisable: ["إيقاف التحقق بخطوتين", "Turn off two-step sign-in", "İki adımlı girişi kapat"],
+  twoFactorDisable: ["إيقاف التحقق بخطوتين", "Turn off two-step sign-in", "İki adımlı girişi kapatın"],
   twoFactorDisabled: ["تم إيقاف التحقق بخطوتين", "Two-step sign-in turned off", "İki adımlı giriş kapatıldı"],
   backupCodesNote: [
     "احفظ هذه الرموز الاحتياطية في مكان آمن. كل رمز يعمل مرة واحدة إذا فقدت هاتفك. لن تظهر مرة أخرى.",
@@ -231,7 +235,7 @@ export const extraRows = {
     "Bu yedek kodları güvenli bir yerde saklayın. Telefonunuzu kaybederseniz her biri bir kez çalışır. Tekrar gösterilmeyecek.",
   ],
   backupCodesSaved: ["حفظتها", "I saved them", "Kaydettim"],
-  backupCodesLeft: ["رموز احتياطية متبقية", "Backup codes left", "Kalan yedek kod"],
+  backupCodesLeft: ["رموز احتياطية متبقية", "Backup codes remaining", "Kalan yedek kod sayısı"],
   "err_Two-factor code required": [
     "أدخل رمز التحقق من تطبيق المصادقة.",
     "Enter the code from your authenticator app.",
@@ -259,23 +263,23 @@ export const extraRows = {
     "The carrier or driver can share the shipment's position from a phone by GPS; it appears here on the map with the update history.",
     "Taşıyıcı veya sürücü sevkiyatın konumunu telefondan GPS ile paylaşabilir; burada harita ve güncelleme geçmişiyle görünür.",
   ],
-  gpsShareNow: ["شارك موقعي الآن", "Share my location now", "Konumumu şimdi paylaş"],
+  gpsShareNow: ["شارك موقعي الآن", "Share my location now", "Konumumu şimdi paylaşın"],
   gpsKeepSharing: [
     "مشاركة تلقائية كل دقيقتين ما دامت الصفحة مفتوحة",
     "Keep sharing every 2 minutes while this page is open",
-    "Bu sayfa açıkken her 2 dakikada paylaş",
+    "Bu sayfa açık kaldığı sürece her 2 dakikada bir otomatik paylaşım",
   ],
   gpsLocating: ["جارٍ تحديد الموقع…", "Getting your location…", "Konum alınıyor…"],
   gpsShared: ["تمت مشاركة الموقع ✓", "Location shared ✓", "Konum paylaşıldı ✓"],
   gpsDenied: [
     "لم يُسمح بالوصول للموقع. فعّل إذن الموقع للمتصفح.",
-    "Location permission denied. Allow location for this browser.",
+    "Location permission was denied. Allow location access for this browser.",
     "Konum izni reddedildi. Tarayıcı için konuma izin verin.",
   ],
   gpsUnavailable: [
     "تعذّر تحديد الموقع. حاول في مكان مكشوف.",
-    "Could not get a location. Try somewhere with open sky.",
-    "Konum alınamadı. Açık bir alanda deneyin.",
+    "Unable to get a location. Try again in an open area.",
+    "Konum alınamadı. Açık bir alanda tekrar deneyin.",
   ],
   gpsUnsupported: [
     "هذا المتصفح لا يدعم تحديد الموقع.",
@@ -298,8 +302,8 @@ export const extraRows = {
   verifyEmailTitle: ["تأكيد البريد الإلكتروني", "Email confirmation", "E-posta doğrulama"],
   emailVerifiedDone: [
     "تم تأكيد بريدك الإلكتروني. شكرًا!",
-    "Your email is confirmed. Thank you!",
-    "E-postanız doğrulandı. Teşekkürler!",
+    "Your email address has been confirmed. Thank you.",
+    "E-posta adresiniz doğrulandı. Teşekkür ederiz.",
   ],
   "err_Verification link invalid or expired": [
     "رابط التأكيد غير صالح أو انتهت صلاحيته. اطلب رابطًا جديدًا من مساحة العمل.",
@@ -319,7 +323,7 @@ export const extraRows = {
   resendVerification: [
     "إعادة إرسال رابط التأكيد",
     "Resend confirmation link",
-    "Doğrulama bağlantısını yeniden gönder",
+    "Doğrulama bağlantısını yeniden gönderin",
   ],
   verificationSent: [
     "أرسلنا رابط تأكيد جديدًا إلى بريدك.",
@@ -329,7 +333,7 @@ export const extraRows = {
   requireEmailVerification: [
     "إلزام المستخدمين بتأكيد البريد الإلكتروني",
     "Require email confirmation",
-    "E-posta doğrulamasını zorunlu kıl",
+    "E-posta doğrulamasını zorunlu kılın",
   ],
   requireEmailVerificationNote: [
     "لا تفعّله إلا بعد ربط دومين خاص بخدمة البريد، وإلا لن تصل الرسائل للعملاء ولن يستطيعوا المتابعة.",
@@ -369,7 +373,7 @@ export const extraRows = {
     "e.g. fabrics, food, machinery",
     "örn. kumaş, gıda, makine",
   ],
-  transportLicense: ["رقم رخصة النقل", "Transport licence number", "Taşıma yetki belgesi no"],
+  transportLicense: ["رقم رخصة النقل", "Transport licence number", "Taşıma yetki belgesi numarası"],
   fleetSize: ["عدد الشاحنات", "Number of trucks", "Araç sayısı"],
   serviceRoutes: ["الخطوط التي تخدمها", "Routes you serve", "Hizmet verilen güzergâhlar"],
   serviceRoutesHint: ["مثال: غازي عنتاب ⇄ حلب", "e.g. Gaziantep ⇄ Aleppo", "örn. Gaziantep ⇄ Halep"],
@@ -411,7 +415,7 @@ export const extraRows = {
   ],
   taxMethod_eu_vies_unavailable: [
     "(خدمة VIES لم ترد — أعد الفحص لاحقًا)",
-    "(VIES did not answer — check again later)",
+    "(VIES did not respond — check again later)",
     "(VIES yanıt vermedi — sonra tekrar deneyin)",
   ],
   taxMethod_eu_vies_pending: ["(بانتظار فحص VIES)", "(VIES check pending)", "(VIES kontrolü bekleniyor)"],
@@ -421,8 +425,16 @@ export const extraRows = {
     "(bu ülke için açık çevrimiçi kayıt yok — sicil belgesiyle karşılaştırın)",
   ],
   taxMethod_format: ["(صيغة غير صالحة)", "(invalid format)", "(geçersiz biçim)"],
-  recheckTax: ["إعادة فحص الرقم الضريبي", "Check tax number again", "Vergi numarasını tekrar kontrol et"],
-  gibCheck: ["التحقق من بوابة الضرائب التركية GİB", "Verify on Turkish GİB portal", "GİB üzerinden doğrula"],
+  recheckTax: [
+    "إعادة فحص الرقم الضريبي",
+    "Check the tax number again",
+    "Vergi numarasını yeniden kontrol edin",
+  ],
+  gibCheck: [
+    "التحقق من بوابة الضرائب التركية GİB",
+    "Verify on Turkish GİB portal",
+    "GİB üzerinden doğrulayın",
+  ],
 
   // Admin approval
   approveAccount: ["موافقة", "Approve", "Onayla"],
@@ -445,12 +457,12 @@ export const extraRows = {
   showDemoAccountsNote: [
     "يظهر زر «تجربة» تحت كل صفحة دخول. بيانات التجربة منفصلة تمامًا عن الحسابات الحقيقية. إخفاؤه يُخرج كل جلسات التجربة.",
     "Shows a “Try demo” button under every sign-in page. Demo data is fully separate from real accounts. Hiding it ends all demo sessions.",
-    "Her giriş sayfasının altında “Demo dene” düğmesi gösterir. Demo verileri gerçek hesaplardan tamamen ayrıdır. Gizlemek tüm demo oturumlarını kapatır.",
+    "Her giriş sayfasının altında “Demo hesabını deneyin” düğmesi gösterir. Demo verileri gerçek hesaplardan tamamen ayrıdır. Gizlemek tüm demo oturumlarını kapatır.",
   ],
   activityEmails: [
     "إرسال عمليات الموقع إلى بريدي",
-    "Email me site activity",
-    "Site etkinliğini bana e-postayla gönder",
+    "Send site activity to my email",
+    "Site etkinliklerini e-postayla bildirin",
   ],
   activityEmailsNote: [
     "تسجيل حساب، طلب توثيق، شحنة جديدة، قبول عرض، دفع، انطلاق، اكتمال عملية، نزاع، إلغاء، طلبات وحجوزات.",
@@ -462,7 +474,7 @@ export const extraRows = {
 
   // Payment methods and completion
   choosePayment: ["اختر طريقة الدفع:", "Choose how to pay:", "Ödeme yöntemini seçin:"],
-  payDirect: ["الدفع مباشرة للناقل", "Pay the carrier directly", "Taşıyıcıya doğrudan öde"],
+  payDirect: ["الدفع مباشرة للناقل", "Pay the carrier directly", "Taşıyıcıya doğrudan ödeyin"],
   payDirectConfirm: [
     "ستدفع المبلغ للناقل مباشرة (نقدًا أو تحويلًا) خارج المنصة، ولن يكون محفوظًا كضمان. يبدأ النقل بعد أن يؤكد الناقل استلام المبلغ. متابعة؟",
     "You will pay the carrier directly (cash or transfer) outside the platform, without escrow protection. Transport starts after the carrier confirms receipt. Continue?",
@@ -471,14 +483,14 @@ export const extraRows = {
   paymentMethodsNote: [
     "التحويل البنكي للمنصة يحفظ المبلغ كضمان حتى تأكيد الاستلام (أكثر أمانًا). الدفع المباشر أسرع لكنه بدون ضمان.",
     "Bank transfer to the platform keeps the money in escrow until you confirm delivery (safer). Direct payment is faster but has no escrow.",
-    "Platforma banka havalesi, teslimatı onaylayana kadar parayı emanette tutar (daha güvenli). Doğrudan ödeme daha hızlıdır ama emanet yoktur.",
+    "Platforma banka havalesi, teslimatı onaylayana kadar parayı emanette tutar (daha güvenli). Doğrudan ödeme daha hızlıdır ancak emanet koruması yoktur.",
   ],
   waitingCarrierPayment: [
     "اخترت الدفع المباشر. بانتظار تأكيد الناقل استلام المبلغ.",
     "You chose direct payment. Waiting for the carrier to confirm receipt.",
     "Doğrudan ödeme seçtiniz. Taşıyıcının onayı bekleniyor.",
   ],
-  confirmPaymentReceived: ["أكّد استلام المبلغ", "Confirm payment received", "Ödemenin alındığını onayla"],
+  confirmPaymentReceived: ["أكّد استلام المبلغ", "Confirm payment received", "Ödemenin alındığını onaylayın"],
   confirmPaymentConfirm: [
     "هل استلمت مبلغ الشحنة كاملًا من صاحبها؟",
     "Did you receive the full shipment payment from the owner?",
@@ -538,13 +550,13 @@ export const extraRows = {
   event_location_update: ["تحديث موقع الشحنة", "Shipment location update", "Sevkiyat konum güncellemesi"],
 
   // Shipment and offer actions
-  cancelShipment: ["إلغاء الشحنة", "Cancel shipment", "Sevkiyatı iptal et"],
+  cancelShipment: ["إلغاء الشحنة", "Cancel shipment", "Sevkiyatı iptal edin"],
   cancelShipmentConfirm: [
     "هل تريد إلغاء هذه الشحنة؟ سيتم إبلاغ الناقلين ولا يمكن التراجع.",
     "Cancel this shipment? Carriers will be notified and this cannot be undone.",
     "Bu sevkiyat iptal edilsin mi? Taşıyıcılar bilgilendirilir ve geri alınamaz.",
   ],
-  withdrawBid: ["سحب عرضي", "Withdraw my offer", "Teklifimi geri çek"],
+  withdrawBid: ["سحب عرضي", "Withdraw my offer", "Teklifimi geri çekin"],
   withdrawBidConfirm: ["هل تريد سحب عرضك؟", "Withdraw your offer?", "Teklifiniz geri çekilsin mi?"],
   yourOffer: ["عرضك", "Your offer", "Teklifiniz"],
   acceptBidConfirm: [
@@ -565,7 +577,7 @@ export const extraRows = {
   demoBanner: [
     "حساب تجريبي · بيانات توضيحية منفصلة عن الحسابات الحقيقية · لا مدفوعات حقيقية",
     "Demo account · sample data kept apart from real accounts · no real payments",
-    "Demo hesap · gerçek hesaplardan ayrı örnek veriler · gerçek ödeme yok",
+    "Demo hesabı · gerçek hesaplardan ayrı örnek veriler · gerçek ödeme yok",
   ],
   logout: ["تسجيل الخروج", "Sign out", "Çıkış yap"],
   security: ["الأمان وكلمة المرور", "Security & password", "Güvenlik ve parola"],
@@ -577,7 +589,7 @@ export const extraRows = {
   ],
   currentPassword: ["كلمة المرور الحالية", "Current password", "Mevcut parola"],
   newPassword: ["كلمة المرور الجديدة", "New password", "Yeni parola"],
-  changePassword: ["تغيير كلمة المرور", "Change password", "Parolayı değiştir"],
+  changePassword: ["تغيير كلمة المرور", "Change password", "Parolayı değiştirin"],
   passwordChanged: ["تم تغيير كلمة المرور", "Password changed", "Parola değiştirildi"],
   demoNoPassword: [
     "الحسابات التجريبية لا تملك كلمة مرور.",
@@ -587,10 +599,10 @@ export const extraRows = {
   forgotPassword: ["نسيت كلمة المرور؟", "Forgot your password?", "Parolanızı mı unuttunuz?"],
   forgotIntro: [
     "أدخل بريدك المسجّل وسنرسل رابطًا لاختيار كلمة مرور جديدة، صالحًا لمدة ساعة.",
-    "Enter your registered email and we will send a link to choose a new password. It is valid for one hour.",
-    "Kayıtlı e-postanızı girin, yeni parola seçmeniz için bir saat geçerli bir bağlantı gönderelim.",
+    "Enter your registered email address and we will send a link to set a new password. The link is valid for one hour.",
+    "Kayıtlı e-posta adresinizi girin; yeni parola belirlemeniz için bir saat geçerli bir bağlantı göndereceğiz.",
   ],
-  sendResetLink: ["إرسال رابط الاستعادة", "Send reset link", "Sıfırlama bağlantısı gönder"],
+  sendResetLink: ["إرسال رابط الاستعادة", "Send reset link", "Sıfırlama bağlantısı gönderin"],
   resetSent: [
     "إذا كان البريد مسجّلًا لدينا فستصلك رسالة خلال دقائق. تحقق أيضًا من مجلد الرسائل غير المرغوبة.",
     "If this email is registered, a message will arrive within minutes. Also check your spam folder.",
@@ -598,20 +610,20 @@ export const extraRows = {
   ],
   resetNoEmail: [
     "إرسال البريد غير مفعّل في المنصة حاليًا. تواصل مع الإدارة لاستعادة حسابك:",
-    "Email sending is not enabled on the platform yet. Contact the administration to recover your account:",
+    "Email sending is not enabled on the platform yet. Contact the administrator to recover your account:",
     "Platformda e-posta gönderimi henüz etkin değil. Hesabınızı kurtarmak için yönetimle iletişime geçin:",
   ],
-  resetTitle: ["اختيار كلمة مرور جديدة", "Choose a new password", "Yeni parola seçin"],
+  resetTitle: ["اختيار كلمة مرور جديدة", "Choose a new password", "Yeni parola belirleyin"],
   resetDone: [
     "تم تعيين كلمة المرور الجديدة. يمكنك تسجيل الدخول الآن.",
     "Your new password is set. You can sign in now.",
     "Yeni parolanız ayarlandı. Şimdi giriş yapabilirsiniz.",
   ],
-  backToSignIn: ["العودة لتسجيل الدخول", "Back to sign in", "Girişe dön"],
+  backToSignIn: ["العودة لتسجيل الدخول", "Back to sign in", "Girişe dönün"],
   alreadySignedIn: ["أنت مسجّل الدخول باسم", "You are signed in as", "Şu hesapla giriş yaptınız:"],
-  openWorkspace: ["فتح مساحة العمل", "Open workspace", "Çalışma alanını aç"],
+  openWorkspace: ["فتح مساحة العمل", "Open workspace", "Çalışma alanını açın"],
   signedOut: ["تم تسجيل الخروج", "Signed out", "Çıkış yapıldı"],
-  suspendAccount: ["إيقاف الحساب", "Suspend account", "Hesabı askıya al"],
+  suspendAccount: ["إيقاف الحساب", "Suspend account", "Hesabı askıya alın"],
   restoreAccount: ["إعادة تفعيل الحساب", "Restore account", "Hesabı yeniden etkinleştir"],
   suspendConfirm: [
     "إيقاف هذا الحساب يسجّل خروجه فورًا ويمنعه من الدخول. متابعة؟",
@@ -670,7 +682,7 @@ export const extraRows = {
   ],
   "err_Account disabled": [
     "هذا الحساب موقوف. تواصل مع إدارة المنصة.",
-    "This account is suspended. Contact the platform administration.",
+    "This account is suspended. Contact the platform administrator.",
     "Bu hesap askıya alındı. Platform yönetimiyle iletişime geçin.",
   ],
   "err_Current password is incorrect": [
@@ -749,7 +761,7 @@ export const extraRows = {
   "err_Shipment already assigned": [
     "تم إسناد الشحنة لناقل مسبقًا.",
     "The shipment is already assigned.",
-    "Sevkiyat zaten atanmış.",
+    "Sevkiyat zaten bir taşıyıcıya atanmış.",
   ],
   "err_You already submitted an offer": [
     "قدّمت عرضًا على هذه الشحنة مسبقًا.",
@@ -810,7 +822,7 @@ export const extraRows = {
   "err_Equipment dates overlap": [
     "المعدات محجوزة في هذه التواريخ.",
     "The equipment is booked on these dates.",
-    "Ekipman bu tarihlerde rezerve.",
+    "Ekipman bu tarihlerde rezerve edilmiş.",
   ],
   "err_Invalid rental dates": [
     "تواريخ الاستئجار غير صالحة.",
@@ -867,8 +879,8 @@ export const extraRows = {
   ],
   access_broker: [
     "استلم مراحل التخليص والمناقلة على المعابر التي تعمل عليها، وقدّم عروضك وارفع الوثائق.",
-    "Take clearance and transshipment stages at your crossings, send offers and upload documents.",
-    "Çalıştığınız kapılarda gümrükleme ve aktarma aşamalarını alın, teklif verin, belge yükleyin.",
+    "Take on clearance and transshipment stages at your crossings, send offers and upload documents.",
+    "Çalıştığınız kapılardaki gümrükleme ve aktarma aşamalarını üstlenin, teklif verin ve belge yükleyin.",
   ],
   tryAs_broker: [
     "شاهد مراحل التخليص على المعبر وقدّم عرضك.",
@@ -898,7 +910,7 @@ export const extraRows = {
   leg_origin_leg: ["النقل إلى المعبر", "Haul to the crossing", "Kapıya taşıma"],
   leg_clearance: ["التخليص والمناقلة", "Clearance and transshipment", "Gümrükleme ve aktarma"],
   leg_destination_leg: ["النقل من المعبر", "Haul from the crossing", "Kapıdan taşıma"],
-  startClearance: ["بدء التخليص", "Start clearance", "Gümrüklemeyi başlat"],
+  startClearance: ["بدء التخليص", "Start clearance", "Gümrüklemeyi başlatın"],
   clearanceDone: [
     "تم التخليص وتحميل الشاحنة الثانية",
     "Cleared and loaded on the next truck",
@@ -909,14 +921,14 @@ export const extraRows = {
     "Since 6 February 2026 non-Syrian trucks may not enter Syria (escorted transit excepted), so goods are moved between trucks in the crossing's customs yard. Your order is split into three stages: a carrier to the crossing, a customs broker for clearance and transshipment, and a carrier from the crossing. Each stage is accepted and paid on its own, and a stage starts only after the one before it finishes.",
     "6 Şubat 2026'dan beri Suriyeli olmayan tırlar Suriye'ye giremiyor (refakatli transit hariç); yük kapının gümrük sahasında araçtan araca aktarılıyor. Bu yüzden siparişiniz üç aşamaya bölünür: kapıya taşıyıcı, gümrükleme ve aktarma için gümrük müşaviri, kapıdan taşıyıcı. Her aşama ayrı kabul edilip ödenir ve bir önceki bitmeden başlamaz.",
   ],
-  cancelOrder: ["إلغاء الطلب كاملًا", "Cancel the whole order", "Siparişin tamamını iptal et"],
+  cancelOrder: ["إلغاء الطلب كاملًا", "Cancel the whole order", "Siparişin tamamını iptal edin"],
   coordinating: ["قيد التنسيق", "Coordinating stages", "Aşamalar koordine ediliyor"],
   salameh: ["باب السلامة / أونجو بينار", "Bab al-Salama / Öncüpınar", "Bab es-Selame / Öncüpınar"],
   jarablus: ["جرابلس / قرقميش", "Jarablus / Karkamış", "Cerablus / Karkamış"],
   tal_abyad: ["تل أبيض / أقجة قلعة", "Tal Abyad / Akçakale", "Tel Abyad / Akçakale"],
-  crossing_open: ["مفتوح تجاريًا", "open for trade", "ticarete açık"],
-  crossing_upgrading: ["قيد التأهيل", "being upgraded", "iyileştiriliyor"],
-  crossing_check: ["تحقق قبل الشحن", "check before shipping", "göndermeden önce kontrol edin"],
+  crossing_open: ["مفتوح تجاريًا", "Open for trade", "ticarete açık"],
+  crossing_upgrading: ["قيد التأهيل", "Being upgraded", "iyileştiriliyor"],
+  crossing_check: ["تحقق قبل الشحن", "Check before shipping", "göndermeden önce kontrol edin"],
   "err_Previous stage not finished": [
     "لا يمكن بدء هذه المرحلة قبل انتهاء المرحلة السابقة.",
     "This stage can start only after the previous one finishes.",
@@ -929,7 +941,7 @@ export const extraRows = {
   ],
   "err_Some stages already started": [
     "لا يمكن إلغاء الطلب كاملًا لأن بعض المراحل بدأت أو دُفعت.",
-    "The whole order can't be cancelled because some stages have started or been paid.",
+    "The whole order cannot be cancelled because some stages have started or been paid.",
     "Bazı aşamalar başladığı veya ödendiği için sipariş tamamen iptal edilemez.",
   ],
   "err_Choose your crossings": [
@@ -947,12 +959,12 @@ export const extraRows = {
   borderRulesIntro: [
     "ملخص لأحدث القرارات التي تؤثر على الشحن بين تركيا وسوريا، مع تاريخ ومصدر كل قرار. الموقع يطبّق هذه القواعد تلقائيًا عند إنشاء الشحنات.",
     "A summary of the latest decisions affecting Türkiye–Syria shipping, each with its date and source. The platform applies these rules automatically when shipments are created.",
-    "Türkiye–Suriye taşımacılığını etkileyen son kararların tarih ve kaynaklı özeti. Platform bu kuralları sevkiyat oluştururken otomatik uygular.",
+    "Türkiye–Suriye taşımacılığını etkileyen son kararların tarih ve kaynak bilgisiyle birlikte özeti. Platform, bu kuralları sevkiyat oluştururken otomatik olarak uygular.",
   ],
   borderNotices: [
     "تنبيهات الإدارة على المعابر",
-    "Administration notices on the crossings",
-    "Yönetimin kapı duyuruları",
+    "Administrator notices for the crossings",
+    "Kapılara ilişkin yönetici duyuruları",
   ],
   noBorderNotices: ["لا توجد تنبيهات حالية.", "No current notices.", "Güncel duyuru yok."],
   crossingStatus: ["حالة المعابر التجارية", "Commercial crossing status", "Ticari kapıların durumu"],
@@ -971,9 +983,9 @@ export const extraRows = {
     "Bunlar kamuya açık bilgilerin özetidir, hukuki danışmanlık değildir. Göndermeden önce gümrük müşavirinize veya resmi makama danışın.",
   ],
   borderChecklist: ["قائمة وثائق المعبر", "Crossing document checklist", "Kapı belge listesi"],
-  borderStart: ["ابدأ شحنة", "Start a shipment", "Sevkiyat başlat"],
-  addBorderNotice: ["نشر تنبيه جديد", "Post a new notice", "Yeni duyuru yayınla"],
-  noticeDate: ["تاريخ القرار أو الخبر", "Date of decision or news", "Karar veya haber tarihi"],
+  borderStart: ["ابدأ شحنة", "Start a shipment", "Sevkiyatı başlatın"],
+  addBorderNotice: ["نشر تنبيه جديد", "Publish a new notice", "Yeni duyuru yayımlayın"],
+  noticeDate: ["تاريخ القرار أو الخبر", "Date of decision or announcement", "Karar veya haber tarihi"],
   noticeTitle: ["العنوان", "Title", "Başlık"],
   noticeBody: ["التفاصيل", "Details", "Ayrıntılar"],
   sourceLink: ["رابط المصدر (اختياري)", "Source link (optional)", "Kaynak bağlantısı (isteğe bağlı)"],
@@ -981,18 +993,18 @@ export const extraRows = {
   levelInfo: ["معلومة", "Information", "Bilgi"],
   levelWarning: ["تحذير", "Warning", "Uyarı"],
   allCrossings: ["كل المعابر", "All crossings", "Tüm kapılar"],
-  publishNotice: ["نشر التنبيه", "Publish notice", "Duyuruyu yayınla"],
+  publishNotice: ["نشر التنبيه", "Publish notice", "Duyuruyu yayımlayın"],
   deleteNotice: ["حذف", "Delete", "Sil"],
   deleteNoticeConfirm: ["حذف هذا التنبيه؟", "Delete this notice?", "Bu duyuru silinsin mi?"],
   "err_Invalid date": ["التاريخ غير صالح.", "Invalid date.", "Geçersiz tarih."],
   // WhatsApp
   shareWhatsapp: ["مشاركة عبر واتساب", "Share on WhatsApp", "WhatsApp'ta paylaş"],
-  chatWhatsapp: ["مراسلة عبر واتساب", "Chat on WhatsApp", "WhatsApp'tan yaz"],
+  chatWhatsapp: ["مراسلة عبر واتساب", "Message on WhatsApp", "WhatsApp üzerinden yazın"],
   waHello: ["مرحبًا", "Hello", "Merhaba"],
   whatsappNotify: [
     "استلام الإشعارات على واتساب أيضًا",
     "Also receive notifications on WhatsApp",
-    "Bildirimleri WhatsApp'tan da al",
+    "Bildirimleri WhatsApp üzerinden de alın",
   ],
   whatsappNotifyNote: [
     "تصل إلى رقم التسجيل:",
@@ -1006,7 +1018,7 @@ export const extraRows = {
   ],
   whatsappNotActive: [
     "خدمة واتساب لم تُفعّل بعد من إدارة المنصة",
-    "WhatsApp sending is not switched on by the platform yet",
+    "WhatsApp sending has not yet been enabled by the platform",
     "WhatsApp gönderimi platformda henüz açık değil",
   ],
   whatsappActive: ["إرسال واتساب مفعّل ويعمل.", "WhatsApp sending is on.", "WhatsApp gönderimi açık."],
@@ -1015,12 +1027,16 @@ export const extraRows = {
     "WhatsApp number for admin alerts",
     "Yönetici uyarıları için WhatsApp numarası",
   ],
-  testWhatsappLink: ["تجربة الرقم", "Test this number", "Numarayı dene"],
-  sendReasonWhatsapp: ["إرسال السبب على واتساب", "Send reason on WhatsApp", "Nedeni WhatsApp'tan gönder"],
+  testWhatsappLink: ["تجربة الرقم", "Test this number", "Numarayı deneyin"],
+  sendReasonWhatsapp: [
+    "إرسال السبب على واتساب",
+    "Send the reason via WhatsApp",
+    "Nedeni WhatsApp üzerinden gönderin",
+  ],
   sendReasonWhatsappConfirm: [
     "هل تريد فتح واتساب لإرسال سبب الرفض للشركة أيضًا؟ (البريد يُرسل تلقائيًا)",
     "Open WhatsApp to send the rejection reason to the company too? (Email is sent automatically.)",
-    "Ret nedenini şirkete WhatsApp'tan da göndermek için açılsın mı? (E-posta otomatik gider.)",
+    "WhatsApp'ı açıp ret nedenini şirkete de göndermek ister misiniz? (E-posta otomatik olarak gönderilir.)",
   ],
   waRejectGreeting: ["مرحبًا", "Hello", "Merhaba"],
   waRejectBody: [
@@ -1033,12 +1049,12 @@ export const extraRows = {
   newHereChoose: [
     "حساب جديد؟ اختر نوعه",
     "New here? Choose your account type",
-    "Yeni misiniz? Hesap türünü seçin",
+    "Yeni misiniz? Hesap türünüzü seçin",
   ],
   chooseOnceNote: [
     "تختار نوع الحساب مرة واحدة عند التسجيل. بعدها تدخل بالإيميل وكلمة المرور فقط وتصل لحسابك مباشرة.",
     "You choose the account type once, at registration. After that you sign in with email and password and go straight to your account.",
-    "Hesap türünü yalnızca kayıtta bir kez seçersiniz. Sonra e-posta ve şifreyle girip doğrudan hesabınıza gidersiniz.",
+    "Hesap türünü yalnızca kayıtta bir kez seçersiniz. Sonra e-posta adresiniz ve parolanızla giriş yaparak doğrudan hesabınıza geçersiniz.",
   ],
   phoneIntlHint: [
     "بالصيغة الدولية مع رمز البلد، مثل +90 5xx… أو +963 9xx…",
@@ -1080,8 +1096,8 @@ export const extraRows = {
   valueTrust: ["الثقة", "Trust", "Güven"],
   valueTrustText: [
     "لا يعمل على المنصة إلا حساب راجعته الإدارة.",
-    "Only accounts reviewed by the administration can work on the platform.",
-    "Platformda yalnızca yönetimin incelediği hesaplar çalışır.",
+    "Only accounts reviewed by the administrator can use the platform.",
+    "Platformda yalnızca yönetici tarafından incelenmiş hesaplar işlem yapabilir.",
   ],
   valueCompliance: ["الالتزام", "Compliance", "Uyum"],
   valueComplianceText: [
@@ -1118,7 +1134,7 @@ export const extraRows = {
   howStep4Text: [
     "أكّد الاستلام فيُحرَّر الدفع، ثم قيّم المزوّد.",
     "Confirm delivery to release payment, then rate the provider.",
-    "Teslimi onaylayın, ödeme serbest kalsın; sonra sağlayıcıyı değerlendirin.",
+    "Teslimi onaylayın; ödeme serbest bırakılsın ve ardından sağlayıcıyı değerlendirin.",
   ],
   // Notifications
   event_border_notice: [
@@ -1135,12 +1151,12 @@ export const extraRows = {
   borderEmailPreference: [
     "استلام تنبيهات الحدود والجمارك بالبريد",
     "Receive border and customs alerts by email",
-    "Sınır ve gümrük uyarılarını e-postayla al",
+    "Sınır ve gümrük uyarılarını e-posta yoluyla alın",
   ],
   notifyMembers: [
     "إرسال التنبيه لكل الشركات المعتمدة (إشعار + إيميل + واتساب لمن فعّله)",
-    "Send to all approved members (notification + email + WhatsApp for those who opted in)",
-    "Tüm onaylı üyelere gönder (bildirim + e-posta + açanlara WhatsApp)",
+    "Send to all approved members (notification, email and WhatsApp for those who opted in)",
+    "Tüm onaylı üyelere gönderin (bildirim, e-posta ve WhatsApp'ı etkinleştirmiş olanlara WhatsApp)",
   ],
   // Crossing congestion
   queueNow: ["الزحمة الآن", "Queue now", "Şu anki kuyruk"],
@@ -1149,7 +1165,7 @@ export const extraRows = {
   wait_2: ["2–6 ساعات", "2–6 hours", "2–6 saat"],
   wait_3: ["6–12 ساعة", "6–12 hours", "6–12 saat"],
   wait_4: ["أكثر من 12 ساعة", "Over 12 hours", "12 saatten fazla"],
-  justNow: ["الآن", "just now", "az önce"],
+  justNow: ["الآن", "Just now", "az önce"],
   reportedAgo: ["قبل {h} ساعة", "{h} h ago", "{h} sa önce"],
   noReportsYet: ["لا تقارير خلال آخر 24 ساعة", "No reports in the last 24 hours", "Son 24 saatte rapor yok"],
   reportsByProviders: [
@@ -1157,7 +1173,7 @@ export const extraRows = {
     "Queues are reported by carriers and brokers at the crossing; reports disappear after 24 hours.",
     "Kuyruklar kapıdaki taşıyıcı ve müşavirlerce bildirilir; raporlar 24 saat sonra kaybolur.",
   ],
-  reportQueue: ["بلّغ عن الزحمة على معبر", "Report the queue at a crossing", "Bir kapıdaki kuyruğu bildir"],
+  reportQueue: ["بلّغ عن الزحمة على معبر", "Report the queue at a crossing", "Bir kapıdaki kuyruğu bildirin"],
   reportQueueNote: [
     "تقريرك يظهر للجميع بدون اسمك، وإذا كانت الزحمة 6 ساعات أو أكثر يصل تنبيه لأصحاب الطلبات على هذا المعبر.",
     "Your report is shown to everyone without your name; for queues of 6 hours or more, owners of orders through that crossing are alerted.",
@@ -1169,31 +1185,35 @@ export const extraRows = {
     "e.g. yard full, detailed checks on food items",
     "ör. saha dolu, gıdada sıkı kontrol",
   ],
-  sendReport: ["إرسال التقرير", "Send report", "Raporu gönder"],
+  sendReport: ["إرسال التقرير", "Send report", "Raporu gönderin"],
   reportThanks: [
     "شكرًا، تم نشر تقريرك.",
-    "Thanks, your report is published.",
-    "Teşekkürler, raporunuz yayınlandı.",
+    "Thank you. Your report has been published.",
+    "Teşekkür ederiz. Raporunuz yayımlandı.",
   ],
   // Truck tracking
-  confirm_payment: ["تأكيد استلام الدفعة", "Payment receipt confirmed", "Ödeme alındı onayı"],
+  confirm_payment: ["تأكيد استلام الدفعة", "Payment receipt confirmed", "Ödeme alımı onaylandı"],
   pay_direct: ["اختيار الدفع المباشر", "Direct payment chosen", "Doğrudan ödeme seçildi"],
-  autoGps: ["قياس GPS تلقائي", "automatic GPS measure", "otomatik GPS ölçümü"],
+  autoGps: ["قياس GPS تلقائي", "Automatic GPS measurement", "Otomatik GPS ölçümü"],
   deliveryPoint: ["نقطة التسليم", "Delivery point", "Teslim noktası"],
   fleetMap: ["كل الشاحنات على الطريق", "All trucks on the road", "Yoldaki tüm araçlar"],
   fleetMapNote: [
     "النقطة الحمراء: شاحنة ما بعتت موقعها من أكثر من 6 ساعات. اضغط على أي شاحنة لفتح شحنتها.",
-    "Red dot: no position for over 6 hours. Click a truck to open its shipment.",
-    "Kırmızı nokta: 6 saattir konum yok. Sevkiyatı açmak için araca tıklayın.",
+    "Red dot: no position received for more than 6 hours. Click a truck to open its shipment.",
+    "Kırmızı nokta: 6 saattir konum bilgisi alınamamış. Sevkiyatı açmak için araca tıklayın.",
   ],
   lastSignal: ["آخر موقع", "Last position", "Son konum"],
-  signalLost: ["انقطع الإرسال", "signal lost", "sinyal yok"],
+  signalLost: ["انقطع الإرسال", "Signal lost", "Sinyal kesildi"],
   etaCrossing: ["الوصول المتوقع للمعبر", "Expected at the crossing", "Kapıya tahmini varış"],
   etaDelivery: ["الوصول المتوقع للتسليم", "Expected delivery", "Tahmini teslim"],
-  atCrossingFor: ["على المعبر منذ {h} ساعة", "At the crossing for {h} h", "{h} saattir kapıda"],
-  timeAtCrossing: ["المدة على المعبر: {h} ساعة", "Time at crossing: {h} h", "Kapıda geçen süre: {h} sa"],
+  atCrossingFor: ["على المعبر منذ {h} ساعة", "At the crossing for {h} hours", "{h} saattir kapıda"],
+  timeAtCrossing: [
+    "المدة على المعبر: {h} ساعة",
+    "Time at the crossing: {h} hours",
+    "Kapıda geçen süre: {h} saat",
+  ],
   deliveredTo: ["سُلّمت إلى", "Delivered to", "Teslim alan"],
-  codeVerified: ["رمز التسليم صحيح ✓", "delivery code verified ✓", "teslim kodu doğru ✓"],
+  codeVerified: ["رمز التسليم صحيح ✓", "Delivery code verified ✓", "Teslim kodu doğrulandı ✓"],
   photo_loading: ["صورة التحميل", "Loading photo", "Yükleme fotoğrafı"],
   photo_sealed: ["صورة الختم/القفل", "Seal photo", "Mühür fotoğrafı"],
   photo_crossing: ["صورة على المعبر", "Photo at the crossing", "Kapıda fotoğraf"],
@@ -1203,8 +1223,8 @@ export const extraRows = {
   photoSaved: ["تم حفظ الصورة ✓", "Photo saved ✓", "Fotoğraf kaydedildi ✓"],
   photoTooLarge: [
     "الصورة كبيرة جدًا، جرّب صورة أخرى.",
-    "Photo too large, try another.",
-    "Fotoğraf çok büyük, başka deneyin.",
+    "The photo is too large. Try another photo.",
+    "Fotoğraf çok büyük. Başka bir fotoğraf deneyin.",
   ],
   addPhoto: ["إضافة صورة", "Add a photo", "Fotoğraf ekle"],
   photoStage: ["المرحلة", "Stage", "Aşama"],
@@ -1213,8 +1233,8 @@ export const extraRows = {
   photosTaken: ["الصور المرسلة", "Photos sent", "Gönderilen fotoğraflar"],
   signatureRequired: [
     "خلّي المستلم يوقّع أولًا.",
-    "Ask the receiver to sign first.",
-    "Önce alıcı imzalasın.",
+    "The receiver must sign first.",
+    "Önce alıcının imzalaması gerekir.",
   ],
   proofSaved: ["تم حفظ إثبات التسليم ✓", "Delivery proof saved ✓", "Teslim kanıtı kaydedildi ✓"],
   deliveryProof: ["إثبات التسليم", "Proof of delivery", "Teslim kanıtı"],
@@ -1226,13 +1246,13 @@ export const extraRows = {
   recipientName: ["اسم المستلم", "Receiver's name", "Alıcının adı"],
   deliveryCodeOptional: ["رمز التسليم (6 أرقام)", "Delivery code (6 digits)", "Teslim kodu (6 hane)"],
   recipientSignature: ["توقيع المستلم", "Receiver's signature", "Alıcı imzası"],
-  clearSignature: ["مسح التوقيع", "Clear", "Temizle"],
+  clearSignature: ["مسح التوقيع", "Clear signature", "İmzayı temizle"],
   saveProof: ["حفظ إثبات التسليم", "Save proof of delivery", "Teslim kanıtını kaydet"],
   liveTracking: ["تتبع مستمر", "Continuous tracking", "Sürekli takip"],
   liveTrackingNote: [
     "يرسل الموقع كل دقيقة ويُبقي الشاشة مضاءة. إذا انقطعت التغطية تُحفظ المواقع على الموبايل وتُرسل لما يرجع الإنترنت.",
-    "Sends the position every minute and keeps the screen on. Without signal, positions are kept on the phone and sent when back online.",
-    "Konumu her dakika gönderir, ekranı açık tutar. Sinyal yoksa konumlar telefonda saklanır, internet gelince gönderilir.",
+    "Sends the position every minute and keeps the screen on. Without a signal, positions are stored on the phone and sent once the connection is restored.",
+    "Konumu her dakika gönderir ve ekranı açık tutar. Sinyal yoksa konumlar telefonda saklanır ve bağlantı yeniden sağlanınca gönderilir.",
   ],
   pointsWaiting: [
     "{n} موقع بانتظار الإرسال",
@@ -1243,7 +1263,7 @@ export const extraRows = {
   deliveryCode: ["رمز التسليم", "Delivery code", "Teslim kodu"],
   deliveryCodeNote: [
     "أعطِه للمستلم فقط؛ السائق يُدخله عند التسليم.",
-    "Give it to the receiver only; the driver enters it at delivery.",
+    "Share it only with the receiver; the driver enters it at delivery.",
     "Yalnızca alıcıya verin; sürücü teslimde girer.",
   ],
   receiverLink: ["رابط تتبع للمستلم", "Tracking link for the receiver", "Alıcı için takip bağlantısı"],
@@ -1259,7 +1279,7 @@ export const extraRows = {
   ],
   createReceiverLink: ["إنشاء رابط للمستلم", "Create receiver link", "Alıcı bağlantısı oluştur"],
   copyLink: ["نسخ الرابط", "Copy link", "Bağlantıyı kopyala"],
-  stopLink: ["إيقاف الرابط", "Turn off link", "Bağlantıyı kapat"],
+  stopLink: ["إيقاف الرابط", "Disable link", "Bağlantıyı devre dışı bırak"],
   deliveryPointLabel: [
     "نقطة التسليم (إحداثيات أو رابط خرائط) لحساب وقت الوصول",
     "Delivery point (coordinates or a map link) for the arrival estimate",
@@ -1301,12 +1321,12 @@ export const extraRows = {
   "err_Photo limit reached": [
     "وصلت الشحنة للحد الأقصى من الصور (15).",
     "This shipment has the maximum number of photos (15).",
-    "Bu sevkiyat en fazla fotoğraf sayısına (15) ulaştı.",
+    "Bu sevkiyat için fotoğraf sınırına (15) ulaşıldı.",
   ],
   "err_Delivery proof needs a shipment on the way": [
     "إثبات التسليم متاح فقط لشحنة في الطريق أو وصلت.",
-    "Proof of delivery is only for a shipment on the way or arrived.",
-    "Teslim kanıtı yalnızca yoldaki veya varan sevkiyat içindir.",
+    "Proof of delivery is available only for shipments in transit or that have arrived.",
+    "Teslim kanıtı yalnızca yolda olan veya varış yapmış sevkiyatlar için kullanılabilir.",
   ],
   "err_Signature required": [
     "توقيع المستلم مطلوب.",
@@ -1315,15 +1335,19 @@ export const extraRows = {
   ],
   "err_Wrong delivery code": [
     "رمز التسليم غير صحيح. تأكد منه مع المستلم.",
-    "Wrong delivery code. Check it with the receiver.",
-    "Teslim kodu yanlış. Alıcıyla kontrol edin.",
+    "The delivery code is incorrect. Please confirm it with the receiver.",
+    "Teslim kodu hatalı. Lütfen alıcıyla doğrulayın.",
   ],
   // Driver mobile app
-  tryDriverAppBrowser: ["افتح التطبيق بالمتصفح", "Open the app in the browser", "Uygulamayı tarayıcıda aç"],
+  tryDriverAppBrowser: [
+    "افتح التطبيق بالمتصفح",
+    "Open the app in your browser",
+    "Uygulamayı tarayıcıda açın",
+  ],
   downloadDriverApp: [
     "تحميل تطبيق السائق (أندرويد)",
     "Download the driver app (Android)",
-    "Sürücü uygulamasını indir (Android)",
+    "Sürücü uygulamasını indirin (Android)",
   ],
   driverAppBanner: [
     "للتتبع حتى لو انطفت الشاشة، نزّل تطبيق السائق والصق فيه هذا الرابط.",
@@ -1332,7 +1356,7 @@ export const extraRows = {
   ],
   driverAppNote: [
     "تطبيق السائق يرسل الموقع بالخلفية حتى لو انطفت الشاشة، ويحفظ المواقع وقت انقطاع التغطية. السائق يلصق رابط السائق فيه مرة واحدة.",
-    "The driver app sends the position in the background even with the screen off and keeps points when there is no signal. The driver pastes the driver link into it once.",
+    "The driver app sends the position in the background even with the screen off and keeps points when there is no signal. The driver pastes this link into the app once.",
     "Sürücü uygulaması ekran kapalıyken bile konumu arka planda gönderir, sinyal yokken konumları saklar. Sürücü bağlantıyı bir kez yapıştırır.",
   ],
   sendToDriverWhatsapp: [
@@ -1362,8 +1386,8 @@ export const extraRows = {
     "Post your shipment once and receive offers from verified carriers and customs brokers. Compare prices, follow every stage from loading to the crossing to delivery, and pay safely.",
     "Sevkiyatınızı bir kez yayınlayın, doğrulanmış taşıyıcı ve gümrük müşavirlerinden teklif alın. Fiyatları karşılaştırın, yüklemeden kapıya ve teslimata kadar her aşamayı izleyin, güvenle ödeyin.",
   ],
-  heroPostShipment: ["انشر شحنتك", "Post a shipment", "Sevkiyat yayınla"],
-  heroTry: ["جرّب بدون تسجيل", "Try without signing up", "Kayıt olmadan dene"],
+  heroPostShipment: ["انشر شحنتك", "Post a shipment", "Sevkiyat yayınlayın"],
+  heroTry: ["جرّب بدون تسجيل", "Try without signing up", "Kayıt olmadan deneyin"],
   benefitVerified: ["مزوّدون موثّقون", "Verified providers", "Doğrulanmış sağlayıcılar"],
   benefitProtected: ["دفع محمي", "Protected payment", "Korumalı ödeme"],
   benefitTracking: ["تتبع مباشر", "Live tracking", "Canlı takip"],
@@ -1498,7 +1522,7 @@ export const extraRows = {
     "Create your account, or try any type with a demo account without signing up.",
     "Hesabınızı oluşturun veya kayıt olmadan herhangi bir türü demo hesapla deneyin.",
   ],
-  tryAdminDemo: ["جرّب لوحة المسؤول", "Try the admin panel", "Yönetici panelini dene"],
+  tryAdminDemo: ["جرّب لوحة المسؤول", "Try the admin panel", "Yönetici panelini deneyin"],
   pricingTitle: ["كم تكلّف المنصة؟", "What does it cost?", "Ücreti ne?"],
   pricingFree: [
     "اشتراك شهري ثابت، بدون أي عمولة على شحناتك أو عروضك.",
@@ -1531,12 +1555,12 @@ export const extraRows = {
   faqQ3: ["كيف يحمي الدفع حقي؟", "How does payment protect me?", "Ödeme beni nasıl korur?"],
   faqA3: [
     "في الدفع المحمي يبقى المبلغ في حساب المنصة ولا يُحوَّل للناقل إلا بعد أن تؤكد الاستلام. وإذا حدثت مشكلة تفتح نزاعًا وتراجعه الإدارة.",
-    "With protected payment the amount stays in the platform account and goes to the carrier only after you confirm receipt. If something goes wrong you open a dispute that the administration reviews.",
+    "With protected payment the amount stays in the platform account and is released to the carrier only after you confirm receipt. If a problem arises, you may open a dispute, which the administration reviews.",
     "Korumalı ödemede tutar platform hesabında kalır ve teslimi onaylamanızdan sonra taşıyıcıya geçer. Sorun olursa yönetimin incelediği bir itiraz açarsınız.",
   ],
   faqQ4: [
     "كيف تصل شحنتي إلى سوريا مع منع الشاحنات الأجنبية؟",
-    "How does my shipment reach Syria with the foreign-truck ban?",
+    "How does my shipment reach Syria given the ban on foreign trucks?",
     "Yabancı tır yasağıyla sevkiyatım Suriye'ye nasıl ulaşır?",
   ],
   faqA4: [
@@ -1740,8 +1764,8 @@ export const extraRows = {
   guideTips: ["نصائح سريعة", "Quick tips", "Hızlı ipuçları"],
   guideHelp: [
     "عندك سؤال؟ راسل إدارة المنصة من «غرفة التواصل» أو عبر إيميل الدعم في أسفل الصفحة الرئيسية.",
-    "Have a question? Message the platform in the hub or use the support email at the bottom of the home page.",
-    "Sorunuz mu var? Mesaj merkezinden veya ana sayfanın altındaki destek e-postasından yazın.",
+    "Have a question? Send a message through the message center or use the support email at the bottom of the home page.",
+    "Sorularınız mı var? Mesaj merkezi üzerinden veya ana sayfanın altındaki destek e-postasıyla bize yazın.",
   ],
   startHere: ["ابدأ من هنا", "Start here", "Buradan başlayın"],
   hideGuideCard: ["إخفاء", "Hide", "Gizle"],
@@ -1753,7 +1777,7 @@ export const extraRows = {
   allCountries: ["كل البلدان", "All countries", "Tüm ülkeler"],
   minRating: ["التقييم", "Rating", "Puan"],
   anyRating: ["أي تقييم", "Any rating", "Tüm puanlar"],
-  andAbove: ["فأكثر", "& up", "ve üzeri"],
+  andAbove: ["فأكثر", "and above", "ve üzeri"],
   sortBy: ["الترتيب", "Sort", "Sırala"],
   sort_rating: ["الأعلى تقييمًا", "Highest rated", "En yüksek puan"],
   sort_completed: ["الأكثر عمليات", "Most operations", "En çok işlem"],
@@ -1917,7 +1941,7 @@ export const extraRows = {
   ],
   "err_Too many notes": [
     "وصلت للحد الأعلى من الملاحظات (2000). احذف القديمة المنجزة.",
-    "Note limit reached (2000). Delete old finished notes.",
+    "Note limit reached (2000). Delete old completed notes.",
     "Not sınırına ulaşıldı (2000). Eski tamamlanmış notları silin.",
   ],
   companyInfoTitle: [
@@ -1928,7 +1952,7 @@ export const extraRows = {
   companyInfoNote: [
     "تظهر في أسفل الصفحة الرئيسية وفي صفحتي الشروط والخصوصية (يطلبها قانون التجارة الإلكترونية التركي). اترك الحقل فارغًا إذا لا تريد إظهاره.",
     "Shown in the home page footer and on the terms and privacy pages (required by Turkish e-commerce law). Leave a field empty to hide it.",
-    "Ana sayfa altında ve koşullar ile gizlilik sayfalarında gösterilir (6563 sayılı Kanun gereği). Göstermek istemediğiniz alanı boş bırakın.",
+    "Ana sayfanın altında ve kullanım koşulları ile gizlilik sayfalarında gösterilir (6563 sayılı Kanun gereği). Göstermek istemediğiniz alanı boş bırakın.",
   ],
   company_legalName: [
     "الاسم التجاري الرسمي (Ticari unvan)",
@@ -1943,12 +1967,12 @@ export const extraRows = {
   serviceProvider: ["مقدّم الخدمة", "Service provider", "Hizmet sağlayıcı"],
   "err_MERSIS number must be 16 digits": [
     "رقم MERSIS يتكون من 16 رقمًا.",
-    "The MERSIS number has 16 digits.",
+    "The MERSIS number must have 16 digits.",
     "MERSIS numarası 16 hanelidir.",
   ],
   "err_Tax number must be 10 or 11 digits": [
     "الرقم الضريبي 10 أرقام (أو 11 للمؤسسة الفردية).",
-    "The tax number has 10 digits (11 for a sole proprietorship).",
+    "The tax number must have 10 digits (11 for a sole proprietorship).",
     "Vergi numarası 10 hanelidir (şahıs şirketi için 11).",
   ],
   termsUpdatedTitle: [
@@ -2039,7 +2063,7 @@ export const extraRows = {
   docKind_other: ["وثيقة أخرى", "Other document", "Diğer belge"],
   documentsIntroNew: [
     "لكل شحنة أو طلب ملف وثائق خاص فيه. اختر نوع الوثيقة وارفعها بضغطة، أو اطلب من الطرف الآخر الوثائق التي تحتاجها. المنصة لا تفرض وثائق: المطلوب هو ما تطلبه الشركات فقط، ولا يُرسل طلب الشحنة قبل رفع ما طُلب منك.",
-    "Every shipment or order has its own documents folder. Pick the document type and upload it in one tap, or ask the other party for the documents you need. The platform imposes no documents: only what the companies request is required, and a shipment request is sent only after you upload what was requested from you.",
+    "Every shipment or order has its own documents folder. Pick the document type and upload it in one tap, or ask the other party for the documents you need. The platform does not require documents of its own: only documents the companies request are required, and a shipment request is sent only after you upload the documents requested from you.",
     "Her sevkiyatın veya siparişin kendi belge klasörü vardır. Belge türünü seçip tek dokunuşla yükleyin veya ihtiyacınız olan belgeleri karşı taraftan isteyin. Platform belge dayatmaz: yalnızca şirketlerin istedikleri gereklidir ve sevkiyat talebi sizden istenenler yüklenmeden gönderilmez.",
   ],
   documentsAskedFromYou: [
@@ -2054,7 +2078,7 @@ export const extraRows = {
   ],
   searchShipments: ["ابحث عن شحنة أو طلب", "Search a shipment or order", "Sevkiyat veya sipariş ara"],
   docFilter_all: ["الكل", "All", "Tümü"],
-  docFilter_mine: ["مطلوب مني", "Asked from me", "Benden istenen"],
+  docFilter_mine: ["مطلوب مني", "Requested from me", "Benden istenen"],
   docFilter_missing: ["ناقصة", "Incomplete", "Eksik"],
   docFilter_complete: ["مكتملة", "Complete", "Tamam"],
   needsYou: ["{n} مطلوب منك", "{n} needed from you", "Sizden {n}"],
@@ -2065,7 +2089,7 @@ export const extraRows = {
   requiredDocuments: ["الوثائق المطلوبة", "Required documents", "Gerekli belgeler"],
   docUploaded: ["مرفوعة", "Uploaded", "Yüklendi"],
   docMissing: ["ناقصة", "Missing", "Eksik"],
-  toUploadBy: ["يرفعها", "Uploaded by", "Yükleyecek"],
+  toUploadBy: ["يرفعها", "To be uploaded by", "Yükleyecek"],
   requestedBy: ["طلبها", "requested by", "isteyen"],
   alwaysRequired: ["مطلوبة دائمًا", "always required", "her zaman gerekli"],
   addFile: ["إضافة ملف", "Add file", "Dosya ekle"],
@@ -2182,7 +2206,7 @@ export const extraRows = {
   ],
   pickDocumentType: [
     "اختر نوع الوثيقة ثم ارفعها:",
-    "Pick the document type, then upload:",
+    "Select the document type, then upload:",
     "Belge türünü seçip yükleyin:",
   ],
   saved: ["تم الحفظ.", "Saved.", "Kaydedildi."],
@@ -2218,8 +2242,12 @@ export const extraRows = {
     "Closed automatically after reaching the delivery point",
     "Teslim noktasına varıştan sonra otomatik kapandı",
   ],
-  feedback: ["تقييم وشكاوى واقتراحات", "Ratings, complaints & ideas", "Değerlendirme, şikâyet ve öneri"],
-  feedbackAdmin: ["التقييمات والشكاوى", "Ratings & complaints", "Değerlendirme ve şikâyetler"],
+  feedback: [
+    "تقييم وشكاوى واقتراحات",
+    "Ratings, complaints and suggestions",
+    "Değerlendirme, şikâyet ve öneri",
+  ],
+  feedbackAdmin: ["التقييمات والشكاوى", "Ratings and complaints", "Değerlendirme ve şikâyetler"],
   feedbackIntro: [
     "قيّم المنصة، أو أرسل شكوى، أو اقترح فكرة. تصل رسالتك لإدارة المنصة مباشرة، ويصلك إشعار عند الرد.",
     "Rate the platform, send a complaint or suggest an idea. Your message goes straight to the platform administration and you are notified when they reply.",
@@ -2333,7 +2361,7 @@ export const extraRows = {
   "err_Write a few words": ["اكتب بعض التفاصيل.", "Write a few words.", "Birkaç kelime yazın."],
   "err_Too many messages today, please try tomorrow": [
     "أرسلت رسائل كثيرة اليوم، حاول غدًا.",
-    "Too many messages today, please try tomorrow.",
+    "You have sent too many messages today. Please try again tomorrow.",
     "Bugün çok fazla mesaj gönderdiniz, lütfen yarın deneyin.",
   ],
   "err_Message unavailable": ["الرسالة غير موجودة.", "Message unavailable.", "Mesaj bulunamadı."],
@@ -2408,12 +2436,12 @@ export const extraRows = {
   "err_HS codes must be 2 to 10 digits": [
     "رموز HS يجب أن تكون من 2 إلى 10 أرقام.",
     "HS codes must be 2 to 10 digits.",
-    "HS kodları 2-10 haneli olmalı.",
+    "HS kodları 2 ila 10 haneli olmalıdır.",
   ],
   "err_Each word must be 3 to 60 characters": [
     "كل كلمة من 3 إلى 60 حرفًا.",
     "Each word must be 3 to 60 characters.",
-    "Her kelime 3-60 karakter olmalı.",
+    "Her kelime 3 ila 60 karakter arasında olmalıdır.",
   ],
   onTimeValue: ["{p}% بالموعد ({n} عملية)", "{p}% on time ({n} jobs)", "%{p} zamanında ({n} iş)"],
   onTimeHint: [
@@ -2453,13 +2481,13 @@ export const extraRows = {
   ],
   searchRoute: ["ابحث عن مدينة أو طريق", "Search a city or route", "Şehir veya güzergâh ara"],
   fullShipment: ["شحنة كاملة", "Whole shipment", "Tüm sevkiyat"],
-  medianPrice: ["السعر الوسيط", "median price", "medyan fiyat"],
-  vsLastMonth: ["عن الشهر الماضي", "vs last month", "geçen aya göre"],
+  medianPrice: ["السعر الوسيط", "Median price", "Medyan fiyat"],
+  vsLastMonth: ["عن الشهر الماضي", "compared with last month", "geçen aya göre"],
   usualRange: ["المجال المعتاد", "Usual range", "Olağan aralık"],
   perTon: ["سعر الطن", "Per ton", "Ton başına"],
-  typicalDays: ["المدة المعتادة (أيام)", "Typical days", "Olağan süre (gün)"],
+  typicalDays: ["المدة المعتادة (أيام)", "Typical duration (days)", "Olağan süre (gün)"],
   dealsCount: ["عدد الصفقات", "Deals", "Anlaşma"],
-  lastDeal: ["آخرها", "latest", "son"],
+  lastDeal: ["آخرها", "Latest", "son"],
   quickPriceTitle: [
     "ما هي تكلفة شحنتك؟",
     "What is the cost of your shipment?",
@@ -2478,7 +2506,7 @@ export const extraRows = {
   estimateRange: [
     "السعر المعتاد لشحنة مثل شحنتك",
     "Usual price for a shipment like yours",
-    "Sizinki gibi bir sevkiyat için olağan fiyat",
+    "Benzer bir sevkiyat için olağan fiyat",
   ],
   estimateMiddle: ["الوسط", "Middle", "Orta"],
   estimateBasisWeight: [
@@ -2500,8 +2528,8 @@ export const extraRows = {
   returnTrips: ["رحلات العودة", "Return trips", "Dönüş seferleri"],
   returnTripsIntroCarrier: [
     "راجع فاضي؟ اعرض رحلة العودة بسعر أقل بدل ما ترجع الشاحنة فارغة. التجار الذين عندهم شحنات على نفس الطريق يصلهم إشعار.",
-    "Going back empty? Offer your return trip at a lower price instead of driving an empty truck. Traders with shipments on the same route are notified.",
-    "Boş mu dönüyorsunuz? Aracı boş sürmek yerine dönüş seferinizi daha düşük fiyata sunun. Aynı güzergâhta sevkiyatı olan tüccarlar bilgilendirilir.",
+    "Is your truck returning empty? Offer the return trip at a lower price rather than running it empty. Traders with shipments on the same route are notified.",
+    "Aracınız boş mu dönüyor? Dönüş seferini boş çalıştırmak yerine daha düşük fiyata sunun. Aynı güzergâhta sevkiyatı olan tüccarlar bilgilendirilir.",
   ],
   returnTripsIntroTrader: [
     "شاحنات راجعة فاضية بأسعار أقل. اطلب الرحلة المناسبة أو راسل الناقل مباشرة.",
@@ -2522,7 +2550,7 @@ export const extraRows = {
   borderCrossing: ["المعبر (إن وجد)", "Border crossing (if any)", "Sınır kapısı (varsa)"],
   tripNoteExample: [
     "مثلًا: يمكن التحميل من مستودعين",
-    "e.g. can load from two warehouses",
+    "e.g. Loading possible from two warehouses",
     "örn. iki depodan yükleme yapılabilir",
   ],
   publishTrip: ["نشر الرحلة", "Publish trip", "Seferi yayınla"],
@@ -2536,11 +2564,11 @@ export const extraRows = {
   trip_open: ["متاحة", "Available", "Uygun"],
   trip_booked: ["محجوزة", "Booked", "Dolu"],
   trip_cancelled: ["ملغاة", "Cancelled", "İptal"],
-  wholeTruck: ["للشاحنة كاملة", "whole truck", "tüm araç"],
+  wholeTruck: ["للشاحنة كاملة", "Whole truck", "Tüm araç"],
   truck: ["شاحنة", "Truck", "Araç"],
   tons: ["طن", "tons", "ton"],
   carrierLabel: ["الناقل", "Carrier", "Taşıyıcı"],
-  requestTrip: ["اطلب هذه الرحلة", "Ask for this trip", "Bu seferi iste"],
+  requestTrip: ["اطلب هذه الرحلة", "Request this trip", "Bu seferi talep et"],
   tripRequestPrompt: [
     "اكتب ملاحظة للناقل (البضاعة، الوزن، مكان التحميل):",
     "Write a note for the carrier (goods, weight, loading place):",
@@ -2654,8 +2682,8 @@ export const extraRows = {
   ],
   commercialPrintHint: [
     "قائمة التعبئة جاهزة للاستعمال (مع ختم الشركة إذا طلبه المخلّص). الفاتورة المبدئية ليست فاتورة رسمية: أصدر الفاتورة الرسمية من نظامك بنفس الأرقام وارفعها من «رفع وثيقة».",
-    "The packing list is ready to use (with the company stamp if the broker asks). The proforma is not an official invoice: issue the official invoice from your own system with the same figures and upload it from 'Upload a document'.",
-    "Çeki listesi kullanıma hazırdır (müşavir isterse şirket kaşesiyle). Proforma resmî fatura değildir: resmî faturayı kendi sisteminizden aynı rakamlarla düzenleyip 'Belge yükle'den yükleyin.",
+    "The packing list is ready to use (with the company stamp if the customs broker requires it). The proforma is not an official invoice: issue the official invoice from your own system with the same figures and upload it from 'Upload a document'.",
+    "Çeki listesi kullanıma hazırdır (gümrük müşaviri talep ederse şirket kaşesiyle). Proforma resmî fatura değildir: resmî faturayı kendi sisteminizden aynı rakamlarla düzenleyip 'Belge yükle'den yükleyin.",
   ],
   unit_pcs: ["قطعة", "pcs", "adet"],
   unit_kg: ["كغ", "kg", "kg"],
@@ -2678,7 +2706,7 @@ export const extraRows = {
   ccItemHs: [
     "الصنف {line}: رمز HS من 6 إلى 12 رقمًا.",
     "Item {line}: HS code must be 6 to 12 digits.",
-    "Ürün {line}: HS kodu 6-12 hane olmalı.",
+    "Ürün {line}: HS kodu 6 ila 12 haneli olmalıdır.",
   ],
   ccItemQty: [
     "الصنف {line}: الكمية أكبر من صفر.",
@@ -2688,7 +2716,7 @@ export const extraRows = {
   ccNetOverGross: [
     "الصنف {line}: الوزن الصافي أكبر من القائم.",
     "Item {line}: net weight is above gross weight.",
-    "Ürün {line}: net ağırlık brütten büyük.",
+    "Ürün {line}: net ağırlık brüt ağırlıktan büyük.",
   ],
   ccProhibited: [
     "الصنف {line}: بضاعة ممنوعة على المنصة.",
@@ -2728,8 +2756,8 @@ export const extraRows = {
   repeatShipment: ["كرّر الشحنة", "Repeat shipment", "Sevkiyatı tekrarla"],
   repeatingShipment: [
     "طلب جديد معبّأ من شحنة «{title}». غيّر التاريخ وما يلزم ثم انشر.",
-    "A new request filled from “{title}”. Change the date and anything else, then publish.",
-    "“{title}” sevkiyatından doldurulmuş yeni talep. Tarihi ve gerekeni değiştirip yayınlayın.",
+    "A new request filled from “{title}”. Change the date and any other details, then publish.",
+    "“{title}” sevkiyatından doldurulmuş yeni talep. Tarihi ve diğer bilgileri değiştirip yayımlayın.",
   ],
   installApp: ["ثبّت التطبيق على جهازك", "Install the app on your device", "Uygulamayı cihazınıza kurun"],
   referralTitle: [
@@ -2801,8 +2829,8 @@ export const extraRows = {
   driverStatus_rejected: ["مرفوض", "Rejected", "Reddedildi"],
   driverFilesMissing: [
     "ارفع صورة الرخصة والشاحنة",
-    "upload the licence and truck photos",
-    "ehliyet ve araç fotoğrafını yükleyin",
+    "Upload the licence and truck photos",
+    "Ehliyet ve araç fotoğraflarını yükleyin",
   ],
   deleteDriverConfirm: ["حذف هذا السائق؟", "Delete this driver?", "Bu sürücü silinsin mi?"],
   driverReviewTitle: ["توثيق السائقين", "Driver verification", "Sürücü doğrulama"],
@@ -2929,7 +2957,7 @@ export const extraRows = {
   ],
   paymentReceivedNote: [
     "تم الدفع. قد يحتاج تفعيل الأشهر دقيقة حتى يصل تأكيد البنك.",
-    "Payment done. Activating the months may take a minute until the bank's confirmation arrives.",
+    "Payment received. Activating the months may take a minute until the bank's confirmation arrives.",
     "Ödeme yapıldı. Ayların etkinleşmesi bankanın onayı gelene kadar bir dakika sürebilir.",
   ],
   paymentFailedNote: [
@@ -2939,23 +2967,23 @@ export const extraRows = {
   ],
   paymentUnavailable: [
     "خدمة الدفع غير متاحة حاليًا، حاول لاحقًا.",
-    "The payment service is unavailable, try later.",
-    "Ödeme hizmeti şu anda kullanılamıyor, sonra deneyin.",
+    "The payment service is currently unavailable. Please try again later.",
+    "Ödeme hizmeti şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.",
   ],
   "err_Online payment is not available yet": [
     "الدفع الإلكتروني غير مفعّل بعد.",
     "Online payment is not available yet.",
-    "Çevrimiçi ödeme henüz yok.",
+    "Çevrimiçi ödeme henüz etkin değil.",
   ],
   "err_Nothing to pay for this account": [
     "لا يوجد مبلغ مستحق على هذا الحساب.",
-    "Nothing to pay for this account.",
-    "Bu hesap için ödenecek tutar yok.",
+    "There is no amount due on this account.",
+    "Bu hesap için ödenecek bir tutar yok.",
   ],
   "err_Payment service unavailable, try again later": [
     "خدمة الدفع غير متاحة، حاول لاحقًا.",
-    "Payment service unavailable, try again later.",
-    "Ödeme hizmeti kullanılamıyor, sonra deneyin.",
+    "The payment service is unavailable. Please try again later.",
+    "Ödeme hizmeti kullanılamıyor. Lütfen daha sonra tekrar deneyin.",
   ],
   growth: ["لوحة النمو", "Growth", "Büyüme"],
   growthIntro: [
@@ -3007,13 +3035,13 @@ export const extraRows = {
   ],
   teamRoleDesc_operations: [
     "الشحنات والعروض والوثائق والرسائل، بدون إعدادات الحساب أو التوثيق أو الاشتراك.",
-    "Shipments, offers, documents and messages — no account settings, verification or subscription.",
-    "Sevkiyatlar, teklifler, belgeler ve mesajlar — hesap ayarları, doğrulama veya abonelik yok.",
+    "Shipments, offers, documents and messages. Excludes account settings, verification and subscription.",
+    "Sevkiyatlar, teklifler, belgeler ve mesajlar. Hesap ayarları, doğrulama ve abonelik bu role dahil değildir.",
   ],
   teamRoleDesc_viewer: [
     "يرى كل شيء ولا يغيّر شيئاً — مناسب للمحاسب أو الشريك.",
-    "Sees everything, changes nothing — good for an accountant or partner.",
-    "Her şeyi görür, hiçbir şeyi değiştirmez — muhasebeci veya ortak için uygun.",
+    "Can view everything but make no changes. Suitable for an accountant or partner.",
+    "Her şeyi görüntüleyebilir, ancak değişiklik yapamaz. Muhasebeci veya ortak için uygundur.",
   ],
   inviteMember: ["دعوة موظف", "Invite an employee", "Çalışan davet et"],
   memberName: ["الاسم", "Name", "Ad"],
@@ -3021,8 +3049,8 @@ export const extraRows = {
   createInvite: ["إنشاء رابط الدعوة", "Create invite link", "Davet bağlantısı oluştur"],
   teamLinkNote: [
     "أرسل هذا الرابط للموظف بنفسك (واتساب أو إيميل). يختار منه كلمة مروره، والرابط صالح 7 أيام ولمرة واحدة.",
-    "Send this link to the employee yourself (WhatsApp or email). They choose their password with it; it works once, for 7 days.",
-    "Bu bağlantıyı çalışana kendiniz gönderin (WhatsApp veya e-posta). Şifresini bununla belirler; 7 gün boyunca bir kez çalışır.",
+    "Send this link to the employee directly (WhatsApp or email). They use it to choose their password. The link is valid for 7 days and can be used once.",
+    "Bu bağlantıyı çalışana doğrudan gönderin (WhatsApp veya e-posta). Çalışan bağlantıyla şifresini belirler. Bağlantı 7 gün geçerlidir ve yalnızca bir kez kullanılabilir.",
   ],
   teamInviteShare: [
     "دعوة للانضمام إلى فريقنا على LogiBridge:",
@@ -3142,7 +3170,7 @@ export const extraRows = {
   mySchedules: ["جداولي", "My schedules", "Programlarım"],
   recurringActive: ["فعّال", "Active", "Aktif"],
   recurringPaused: ["متوقف", "Paused", "Duraklatıldı"],
-  recurringEnded: ["انتهى", "Ended", "Bitti"],
+  recurringEnded: ["انتهى", "Ended", "Sona erdi"],
   nextShipment: ["الشحنة القادمة", "Next shipment", "Sonraki sevkiyat"],
   publishedCount: ["نُشر حتى الآن", "Published so far", "Şimdiye kadar yayınlanan"],
   recurringPausedNote: [
@@ -3165,8 +3193,8 @@ export const extraRows = {
   ],
   event_recurring_invite: [
     "عميل متكرر نشر شحنة جديدة لك — قدّم عرضك",
-    "A regular customer published a new shipment for you — send your offer",
-    "Düzenli müşteriniz yeni bir sevkiyat yayınladı — teklifinizi gönderin",
+    "A regular customer has published a new shipment for you. Send your offer.",
+    "Düzenli müşteriniz sizin için yeni bir sevkiyat yayınladı. Teklifinizi gönderin.",
   ],
   event_recurring_paused: [
     "توقف جدول شحن متكرر",
@@ -3285,8 +3313,8 @@ export const extraRows = {
   realDeals: ["صفقة حقيقية", "real deals", "gerçek anlaşma"],
   routeNoPrices: [
     "لا توجد بعد صفقات كافية على هذا الطريق لعرض سعر حقيقي. نعرض الأسعار فقط من {n} صفقات حقيقية على الأقل — انشر طلبك واحصل على عروض فعلية.",
-    "There are not enough deals on this route yet to show a real price. Prices are only shown from at least {n} real deals — post your request and get actual offers.",
-    "Bu rotada gerçek bir fiyat göstermek için henüz yeterli anlaşma yok. Fiyatlar yalnızca en az {n} gerçek anlaşmadan gösterilir — talebinizi yayınlayın ve gerçek teklifler alın.",
+    "There are not enough deals on this route yet to show a real price. Prices are only shown from at least {n} real deals. Post your request to receive actual offers.",
+    "Bu rotada gerçek bir fiyat göstermek için henüz yeterli anlaşma yok. Fiyatlar yalnızca en az {n} gerçek anlaşmadan gösterilir. Talebinizi yayınlayarak gerçek teklifler alın.",
   ],
   routeCrossings: [
     "المعابر الأقرب على الطريق",
@@ -3338,8 +3366,8 @@ export const extraRows = {
   addAlert: ["إضافة تنبيه", "Add alert", "Uyarı ekle"],
   alertSaved: [
     "تم حفظ التنبيه — سيصلك إشعار فور نشر طلب مطابق.",
-    "Alert saved — you will be notified as soon as a matching request is posted.",
-    "Uyarı kaydedildi — uygun bir talep yayınlanınca bildirim alacaksınız.",
+    "Alert saved. You will be notified as soon as a matching request is posted.",
+    "Uyarı kaydedildi. Uygun bir talep yayınlandığında bildirim alacaksınız.",
   ],
   anyPlace: ["أي مكان", "Anywhere", "Her yer"],
   noAlertsYet: ["لم تحفظ أي تنبيه بعد.", "No alerts saved yet.", "Henüz kayıtlı uyarı yok."],
@@ -3373,7 +3401,7 @@ export const extraRows = {
   owner: ["صاحب الطلب", "Owner", "Talep sahibi"],
   waOwnerNoOffers: [
     "مرحبًا، من فريق LogiBridge بخصوص طلبك «{title}»: ما زلنا نبحث لك عن عروض، هل التفاصيل والتاريخ ما زالت صحيحة؟",
-    "Hello, LogiBridge team here about your request “{title}”: we are still finding offers for you — are the details and date still right?",
+    "Hello, LogiBridge team here about your request “{title}”: we are still finding offers for you. Are the details and date still correct?",
     "Merhaba, “{title}” talebiniz hakkında LogiBridge ekibinden yazıyoruz: sizin için teklif arıyoruz, ayrıntılar ve tarih hâlâ doğru mu?",
   ],
   waProviderNudge: [
@@ -3389,8 +3417,8 @@ export const extraRows = {
   nudgeSent: ["أُرسل إشعار إلى {n}.", "Notice sent to {n}.", "{n} kişiye bildirim gönderildi."],
   noSuggestedProviders: [
     "لا يوجد مزوّد مقترح لهذا الطريق بعد — جرّب التواصل مع شركات من الدليل.",
-    "No suggested provider for this route yet — try companies from the directory.",
-    "Bu rota için henüz önerilen sağlayıcı yok — rehberdeki şirketleri deneyin.",
+    "No suggested provider for this route yet. Try companies from the directory.",
+    "Bu rota için henüz önerilen sağlayıcı yok. Rehberdeki şirketlerle iletişime geçmeyi deneyin.",
   ],
   errorLog: ["سجل الأخطاء", "Error log", "Hata günlüğü"],
   errorLogIntro: [
@@ -3412,11 +3440,11 @@ export const extraRows = {
   assistantTitle: ["المساعد الذكي", "Assistant", "Asistan"],
   assistantHello: [
     "أهلًا! اسألني أي سؤال عن استخدام LogiBridge.",
-    "Hi! Ask me anything about using LogiBridge.",
-    "Merhaba! LogiBridge kullanımıyla ilgili her şeyi sorabilirsiniz.",
+    "Hello. Ask any question about using LogiBridge.",
+    "Merhaba. LogiBridge kullanımıyla ilgili her konuda soru sorabilirsiniz.",
   ],
   exampleQ1: ["كيف أنشر طلب شحن؟", "How do I post a shipment?", "Sevkiyat talebi nasıl yayınlanır?"],
-  exampleQ2: ["كم الاشتراك؟", "How much is the subscription?", "Abonelik ne kadar?"],
+  exampleQ2: ["كم الاشتراك؟", "What does the subscription cost?", "Abonelik ücreti nedir?"],
   exampleQ3: ["من يرى وثائقي؟", "Who sees my documents?", "Belgelerimi kimler görür?"],
   askPlaceholder: ["اكتب سؤالك…", "Type your question…", "Sorunuzu yazın…"],
   assistantTyping: ["يكتب…", "Typing…", "Yazıyor…"],
@@ -3435,13 +3463,13 @@ export const extraRows = {
     "I could not find a ready answer. Our team will help you directly on WhatsApp.",
     "Hazır bir yanıt bulamadım. Ekibimiz WhatsApp'tan doğrudan yardımcı olur.",
   ],
-  notSolved: ["ما انحلّت؟", "Not solved?", "Çözülmedi mi?"],
+  notSolved: ["ما انحلّت؟", "Not resolved?", "Çözülmedi mi?"],
   talkToPerson: ["كلّم شخصًا على واتساب", "Talk to a person on WhatsApp", "WhatsApp'ta biriyle konuşun"],
   openTicket: ["اكتب شكوى أو طلب", "Open a ticket", "Talep oluştur"],
   openTicketNote: [
     "تصل للإدارة وتتابع الرد من حسابك",
-    "Reaches the team; follow the reply in your account",
-    "Ekibe ulaşır; yanıtı hesabınızdan izleyin",
+    "Sent to the team. Follow the reply in your account.",
+    "Ekibe iletilir. Yanıtı hesabınızdan takip edin.",
   ],
   assistantNoteAi: [
     "الإجابات من مساعد ذكاء اصطناعي وقد تخطئ؛ للأمور المهمة تواصل مع الفريق.",
