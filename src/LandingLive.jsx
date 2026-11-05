@@ -61,7 +61,7 @@ export function LiveBorderStrip({ t, lang }) {
 }
 
 // Hero picture: a small, clearly labelled example of what a trader sees for a Türkiye⇄Syria order.
-export function ProductPreview({ t }) {
+export function ProductPreview({ t, children }) {
   return (
     <figure className="product-preview" aria-label={t("gpsMap")}>
       <div className="pp-card">
@@ -85,7 +85,24 @@ export function ProductPreview({ t }) {
           </div>
         </div>
         <svg className="pp-map" viewBox="0 0 320 150" role="img" aria-label={t("gpsMap")} direction="ltr">
-          <rect width="320" height="150" rx="12" fill="#eef3fb" />
+          <rect width="320" height="150" rx="12" fill="#e7edf5" />
+          <path d="M0 0 H320 V70 C240 76 180 70 100 84 C60 90 30 88 0 92 Z" fill="#f5f0e4" />
+          <path d="M0 92 C30 88 60 90 100 84 C180 70 240 76 320 70 V150 H0 Z" fill="#e6f0e8" />
+          <path
+            d="M0 92 C30 88 60 90 100 84 C180 70 240 76 320 70"
+            stroke="#94a3b8"
+            strokeWidth="2"
+            strokeDasharray="5 4"
+            fill="none"
+          />
+          <path d="M20 60 C80 52 140 48 200 30 S290 14 310 20" stroke="#d6dbe3" strokeWidth="3" fill="none" />
+          <path d="M60 140 C100 120 150 115 230 128" stroke="#d6dbe3" strokeWidth="3" fill="none" />
+          <text x="10" y="18" fontSize="9" fill="#64748b">
+            TÜRKİYE
+          </text>
+          <text x="10" y="140" fontSize="9" fill="#64748b">
+            SYRIA
+          </text>
           <path
             d="M30 30 C 90 40, 120 60, 160 78"
             stroke="#2563eb"
@@ -115,6 +132,7 @@ export function ProductPreview({ t }) {
             Aleppo
           </text>
         </svg>
+        {children}
       </div>
     </figure>
   );

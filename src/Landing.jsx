@@ -131,14 +131,15 @@ export default function Landing({ t, langSelect, user }) {
             </div>
           </div>
           <div className="hero-visual">
-            <ProductPreview t={t} />
-            <div className="access-benefits hero-benefits">
-              <span>✓ {t("benefitVerified")}</span>
-              <span>✓ {t("benefitProtected")}</span>
-              <span>✓ {t("benefitTracking")}</span>
-              <span>✓ {t("benefitNoCommission")}</span>
-              <span>✓ AR / EN / TR</span>
-            </div>
+            <ProductPreview t={t}>
+              <div className="access-benefits hero-benefits">
+                <span>✓ {t("benefitVerified")}</span>
+                <span>✓ {t("benefitProtected")}</span>
+                <span>✓ {t("benefitTracking")}</span>
+                <span>✓ {t("benefitNoCommission")}</span>
+                <span>✓ AR / EN / TR</span>
+              </div>
+            </ProductPreview>
             <div className="hero-auth">
               <a className="button" href="/login">
                 {t("signIn")} ↗

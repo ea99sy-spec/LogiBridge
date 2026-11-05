@@ -984,4 +984,10 @@
   flex-wrap: wrap;
   justify-content: center;
 }
-.landing-hero .hero-auth a{text-decoration:none}
+.landing-hero .hero-auth a {
+  text-decoration: none;
+}
+.landing-hero .pp-card .hero-benefits {
+  margin-top: 14px;
+  justify-content: center;
+}
