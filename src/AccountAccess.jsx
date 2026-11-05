@@ -86,46 +86,50 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
       </header>
       <div className="access-layout">
         <section className="access-story">
-          <span className="access-chip">
-            TÜRKİYE · SYRIA · GLOBAL <i />
-          </span>
+          {!register && (
+            <span className="access-chip">
+              TÜRKİYE · SYRIA · GLOBAL <i />
+            </span>
+          )}
           <h1>{register ? title(type) : t("accessWelcome")}</h1>
           <p>{t(register ? `access_${type}` : "accessIntro")}</p>
-          <div className="bridge-illustration">
-            <div className="bridge-city">
-              <span>TR</span>
-              <b>Gaziantep</b>
-            </div>
-            <div className="bridge-track">
-              <span>⇄</span>
-              <i />
-              <i />
-              <i />
-            </div>
-            <div className="bridge-city">
-              <span>SY</span>
-              <b>Aleppo</b>
-            </div>
-            <span className="bridge-orbit orbit-one" />
-            <span className="bridge-orbit orbit-two" />
-          </div>
-          <div className="access-benefits">
-            <span>✓ {t("secureAccess")}</span>
-            <span>✓ {t("identityReview")}</span>
-            <span>✓ AR / EN / TR</span>
-          </div>
-          <p className="access-footnote">{t("manualVerificationNote")}</p>
+          {!register && (
+            <>
+              <div className="bridge-illustration">
+                <div className="bridge-city">
+                  <span>TR</span>
+                  <b>Gaziantep</b>
+                </div>
+                <div className="bridge-track">
+                  <span>⇄</span>
+                  <i />
+                  <i />
+                  <i />
+                </div>
+                <div className="bridge-city">
+                  <span>SY</span>
+                  <b>Aleppo</b>
+                </div>
+                <span className="bridge-orbit orbit-one" />
+                <span className="bridge-orbit orbit-two" />
+              </div>
+              <div className="access-benefits">
+                <span>✓ {t("secureAccess")}</span>
+                <span>✓ {t("identityReview")}</span>
+                <span>✓ AR / EN / TR</span>
+              </div>
+              <p className="access-footnote">{t("manualVerificationNote")}</p>
+            </>
+          )}
         </section>
         <section className="access-card">
           {!form ? (
             <>
-              <span className="eyebrow">YOUR LOGISTICS WORKSPACE</span>
               <h2>{t("haveAccount")}</h2>
               <a className="button access-signin-button" href={accountUrl("/login")}>
                 {t("signIn")} ↗
               </a>
               <h2>{t("newHereChoose")}</h2>
-              <p className="muted">{t("chooseOnceNote")}</p>
               <div className="access-options">
                 {accounts
                   .filter((k) => k !== "admin")
@@ -218,7 +222,6 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
                             dir="ltr"
                             placeholder="+90 5xx xxx xx xx"
                             pattern="^(\+|00)[1-9][0-9 ()\-]{7,24}$"
-                            title={t("phoneIntlHint")}
                             autoComplete="tel"
                           />
                           <small className="muted">{t("phoneIntlHint")}</small>
