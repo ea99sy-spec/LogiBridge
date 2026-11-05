@@ -97,7 +97,7 @@ export function ProductPreview({ t, children }) {
           />
           <path d="M20 60 C80 52 140 48 200 30 S290 14 310 20" stroke="#d6dbe3" strokeWidth="3" fill="none" />
           <path d="M60 140 C100 120 150 115 230 128" stroke="#d6dbe3" strokeWidth="3" fill="none" />
-          <text x="10" y="18" fontSize="9" fill="#64748b">
+          <text x="250" y="18" fontSize="9" fill="#64748b">
             TÜRKİYE
           </text>
           <text x="10" y="140" fontSize="9" fill="#64748b">
