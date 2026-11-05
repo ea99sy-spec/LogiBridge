@@ -45,3 +45,60 @@
   font-size: clamp(32px, 3.6vw, 46px);
   font-weight: 700;
 }
+
+/* Sign-in and registration pages: the same navy identity as the home page, with the form on white. */
+.access-page {
+  background:
+    radial-gradient(ellipse at 15% 0%, #14325c 0%, transparent 45%),
+    linear-gradient(135deg, var(--navy-900), var(--navy-700) 70%, #061326);
+  color: #e8eef7;
+}
+.access-page .brand,
+.access-page .access-header .brand {
+  color: #ffffff;
+}
+.access-page .access-story h1,
+.access-page .access-story h2 {
+  color: #ffffff;
+}
+.access-page .access-story p,
+.access-page .access-story small {
+  color: #c9d5e6;
+}
+.access-page .access-header select,
+.access-page .access-header button {
+  color: #ffffff;
+  border-color: #ffffff55;
+  background: transparent;
+}
+.access-card {
+  background: #ffffff;
+  color: var(--navy-900);
+}
+.access-card label,
+.access-card .field-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy-800);
+}
+.access-card h2 {
+  color: var(--navy-900);
+}
+.access-page a {
+  color: #ffe2a0;
+}
+.access-card a {
+  color: var(--navy-800);
+}
+.access-page footer,
+.access-page .access-footer {
+  color: #c9d5e6;
+}
+.access-card .button,
+.access-card a.button {
+  color: #ffffff;
+}
+.access-page .bridge-track span,
+.access-page .bridge-track small {
+  color: #dfe7f3;
+}

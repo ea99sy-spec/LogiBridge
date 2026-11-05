@@ -1869,7 +1869,7 @@ export const extraRows = {
   statCompleted: ["شحنة مكتملة", "completed shipments", "tamamlanan sevkiyat"],
   statActive: ["شحنة جارية الآن", "shipments under way", "devam eden sevkiyat"],
   statCountries: ["دولة", "countries", "ülke"],
-  statCrossings: ["معابر مفتوحة نغطيها", "open crossings covered", "kapsanan açık kapı"],
+  statCrossings: ["المعابر المفتوحة التي نغطيها", "Open crossings we cover", "Hizmet verdiğimiz açık sınır kapıları"],
   showStats: [
     "إظهار أرقام المنصة في الصفحة الرئيسية",
     "Show platform numbers on the home page",
@@ -2520,9 +2520,9 @@ export const extraRows = {
     "Bu güzergâhta {n} gerçek anlaşmadan hesaplandı.",
   ],
   estimateNotEnough: [
-    "لا توجد صفقات كافية على هذا الطريق بعد لإعطاء تقدير. انشر شحنتك مجانًا واستقبل عروض أسعار حقيقية.",
-    "There are not enough deals on this route yet for an estimate. Post your shipment for free and receive real price offers.",
-    "Bu güzergâhta tahmin için henüz yeterli anlaşma yok. Sevkiyatınızı ücretsiz yayınlayın ve gerçek fiyat teklifleri alın.",
+    "لا توجد صفقات مكتملة كافية على هذا الطريق لإعداد تقدير. يمكنك نشر شحنتك الآن واستلام عروض أسعار فعلية.",
+    "There are not enough completed deals on this route yet to prepare an estimate. You can post your shipment now and receive actual price offers.",
+    "Bu güzergâh için tahmin hazırlamaya yetecek kadar tamamlanmış anlaşma henüz yok. Sevkiyatınızı şimdi yayınlayıp gerçek fiyat teklifleri alabilirsiniz.",
   ],
   getRealOffers: ["استقبل عروضًا حقيقية", "Get real offers", "Gerçek teklif alın"],
   returnTrips: ["رحلات العودة", "Return trips", "Dönüş seferleri"],
