@@ -102,3 +102,11 @@
 .access-page .bridge-track small {
   color: #dfe7f3;
 }
+
+/* Space between the hero and the live border strip, and between the strip and the sections below. */
+.landing-hero + .live-strip {
+  margin-top: 32px;
+}
+.live-strip + .platform-stats {
+  margin-top: 28px;
+}
