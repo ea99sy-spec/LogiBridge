@@ -43,6 +43,7 @@ const whatsappEvents = {
   shared_truck_suggestion: "يمكنك مشاركة شاحنة مع شحنة أخرى على نفس الطريق",
   referral_reward: "حصلت على شهر مجاني لأن شركة دعوتها انضمت",
   driver_verified: "تم توثيق السائق",
+  driver_rejected: "لم يُقبل السائق، افتح المنصة لمعرفة السبب",
 };
 export function notice(s, userId, event, shipmentId, detail) {
   if (!userId) return;
