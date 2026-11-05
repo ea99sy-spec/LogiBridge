@@ -132,7 +132,7 @@
 .doc-item.drag,
 .doc-extra-upload.drag {
   border-style: dashed;
-  border-color: #2563eb;
+  border-color: #10294b;
   background: #eef4ff;
 }
 .doc-item-head {
@@ -369,7 +369,7 @@
   font-weight: 700;
 }
 .doc-option:focus-within {
-  outline: 2px solid #2563eb;
+  outline: 2px solid #10294b;
   outline-offset: 2px;
 }
 .doc-extra-upload {
@@ -494,4 +494,4 @@
   .print-blocked{display:block!important;padding:40px;text-align:center;font-size:18px}
 }
 .doc-protect-note{font-size:.85rem;color:#64748b;margin:4px 0 14px}
-.doc-views{display:block;color:#2563eb}
+.doc-views{display:block;color:#10294b}

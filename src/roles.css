@@ -62,9 +62,9 @@
   font-size: 12px;
 }
 .role-tabs button.active {
-  background: #2563eb;
+  background: #10294b;
   color: white;
-  border-color: #2563eb;
+  border-color: #10294b;
 }
 .supplier-catalog {
   margin-top: 25px;

@@ -21,7 +21,7 @@
   display: grid;
   place-items: center;
   background: #edf4ff;
-  color: #2563eb;
+  color: #10294b;
   border-radius: 9px;
   font-size: 22px;
   flex-shrink: 0;
@@ -159,9 +159,9 @@
   border: 1px solid #e0e9f8;
 }
 .shipment-progress .complete span {
-  background: #2563eb;
+  background: #10294b;
   color: white;
-  border-color: #2563eb;
+  border-color: #10294b;
 }
 .shipment-progress .complete b {
   color: #3d6297;
@@ -359,7 +359,7 @@
   padding: 12px;
 }
 .access-contact a {
-  color: #2563eb;
+  color: #10294b;
 }
 .shipment-payment {
   max-width: 100%;

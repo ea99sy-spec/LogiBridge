@@ -546,9 +546,14 @@ export function VerifyEmail({ t, langSelect, run }) {
     const token = window.location.hash.slice(1);
     history.replaceState(null, "", "/verify-email");
     if (!token) return setState("failed");
-    run("/auth/verify-email", { token }, "POST", { silent: true }).then((r) =>
-      setState(r ? "done" : "failed"),
-    );
+    run("/auth/verify-email", { token }, "POST", { silent: true }).then((r) => {
+      if (r) {
+        try {
+          localStorage.setItem("lb_email_verified", "1");
+        } catch {}
+      }
+      setState(r ? "done" : "failed");
+    });
   }, []);
   return (
     <div className="access-page">

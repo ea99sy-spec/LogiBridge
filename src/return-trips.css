@@ -23,7 +23,7 @@
   border-top: 4px solid #16a34a;
 }
 .trip-card.st-booked {
-  border-top-color: #2563eb;
+  border-top-color: #10294b;
 }
 .trip-card.st-cancelled {
   opacity: 0.6;

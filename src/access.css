@@ -1,6 +1,6 @@
 :root {
   --brand-yellow: #facc15;
-  --brand-blue: #2563eb;
+  --brand-blue: #10294b;
   --brand-navy: #102a56;
 }
 .brand-icon {
@@ -32,16 +32,16 @@
   background: var(--brand-yellow);
 }
 .button {
-  box-shadow: 0 4px 12px #2563eb14;
+  box-shadow: 0 4px 12px #10294b14;
 }
 .button:hover {
-  box-shadow: 0 6px 18px #2563eb26;
+  box-shadow: 0 6px 18px #10294b26;
 }
 .button.ghost {
   box-shadow: none;
 }
 .stat-icon {
-  color: #2563eb;
+  color: #10294b;
   background: #eff6ff;
 }
 .stat:nth-child(2) .stat-icon,
@@ -165,11 +165,11 @@ a:focus-visible {
   height: 72px;
   border: 6px solid white;
   border-radius: 22px;
-  background: #2563eb;
+  background: #10294b;
   color: white;
   font-size: 21px;
   font-weight: 700;
-  box-shadow: 0 9px 26px #2563eb2b;
+  box-shadow: 0 9px 26px #10294b2b;
   transform: rotate(-7deg);
 }
 .bridge-city:last-of-type > span {
@@ -207,7 +207,7 @@ a:focus-visible {
   border: 1px solid #cfddf2;
   border-radius: 12px;
   z-index: 1;
-  color: #2563eb;
+  color: #10294b;
   box-shadow: 0 10px 20px #102a560d;
 }
 .bridge-track i {
@@ -274,7 +274,7 @@ a:focus-visible {
   top: 0;
   inset-inline: 0;
   height: 5px;
-  background: linear-gradient(90deg, #2563eb 0 72%, #facc15 72%);
+  background: linear-gradient(90deg, #10294b 0 72%, #facc15 72%);
 }
 .access-card h2 {
   font-size: 25px;
@@ -324,7 +324,7 @@ a:focus-visible {
   width: 43px;
   height: 43px;
   background: #edf4ff;
-  color: #2563eb;
+  color: #10294b;
   border-radius: 12px;
   font-size: 25px;
   display: grid;
@@ -354,7 +354,7 @@ a:focus-visible {
   place-items: center;
   border-radius: 16px;
   background: #edf4ff;
-  color: #2563eb;
+  color: #10294b;
   font-size: 31px;
   margin-bottom: 17px;
 }
@@ -382,7 +382,7 @@ a:focus-visible {
   margin-top: 22px;
 }
 .access-register-link a {
-  color: #2563eb;
+  color: #10294b;
   font-weight: 600;
   text-decoration: none;
   margin-inline-start: 4px;
@@ -424,7 +424,7 @@ a:focus-visible {
   width: 17px;
   height: 17px;
   margin-top: 3px;
-  accent-color: #2563eb;
+  accent-color: #10294b;
   flex-shrink: 0;
   padding: 0;
 }
@@ -461,9 +461,9 @@ a:focus-visible {
   background: white;
 }
 .verification-steps .complete span {
-  background: #2563eb;
+  background: #10294b;
   color: white;
-  border-color: #2563eb;
+  border-color: #10294b;
 }
 .verification-steps .complete b {
   color: #315784;
@@ -481,7 +481,7 @@ a:focus-visible {
 }
 .upload-icon {
   font-size: 33px;
-  color: #2563eb;
+  color: #10294b;
   background: #e7f0ff;
   width: 56px;
   height: 56px;
@@ -596,7 +596,7 @@ a:focus-visible {
 }
 .registry-links a {
   font-size: 11px;
-  color: #2563eb;
+  color: #10294b;
 }
 .registry-links small {
   font-size: 10px;
@@ -855,4 +855,17 @@ a:focus-visible {
   flex-wrap: wrap;
   gap: 14px;
   font-weight: 700;
+}
+
+/* Phones: the help button floats over the bottom of the page, so keep the sign-in button clear of it,
+   and make the account-type links large enough to tap. */
+@media (max-width: 640px) {
+  .access-page {
+    padding-bottom: 110px;
+  }
+  .access-page a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
 }

@@ -1,4 +1,4 @@
-import { watermarkDocument, watermarkText, arabicPart } from "./watermark.js";
+import { watermarkDocument, watermarkText, arabicPart, imageAsPdf } from "./watermark.js";
 import { readState, mutate, id } from "./store.js";
 import { validateDocument, encryptDocument, decryptDocument } from "./identity.js";
 import { notice } from "./advanced.js";
@@ -189,6 +189,22 @@ export function documentRoutes(app) {
             `${req.query.view ? "inline" : "attachment"}; filename="${base}-LogiBridge.pdf"`,
           )
           .send(marked);
+      }
+    }
+    // PNG originals are delivered as PDF, so every file opens on any device. PDF and JPG stay as they are.
+    if (doc.mime === "image/png") {
+      const pdfBytes = await imageAsPdf(decryptDocument(doc.encryptedContent), doc.mime);
+      if (pdfBytes) {
+        const base =
+          String(doc.filename || "document")
+            .replace(/\.[a-z0-9]+$/i, "")
+            .replace(/[^\w.\- ]+/g, "_")
+            .slice(0, 80) || "document";
+        return res
+          .set("Content-Type", "application/pdf")
+          .set("Cache-Control", "private, no-store")
+          .set("Content-Disposition", `${req.query.view ? "inline" : "attachment"}; filename="${base}.pdf"`)
+          .send(Buffer.from(pdfBytes));
       }
     }
     const ext = { "application/pdf": "pdf", "image/png": "png", "image/jpeg": "jpg" }[doc.mime] || "bin";

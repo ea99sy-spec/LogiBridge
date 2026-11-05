@@ -346,9 +346,9 @@ main {
   font-size: 22px;
 }
 .button {
-  background: #2563eb;
+  background: #10294b;
   color: white;
-  border: 1px solid #2563eb;
+  border: 1px solid #10294b;
   border-radius: 7px;
   padding: 10px 17px;
   font-size: 12px;
@@ -356,7 +356,7 @@ main {
   white-space: normal;
 }
 .button:hover {
-  background: #1d4ed8;
+  background: #0b1f3a;
 }
 .button.ghost {
   background: white;

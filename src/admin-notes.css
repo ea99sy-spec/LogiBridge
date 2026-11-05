@@ -54,7 +54,7 @@
 }
 .note-dot.c-blue,
 .note-card.c-blue {
-  --note: #2563eb;
+  --note: #10294b;
 }
 .note-dot:not(.c-none) {
   background: var(--note);

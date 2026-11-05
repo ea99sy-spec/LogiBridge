@@ -43,9 +43,9 @@
   box-shadow: 0 0 0 2px #ef4444 inset;
 }
 .fb-type.suggestion.on {
-  border-color: #2563eb;
+  border-color: #10294b;
   background: #eef4ff;
-  box-shadow: 0 0 0 2px #2563eb inset;
+  box-shadow: 0 0 0 2px #10294b inset;
 }
 .fb-rate {
   display: grid;
@@ -97,7 +97,7 @@
   border-inline-start-color: #ef4444;
 }
 .fb-item.suggestion {
-  border-inline-start-color: #2563eb;
+  border-inline-start-color: #10294b;
 }
 .fb-item-head {
   display: flex;

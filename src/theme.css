@@ -1,0 +1,41 @@
+/* Visual direction: navy and gold, calm and professional. Real content only. */
+:root {
+  --navy-900: #07172d;
+  --navy-800: #0b1f3a;
+  --navy-700: #10294b;
+  --gold: #f4bd4c;
+  --gold-soft: #ffdc8b;
+}
+
+/* Landing hero on a deep navy background, with gold accents. */
+.landing-hero {
+  background:
+    radial-gradient(ellipse at 22% 40%, #1f4a72 0%, transparent 38%),
+    radial-gradient(ellipse at 75% 10%, #173a60 0%, transparent 42%),
+    linear-gradient(115deg, var(--navy-900), var(--navy-700) 60%, #061326);
+  color: #e8eef7;
+}
+.landing-hero h1 {
+  color: #ffffff;
+}
+.landing-hero .hero-value {
+  color: #d5deea;
+}
+.landing-hero h1 span,
+.landing-hero h1 em {
+  color: var(--gold);
+  font-style: normal;
+}
+
+/* Buttons on the hero: gold on navy. */
+.landing-hero .button,
+.landing-hero a.button {
+  background: linear-gradient(135deg, var(--gold-soft), #e9ad39);
+  color: var(--navy-900);
+  border-color: transparent;
+}
+.landing-hero .access-chip {
+  background: #f4bd4c1f;
+  border-color: #f4bd4c66;
+  color: #ffe2a0;
+}

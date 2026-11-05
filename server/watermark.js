@@ -133,3 +133,23 @@ export async function watermarkDocument(bytes, mime, text, arName = "") {
     return null;
   }
 }
+
+// Converts a PNG or JPG into a PDF page without any stamp (used when the owner downloads a PNG,
+// so every download opens as PDF or JPG on any device).
+export async function imageAsPdf(bytes, mime) {
+  try {
+    if (mime !== "image/png" && mime !== "image/jpeg") return null;
+    const pdf = await PDFDocument.create();
+    const img = mime === "image/png" ? await pdf.embedPng(bytes) : await pdf.embedJpg(bytes);
+    const max = [595, 842];
+    const scale = Math.min(max[0] / img.width, max[1] / img.height, 1.5);
+    const w = Math.max(200, img.width * scale),
+      h = Math.max(200, img.height * scale);
+    const page = pdf.addPage([w, h]);
+    page.drawImage(img, { x: 0, y: 0, width: w, height: h });
+    pdf.setProducer("LogiBridge");
+    return await pdf.save();
+  } catch {
+    return null;
+  }
+}

@@ -27,7 +27,7 @@
   color: #768aab;
 }
 .landing-header nav a:hover {
-  color: #2563eb;
+  color: #10294b;
 }
 .landing-header-actions {
   display: flex;
@@ -60,7 +60,7 @@
 }
 .landing-hero h1 > span {
   display: block;
-  color: #2563eb;
+  color: #10294b;
 }
 .landing-hero p {
   font-size: 14px;
@@ -106,7 +106,7 @@
   background: radial-gradient(circle at 35% 25%, #edf5ff, #bfd5f9);
   box-shadow:
     inset -20px -14px 55px #608dd530,
-    0 25px 75px #2563eb13;
+    0 25px 75px #10294b13;
   overflow: hidden;
 }
 .globe:before,
@@ -163,7 +163,7 @@
   border-radius: 12px;
   padding: 11px 17px;
   font-size: 13px;
-  color: #2563eb;
+  color: #10294b;
   display: flex;
   align-items: center;
   gap: 11px;
@@ -726,7 +726,7 @@
   color: #50678a;
 }
 .compare-head .ours {
-  color: #1d4ed8;
+  color: #0b1f3a;
 }
 .compare-row + .compare-row,
 .compare-head + .compare-row {

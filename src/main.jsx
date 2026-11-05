@@ -39,6 +39,7 @@ import { workspaceModules, accountKind } from "../shared/workspaces";
 import "./roles.css";
 import "./advanced.css";
 import "./accent.css";
+import "./theme.css";
 import ShipmentRoute from "./ShipmentRoute";
 import { crossingKeys } from "../shared/crossings";
 import {
@@ -788,6 +789,21 @@ const icons = {
   orders: "▤",
   security: "⚿",
 };
+// Set by the confirmation page after the email is verified; shown once at the next sign-in.
+const verifiedFlag = () => {
+  try {
+    return localStorage.getItem("lb_email_verified") === "1";
+  } catch {
+    return false;
+  }
+};
+const clearVerifiedFlag = () => {
+  try {
+    localStorage.removeItem("lb_email_verified");
+  } catch {}
+  location.reload();
+};
+
 function App() {
   const [currency, setCurrency] = useState(localStorage.getItem("lb_currency") || "USD"),
     [fx, setFx] = useState({ rates: { USD: 1 }, dates: {} });
@@ -1185,6 +1201,14 @@ function App() {
           {user.disabled && <p className="notice">{t("err_Account disabled")}</p>}
           <SubscriptionBanner sub={data.subscription} t={t} onOpen={() => setTab("dashboard")} />
           {user.termsOutdated && <TermsUpdateDialog t={t} run={run} busy={busy} />}
+          {!user.demo && user.emailVerified === true && verifiedFlag() && (
+            <div className="notice email-verify-done">
+              <span>{t("emailVerifiedDone")}</span>
+              <button className="button small-button" onClick={clearVerifiedFlag} aria-label="close">
+                ✕
+              </button>
+            </div>
+          )}
           {!user.demo && user.emailVerified === false && (
             <div className={`notice email-verify ${data.emailVerificationRequired ? "blocking" : ""}`}>
               <span>{t(data.emailVerificationRequired ? "emailVerifyRequired" : "emailVerifyPending")}</span>
