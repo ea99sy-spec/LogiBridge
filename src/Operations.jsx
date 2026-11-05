@@ -25,6 +25,7 @@ import { countryName } from "../shared/countries";
 import CountrySelect from "./CountrySelect";
 import ShipmentRoute from "./ShipmentRoute";
 import { ReviewQueue } from "./Verification";
+import { AccountBoard } from "./AccountBoard";
 import { documentLabels } from "./i18n";
 import { PriceEstimate } from "./Advanced";
 async function fileBody(file) {
@@ -724,6 +725,7 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
             <>
               <h3>{detail.account.name}</h3>
               <AccountDetails account={detail.account} t={t} />
+              <AccountBoard accountId={detail.account.id} t={t} lang={document.documentElement.lang} />
               {!data.user.demo && !detail.account.demo && <ResetLinkTool account={detail.account} t={t} />}
               {!data.user.demo && !detail.account.demo && (
                 <AccountNotes accountId={detail.account.id} t={t} lang={document.documentElement.lang} />

@@ -90,6 +90,58 @@ export function operationRoutes(app) {
         })),
     );
   });
+  // Read-only overview of one account, as its owner would see the key numbers. Never returns secrets,
+  // documents or messages, and every view is recorded in the audit list.
+  app.get("/api/admin/accounts/:id/overview", async (req, res) => {
+    if (req.user.role !== "admin") return res.status(403).json({ error: "Forbidden" });
+    const s = readState(),
+      account = s.users.find((u) => u.id === req.params.id && u.role !== "admin");
+    if (!account) return res.sendStatus(404);
+    if (req.user.demo && !account.demo)
+      return res.status(403).json({ error: "A registered administrator is required" });
+    const mine = s.shipments.filter((sh) => sh.ownerId === account.id),
+      carried = s.shipments.filter((sh) => sh.carrierId === account.id),
+      bidsMade = (s.bids || []).filter((b) => b.carrierId === account.id);
+    const overview = {
+      account: {
+        id: account.id,
+        name: account.name,
+        accountType: account.accountType,
+        role: account.role,
+        verificationStatus: account.verificationStatus || "not_submitted",
+        disabled: !!account.disabled,
+      },
+      subscription: subscriptionOf(s, account),
+      counts: {
+        shipmentsPosted: mine.length,
+        shipmentsCarried: carried.length,
+        openShipments: mine.filter((sh) => sh.status === "open").length,
+        activeShipments: [...mine, ...carried].filter(
+          (sh) => !["delivered", "cancelled", "rejected"].includes(sh.status),
+        ).length,
+        completedShipments: [...mine, ...carried].filter((sh) => sh.status === "delivered").length,
+        offersMade: bidsMade.length,
+      },
+      recentShipments: [...mine, ...carried]
+        .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))
+        .slice(0, 10)
+        .map((sh) => ({
+          id: sh.id,
+          title: sh.title,
+          origin: sh.origin,
+          destination: sh.destination,
+          status: sh.status,
+          createdAt: sh.createdAt,
+        })),
+    };
+    await mutate((st) => {
+      st.adminViews = [
+        { id: id(), adminId: req.user.id, accountId: account.id, at: new Date().toISOString() },
+        ...(st.adminViews || []),
+      ].slice(0, 500);
+    });
+    res.json(overview);
+  });
   app.get("/api/admin/accounts/:id", (req, res) => {
     if (req.user.role !== "admin") return res.status(403).json({ error: "Forbidden" });
     const s = readState(),
