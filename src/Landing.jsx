@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./public-pages.css";
 import { LegalLinks, CompanyInfo } from "./Legal";
-import { LiveBorderStrip, PlatformStats } from "./LandingLive";
+import { LiveBorderStrip, ProductPreview, PlatformStats } from "./LandingLive";
 import { QuickPrice } from "./Prices";
 import { DRIVER_APP_URL } from "./Advanced";
 import { waLink } from "../shared/wa";
@@ -129,16 +129,24 @@ export default function Landing({ t, langSelect, user }) {
                 {t(health.demo ? "heroTry" : "navHow")}
               </a>
             </div>
-            <p className="hero-signin">
-              {t("haveAccount")} <a href="/login">{t("signIn")}</a>
-            </p>
           </div>
-          <div className="access-benefits hero-benefits">
-            <span>✓ {t("benefitVerified")}</span>
-            <span>✓ {t("benefitProtected")}</span>
-            <span>✓ {t("benefitTracking")}</span>
-            <span>✓ {t("benefitNoCommission")}</span>
-            <span>✓ AR / EN / TR</span>
+          <div className="hero-visual">
+            <ProductPreview t={t} />
+            <div className="access-benefits hero-benefits">
+              <span>✓ {t("benefitVerified")}</span>
+              <span>✓ {t("benefitProtected")}</span>
+              <span>✓ {t("benefitTracking")}</span>
+              <span>✓ {t("benefitNoCommission")}</span>
+              <span>✓ AR / EN / TR</span>
+            </div>
+            <div className="hero-auth">
+              <a className="button" href="/login">
+                {t("signIn")} ↗
+              </a>
+              <a className="button ghost" href="/register">
+                {t("createAccount")} ↗
+              </a>
+            </div>
           </div>
         </section>
         <LiveBorderStrip t={t} lang={document.documentElement.lang} />

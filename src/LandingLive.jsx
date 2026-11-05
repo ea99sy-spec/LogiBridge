@@ -60,6 +60,66 @@ export function LiveBorderStrip({ t, lang }) {
   );
 }
 
+// Hero picture: a small, clearly labelled example of what a trader sees for a Türkiye⇄Syria order.
+export function ProductPreview({ t }) {
+  return (
+    <figure className="product-preview" aria-label={t("gpsMap")}>
+      <div className="pp-card">
+        <div className="pp-head">
+          <div>
+            <b dir="auto">Gaziantep → Aleppo</b>
+          </div>
+        </div>
+        <div className="pp-stages">
+          <div className="done">
+            <span>✓</span>
+            <small>{t("leg_origin_leg")}</small>
+          </div>
+          <div className="active">
+            <span>2</span>
+            <small>{t("leg_clearance")}</small>
+          </div>
+          <div>
+            <span>3</span>
+            <small>{t("leg_destination_leg")}</small>
+          </div>
+        </div>
+        <svg className="pp-map" viewBox="0 0 320 150" role="img" aria-label={t("gpsMap")} direction="ltr">
+          <rect width="320" height="150" rx="12" fill="#eef3fb" />
+          <path
+            d="M30 30 C 90 40, 120 60, 160 78"
+            stroke="#2563eb"
+            strokeWidth="5"
+            fill="none"
+            strokeLinecap="round"
+          />
+          <path
+            d="M160 78 C 200 95, 240 105, 290 122"
+            stroke="#94a3b8"
+            strokeWidth="4"
+            strokeDasharray="8 8"
+            fill="none"
+            strokeLinecap="round"
+          />
+          <circle cx="160" cy="78" r="26" fill="#facc15" fillOpacity="0.25" stroke="#c27c0e" />
+          <circle cx="30" cy="30" r="6" fill="#102a56" />
+          <circle cx="290" cy="122" r="6" fill="#12805c" />
+          <circle cx="152" cy="74" r="9" fill="#2563eb" stroke="#fff" strokeWidth="3" />
+          <text x="42" y="24" fontSize="11" fill="#102a56">
+            Gaziantep
+          </text>
+          <text x="160" y="42" fontSize="11" fill="#7a5c00" textAnchor="middle">
+            {t("salameh").split(" / ")[0]}
+          </text>
+          <text x="236" y="144" fontSize="11" fill="#12805c">
+            Aleppo
+          </text>
+        </svg>
+      </div>
+    </figure>
+  );
+}
+
 // Counts up from the previous value to the new one (respects reduced motion).
 function CountUp({ value }) {
   const [shown, setShown] = useState(0);

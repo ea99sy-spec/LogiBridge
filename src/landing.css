@@ -958,3 +958,30 @@
   color: #facc15;
   font-weight: 700;
 }
+.landing-hero .hero-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  justify-self: center;
+  width: 100%;
+  max-width: 460px;
+}
+.landing-hero .hero-visual .product-preview {
+  width: 100%;
+  margin: 0;
+}
+.landing-hero .hero-benefits {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+.landing-hero .hero-auth {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.landing-hero .hero-auth a{text-decoration:none}
