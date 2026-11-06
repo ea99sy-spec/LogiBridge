@@ -1043,6 +1043,35 @@ function App() {
     (s) => admin || s.ownerId === user.id || s.carrierId === user.id,
   );
   const name = (id) => data.users.find((u) => u.id === id)?.name || id;
+  const MERCHANT_MAIN = ["dashboard", "newShipment", "shipments", "documents", "team", "profile"];
+  const isMerchant = accountKind(user) === "merchant";
+  const mainNav = isMerchant ? modules.filter((k) => MERCHANT_MAIN.includes(k)) : modules;
+  const moreNav = isMerchant ? modules.filter((k) => !MERCHANT_MAIN.includes(k)) : [];
+  const navButton = (k) => (
+    <button
+      className={activeTab === k ? "active" : ""}
+      onClick={() => {
+        setTab(k);
+        window.scrollTo({ top: 0 });
+      }}
+      key={k}
+    >
+      <span className="nav-icon">{icons[k]}</span>
+      {t(
+        k === "kyb" && user.accountType === "individual"
+          ? "passportVerification"
+          : k === "kyb" && admin
+            ? "verifyHub"
+            : k,
+      )}
+      {k === "documents" && pendingDocumentsCount(data, user) > 0 && (
+        <span className="nav-count alert">{pendingDocumentsCount(data, user)}</span>
+      )}
+      {k === "shipments" && (
+        <span className="nav-count">{data.shipments.filter((s) => s.status === "open").length}</span>
+      )}
+    </button>
+  );
   const heading = (key, desc) => (
     <div className="section-heading">
       <div>
@@ -1083,33 +1112,13 @@ function App() {
           <p className="sidebar-tagline">{t("tagline")}</p>
           <div className="nav-label">WORKSPACE</div>
           <nav>
-            {modules.map((k) => (
-              <button
-                className={activeTab === k ? "active" : ""}
-                onClick={() => {
-                  setTab(k);
-                  window.scrollTo({ top: 0 });
-                }}
-                key={k}
-              >
-                <span className="nav-icon">{icons[k]}</span>
-                {t(
-                  k === "kyb" && user.accountType === "individual"
-                    ? "passportVerification"
-                    : k === "kyb" && admin
-                      ? "verifyHub"
-                      : k,
-                )}
-                {k === "documents" && pendingDocumentsCount(data, user) > 0 && (
-                  <span className="nav-count alert">{pendingDocumentsCount(data, user)}</span>
-                )}
-                {k === "shipments" && (
-                  <span className="nav-count">
-                    {data.shipments.filter((s) => s.status === "open").length}
-                  </span>
-                )}
-              </button>
-            ))}
+            {mainNav.map(navButton)}
+            {moreNav.length > 0 && (
+              <details className="nav-more">
+                <summary>{t("moreSections")}</summary>
+                {moreNav.map(navButton)}
+              </details>
+            )}
           </nav>
           <InstallButton t={t} />
           <div className="sidebar-bottom">

@@ -1720,6 +1720,7 @@ export const extraRows = {
     "Company subscriptions, payments and the transfer log.",
     "Şirket abonelikleri, ödemeler ve transfer kaydı.",
   ],
+  moreSections: ["المزيد", "More", "Daha fazla"],
   showPricingSection: [
     "عرض قسم «كم يكلّف الاشتراك» في الصفحة الرئيسية",
     "Show the subscription price section on the home page",

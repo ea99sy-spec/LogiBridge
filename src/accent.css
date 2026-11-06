@@ -1100,3 +1100,18 @@ body {
   font-size: 15px;
   line-height: 1.7;
 }
+
+/* Merchant sidebar: six main sections, the rest under "More" */
+.nav-more {
+  margin-top: 6px;
+}
+.nav-more > summary {
+  cursor: pointer;
+  padding: 8px 12px;
+  color: rgba(255, 255, 255, 0.7);
+  list-style: none;
+  font-weight: 600;
+}
+.nav-more > summary::-webkit-details-marker {
+  display: none;
+}
