@@ -233,6 +233,8 @@ export async function createApp() {
       reports: crossingReports(s, false),
       // Best time to cross, from all queue reports so far (registered accounts only).
       times: Object.fromEntries(crossingKeys.map((k) => [k, crossingTimes(s.crossingStats, k)])),
+      // Live states set by the administrator (open, busy, closed).
+      live: s.settings?.crossingState || {},
     });
   });
   async function sessionFor(user, res, respond = true, memberId) {

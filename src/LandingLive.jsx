@@ -10,17 +10,35 @@ const hoursAgo = (iso) => Math.max(0, Math.round((Date.now() - Date.parse(iso)) 
 // "Live from the crossings": queue reports, next holiday and the latest administration notice,
 // all from the platform's own data (/api/border and the holiday calendar).
 export function LiveBorderStrip({ t, lang }) {
-  const [data, setData] = useState({ notices: [], reports: [] });
+  const [data, setData] = useState({ notices: [], reports: [], live: {} });
   useEffect(() => {
     fetch("/api/border")
       .then((r) => (r.ok ? r.json() : { notices: [], reports: [] }))
-      .then((v) => setData({ notices: v.notices || [], reports: v.reports || [] }))
+      .then((v) => setData({ notices: v.notices || [], reports: v.reports || [], live: v.live || {} }))
       .catch(() => {});
   }, []);
   const i = index(lang);
   const items = [];
-  for (const k of Object.keys(crossings).filter((k) => crossings[k].status === "open")) {
+  for (const k of Object.keys(crossings)) {
+    const live = data.live[k];
+    if (live === "closed") {
+      items.push(
+        <span key={k} className="live-item busy">
+          <b>{t(k)}</b>: {t("crossingClosedNow")}
+        </span>,
+      );
+      continue;
+    }
+    if (!live && crossings[k].status !== "open") continue;
     const r = data.reports.find((x) => x.crossing === k);
+    if (live === "busy") {
+      items.push(
+        <span key={k} className="live-item busy">
+          <b>{t(k)}</b>: {t("crossingBusyNow")}
+        </span>,
+      );
+      continue;
+    }
     items.push(
       <span key={k} className={`live-item ${r && r.level >= 3 ? "busy" : ""}`}>
         <b>{t(k)}</b>:{" "}

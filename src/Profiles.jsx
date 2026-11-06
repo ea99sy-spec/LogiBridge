@@ -618,6 +618,27 @@ export function AdminSiteSettings({ data, t, run, busy }) {
     <section className="panel form-stack">
       <h2>{t("siteSettings")}</h2>
       <CorridorCard t={t} />
+      <div className="form-stack">
+        <b>{t("crossingLiveTitle")}</b>
+        <small>{t("crossingLiveNote")}</small>
+        {crossingKeys.map((k) => (
+          <label className="field" key={k}>
+            <span>{t(k)}</span>
+            <select
+              value={settings.crossingState?.[k] || ""}
+              disabled={busy}
+              onChange={(e) =>
+                save({ crossingState: { ...(settings.crossingState || {}), [k]: e.target.value } })
+              }
+            >
+              <option value="">{t("crossingLiveAuto")}</option>
+              <option value="open">{t("crossingOpenNow")}</option>
+              <option value="busy">{t("crossingBusyNow")}</option>
+              <option value="closed">{t("crossingClosedNow")}</option>
+            </select>
+          </label>
+        ))}
+      </div>
       <label className="consent">
         <input
           type="checkbox"

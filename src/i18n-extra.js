@@ -1685,6 +1685,16 @@ export const extraRows = {
   ],
   afterFreePeriod: ["بعد الفترة المجانية:", "After the free period:", "Ücretsiz dönemden sonra:"],
   pricingSettings: ["أسعار الاشتراك", "Subscription prices", "Abonelik fiyatları"],
+  crossingLiveTitle: ["حالة المعابر الآن", "Crossing status now", "Kapıların şu anki durumu"],
+  crossingLiveNote: [
+    "غيّرها عند الازدحام أو الإغلاق المؤقت. تظهر فوراً في الصفحة الرئيسية.",
+    "Change it when a crossing is busy or temporarily closed. It appears on the home page at once.",
+    "Yoğunlukta veya geçici kapanmada değiştirin. Ana sayfada hemen görünür.",
+  ],
+  crossingLiveAuto: ["حسب المعلن", "As published", "Yayımlanan duruma göre"],
+  crossingOpenNow: ["مفتوح", "Open", "Açık"],
+  crossingBusyNow: ["مزدحم", "Busy", "Yoğun"],
+  crossingClosedNow: ["مغلق مؤقتاً", "Temporarily closed", "Geçici olarak kapalı"],
   showPricingSection: [
     "عرض قسم «كم يكلّف الاشتراك» في الصفحة الرئيسية",
     "Show the subscription price section on the home page",

@@ -211,6 +211,7 @@ export function operationRoutes(app) {
       showStats: s.settings?.showStats !== false,
       showHomeVerification: s.settings?.showHomeVerification !== false,
       showPricingSection: s.settings?.showPricingSection !== false,
+      crossingState: s.settings?.crossingState || {},
       company: s.settings?.company || {},
       prohibited: prohibitedRules(s.settings),
       pricing: pricingOf(s),
@@ -222,6 +223,18 @@ export function operationRoutes(app) {
   app.put("/api/admin/settings", async (req, res) => {
     if (!realAdmin(req, res)) return;
     const b = req.body;
+    // Live crossing states set by the administrator: open, busy or closed (empty = use the published status).
+    let crossingState;
+    if ("crossingState" in b) {
+      if (!b.crossingState || typeof b.crossingState !== "object") throw new Error("Invalid request");
+      crossingState = {};
+      for (const [k, v] of Object.entries(b.crossingState)) {
+        if (!crossingKeys.includes(k)) throw new Error("Invalid request");
+        if (v === "" || v == null) continue;
+        if (!["open", "busy", "closed"].includes(v)) throw new Error("Invalid request");
+        crossingState[k] = v;
+      }
+    }
     for (const k of [
       "demoLogin",
       "activityEmails",
@@ -313,6 +326,7 @@ export function operationRoutes(app) {
       if ("showStats" in b) s.settings.showStats = b.showStats;
       if ("showHomeVerification" in b) s.settings.showHomeVerification = b.showHomeVerification;
       if ("showPricingSection" in b) s.settings.showPricingSection = b.showPricingSection;
+      if (crossingState) s.settings.crossingState = crossingState;
       if (notifyEmail !== undefined) s.settings.notifyEmail = notifyEmail;
     });
     res.json({ ok: true });
