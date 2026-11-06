@@ -203,6 +203,7 @@ export async function createApp() {
       whatsapp: readState().settings?.publicWhatsapp || "",
       // The administrator can hide the verification section of the home page.
       homeVerification: readState().settings?.showHomeVerification !== false,
+      pricingSection: readState().settings?.showPricingSection !== false,
       // Legal details of the company running the platform (shown in the footer and legal pages).
       company: readState().settings?.company?.legalName ? readState().settings.company : null,
       // Subscription prices for the home page, unless the administrator hid them.

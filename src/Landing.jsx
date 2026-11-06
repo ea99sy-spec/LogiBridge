@@ -17,6 +17,7 @@ function useHealth() {
     pricing: null,
     whatsapp: "",
     homeVerification: true,
+    homePricing: true,
   });
   useEffect(() => {
     fetch("/api/health")
@@ -272,38 +273,40 @@ export default function Landing({ t, langSelect, user }) {
         )}
 
         {/* 7. Cost and questions */}
-        <section id="pricing" className="landing-section">
-          <div className="pricing-card">
-            <h2>{t("pricingTitle")}</h2>
-            <ul>
-              <li>✓ {t("pricingFree")}</li>
-              <li>✓ {t("pricingProtected")}</li>
-              <li>✓ {t("pricingDirect")}</li>
-            </ul>
-            {health.pricing && (
-              <>
-                <div className="price-grid">
-                  {types.map((type) => (
-                    <div key={type} className="price-item">
-                      <span>{t(type)}</span>
-                      <b>
-                        {health.pricing.prices[type] > 0 ? (
-                          <>
-                            <bdi dir="ltr">${health.pricing.prices[type]}</bdi>{" "}
-                            <small>/ {t("perMonth")}</small>
-                          </>
-                        ) : (
-                          t("freePrice")
-                        )}
-                      </b>
-                    </div>
-                  ))}
-                </div>
-                <p className="price-note">{t("yearlyNote")}</p>
-              </>
-            )}
-          </div>
-        </section>
+        {health.homePricing !== false && (
+          <section id="pricing" className="landing-section">
+            <div className="pricing-card">
+              <h2>{t("pricingTitle")}</h2>
+              <ul>
+                <li>✓ {t("pricingFree")}</li>
+                <li>✓ {t("pricingProtected")}</li>
+                <li>✓ {t("pricingDirect")}</li>
+              </ul>
+              {health.pricing && (
+                <>
+                  <div className="price-grid">
+                    {types.map((type) => (
+                      <div key={type} className="price-item">
+                        <span>{t(type)}</span>
+                        <b>
+                          {health.pricing.prices[type] > 0 ? (
+                            <>
+                              <bdi dir="ltr">${health.pricing.prices[type]}</bdi>{" "}
+                              <small>/ {t("perMonth")}</small>
+                            </>
+                          ) : (
+                            t("freePrice")
+                          )}
+                        </b>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="price-note">{t("yearlyNote")}</p>
+                </>
+              )}
+            </div>
+          </section>
+        )}
 
         <section id="faq" className="landing-section">
           <h2>{t("faqTitle")}</h2>

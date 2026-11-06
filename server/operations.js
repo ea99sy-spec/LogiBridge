@@ -210,6 +210,7 @@ export function operationRoutes(app) {
       enforceSubscription: s.settings?.enforceSubscription === true,
       showStats: s.settings?.showStats !== false,
       showHomeVerification: s.settings?.showHomeVerification !== false,
+      showPricingSection: s.settings?.showPricingSection !== false,
       company: s.settings?.company || {},
       prohibited: prohibitedRules(s.settings),
       pricing: pricingOf(s),
@@ -228,6 +229,7 @@ export function operationRoutes(app) {
       "enforceSubscription",
       "showStats",
       "showHomeVerification",
+      "showPricingSection",
     ])
       if (k in b && typeof b[k] !== "boolean") throw new Error("Invalid request");
     let notifyEmail;
@@ -310,6 +312,7 @@ export function operationRoutes(app) {
       if ("enforceSubscription" in b) s.settings.enforceSubscription = b.enforceSubscription;
       if ("showStats" in b) s.settings.showStats = b.showStats;
       if ("showHomeVerification" in b) s.settings.showHomeVerification = b.showHomeVerification;
+      if ("showPricingSection" in b) s.settings.showPricingSection = b.showPricingSection;
       if (notifyEmail !== undefined) s.settings.notifyEmail = notifyEmail;
     });
     res.json({ ok: true });

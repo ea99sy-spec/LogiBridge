@@ -444,7 +444,6 @@ export default function AccountAccess({ t, langSelect, run, busy, toast, onEnter
               )}
               {demo && !forgot && !register && (
                 <div className="demo-access">
-                  <span>{t("demoOnly")}</span>
                   {(type ? [type] : accounts.filter((k) => k !== "admin")).map((k) => (
                     <button
                       key={k}

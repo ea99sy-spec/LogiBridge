@@ -2,6 +2,7 @@ import { ReputationChips } from "./Reputation";
 import React, { useState, useEffect } from "react";
 import { waLink } from "../shared/wa";
 import { crossingKeys } from "../shared/crossings";
+import CorridorCard from "./CorridorCard";
 import { countryName } from "../shared/countries";
 export function PendingAccount({ data, t, navigate }) {
   const status = data.user.verificationStatus;
@@ -616,6 +617,7 @@ export function AdminSiteSettings({ data, t, run, busy }) {
   return (
     <section className="panel form-stack">
       <h2>{t("siteSettings")}</h2>
+      <CorridorCard t={t} />
       <label className="consent">
         <input
           type="checkbox"
@@ -627,6 +629,17 @@ export function AdminSiteSettings({ data, t, run, busy }) {
           <b>{t("showDemoAccounts")}</b>
           <br />
           <small>{t("showDemoAccountsNote")}</small>
+        </span>
+      </label>
+      <label className="consent">
+        <input
+          type="checkbox"
+          checked={settings.showPricingSection}
+          disabled={busy}
+          onChange={(e) => save({ showPricingSection: e.target.checked })}
+        />
+        <span>
+          <b>{t("showPricingSection")}</b>
         </span>
       </label>
       <label className="consent">

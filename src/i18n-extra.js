@@ -1523,7 +1523,7 @@ export const extraRows = {
     "Hesabınızı oluşturun veya kayıt olmadan herhangi bir türü demo hesapla deneyin.",
   ],
   tryAdminDemo: ["جرّب لوحة المسؤول", "Try the admin panel", "Yönetici panelini deneyin"],
-  pricingTitle: ["كم تكلّف المنصة؟", "What does it cost?", "Ücreti ne?"],
+  pricingTitle: ["كم يكلّف الاشتراك؟", "How much is the subscription?", "Abonelik ücreti ne kadar?"],
   pricingFree: [
     "اشتراك شهري ثابت، بدون أي عمولة على شحناتك أو عروضك.",
     "A flat monthly subscription, with no commission on your shipments or offers.",
@@ -1685,6 +1685,11 @@ export const extraRows = {
   ],
   afterFreePeriod: ["بعد الفترة المجانية:", "After the free period:", "Ücretsiz dönemden sonra:"],
   pricingSettings: ["أسعار الاشتراك", "Subscription prices", "Abonelik fiyatları"],
+  showPricingSection: [
+    "عرض قسم «كم يكلّف الاشتراك» في الصفحة الرئيسية",
+    "Show the subscription price section on the home page",
+    "Ana sayfada abonelik ücreti bölümünü göster",
+  ],
   showPrices: [
     "إظهار الأسعار في الصفحة الرئيسية",
     "Show prices on the home page",

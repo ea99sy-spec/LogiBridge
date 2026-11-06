@@ -605,7 +605,7 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
                 <tr key={a.id}>
                   <td>
                     <b>{a.name}</b>
-                    <small>{a.email || t(a.demo ? "demoOnly" : "emailPrivate")}</small>
+                    <small>{a.email || t("emailPrivate")}</small>
                   </td>
                   <td>{t(a.accountType)}</td>
                   <td>
