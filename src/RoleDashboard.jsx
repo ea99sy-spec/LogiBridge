@@ -114,6 +114,7 @@ export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }
     admin: "kyb",
   }[kind];
   const list = provider ? active : own;
+  const infoAtBottom = ["carrier", "broker", "supplier"].includes(kind);
   return (
     <>
       <div className="page-intro">
@@ -124,18 +125,22 @@ export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }
         </div>
         <span className="role-tag">{user.name}</span>
       </div>
-      <SubscriptionCard
-        sub={data.subscription}
-        t={t}
-        lang={document.documentElement.lang}
-        pricing={data.pricing}
-        accountType={user.accountType}
-      />
-      <HolidayCard
-        t={t}
-        lang={document.documentElement.lang}
-        navigate={allowed.includes("border") ? navigate : null}
-      />
+      {!infoAtBottom && (
+        <>
+          <SubscriptionCard
+            sub={data.subscription}
+            t={t}
+            lang={document.documentElement.lang}
+            pricing={data.pricing}
+            accountType={user.accountType}
+          />
+          <HolidayCard
+            t={t}
+            lang={document.documentElement.lang}
+            navigate={allowed.includes("border") ? navigate : null}
+          />
+        </>
+      )}
       <div className="operation-shortcuts">
         {actions[kind]
           .filter(([path]) => allowed.includes(path))
@@ -446,6 +451,22 @@ export function SupplierOrders({ data, t, run, busy, money }) {
         <div className="panel">
           <p>{t("empty")}</p>
         </div>
+      )}
+      {infoAtBottom && (
+        <>
+          <SubscriptionCard
+            sub={data.subscription}
+            t={t}
+            lang={document.documentElement.lang}
+            pricing={data.pricing}
+            accountType={user.accountType}
+          />
+          <HolidayCard
+            t={t}
+            lang={document.documentElement.lang}
+            navigate={allowed.includes("border") ? navigate : null}
+          />
+        </>
       )}
     </>
   );

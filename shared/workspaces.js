@@ -18,7 +18,6 @@ const modules = {
     "reports",
     "integrations",
     "returnTrips",
-    "prices",
     "team",
     "guide",
     "ratings",
