@@ -123,6 +123,8 @@ const modules = {
     "returnTrips",
     "prices",
     "kyb",
+    "disputes",
+    "subscriptionsAdmin",
     "shipments",
     "tracking",
     "documents",

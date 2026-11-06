@@ -52,6 +52,8 @@ import {
   Integrations,
 } from "./Advanced";
 import { VerificationPanel, ReviewQueue } from "./Verification";
+import DisputesAdmin from "./DisputesAdmin";
+import { AdminPayments } from "./Payments";
 
 // Browser errors go to the administration's error log (message and page only), at most a few per visit.
 if (typeof window !== "undefined" && !window.__lbErrors) {
@@ -1091,7 +1093,13 @@ function App() {
                 key={k}
               >
                 <span className="nav-icon">{icons[k]}</span>
-                {t(k === "kyb" && user.accountType === "individual" ? "passportVerification" : k)}
+                {t(
+                  k === "kyb" && user.accountType === "individual"
+                    ? "passportVerification"
+                    : k === "kyb" && admin
+                      ? "verifyHub"
+                      : k,
+                )}
                 {k === "documents" && pendingDocumentsCount(data, user) > 0 && (
                   <span className="nav-count alert">{pendingDocumentsCount(data, user)}</span>
                 )}
@@ -1508,12 +1516,25 @@ function App() {
             {activeTab === "kyb" &&
               (admin ? (
                 <>
+                  {heading("verifyHub", "verifyHubDesc")}
                   <ReviewQueue data={data} t={t} run={run} busy={busy} />
                   <DriverReview data={data} t={t} run={run} busy={busy} />
                 </>
               ) : (
                 <VerificationPanel data={data} user={user} t={t} run={run} busy={busy} />
               ))}
+            {activeTab === "disputes" && admin && (
+              <>
+                {heading("disputes", "disputesDesc")}
+                <DisputesAdmin data={data} t={t} run={run} busy={busy} />
+              </>
+            )}
+            {activeTab === "subscriptionsAdmin" && admin && (
+              <>
+                {heading("subscriptionsAdmin", "subscriptionsAdminDesc")}
+                <AdminPayments data={data} t={t} run={run} busy={busy} />
+              </>
+            )}
             {activeTab === "tracking" && (
               <TrackingPanel
                 data={data}

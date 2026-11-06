@@ -1695,6 +1695,31 @@ export const extraRows = {
   crossingOpenNow: ["مفتوح", "Open", "Açık"],
   crossingBusyNow: ["مزدحم", "Busy", "Yoğun"],
   crossingClosedNow: ["مغلق مؤقتاً", "Temporarily closed", "Geçici olarak kapalı"],
+  verifyHub: ["مركز التوثيق", "Verification hub", "Doğrulama merkezi"],
+  verifyHubDesc: [
+    "طلبات الشركات والأفراد بانتظار المراجعة: قبول، أو رفض مع سبب.",
+    "Company and individual applications waiting for review: approve, or reject with a reason.",
+    "İnceleme bekleyen şirket ve bireysel başvurular: onaylayın veya gerekçeyle reddedin.",
+  ],
+  disputes: ["النزاعات", "Disputes", "Uyuşmazlıklar"],
+  disputesDesc: [
+    "شحنات معترض عليها والمبلغ المحجوز. الاسترداد للعميل يتم من هنا.",
+    "Disputed shipments and the amount held. Refunds to the customer are made here.",
+    "İtiraz edilen sevkiyatlar ve tutulan tutar. Müşteriye iade buradan yapılır.",
+  ],
+  disputeNone: ["لا توجد نزاعات مفتوحة.", "No open disputes.", "Açık uyuşmazlık yok."],
+  disputeRefund: ["استرداد للعميل", "Refund customer", "Müşteriye iade et"],
+  disputeRefundConfirm: [
+    "سيتم إلغاء الشحنة وإرجاع المبلغ المحجوز للعميل. متأكد؟",
+    "The shipment will be cancelled and the held amount returned to the customer. Are you sure?",
+    "Sevkiyat iptal edilecek ve tutulan tutar müşteriye iade edilecek. Emin misiniz?",
+  ],
+  subscriptionsAdmin: ["الاشتراكات", "Subscriptions", "Abonelikler"],
+  subscriptionsAdminDesc: [
+    "اشتراكات الشركات والمدفوعات وسجل التحويلات.",
+    "Company subscriptions, payments and the transfer log.",
+    "Şirket abonelikleri, ödemeler ve transfer kaydı.",
+  ],
   showPricingSection: [
     "عرض قسم «كم يكلّف الاشتراك» في الصفحة الرئيسية",
     "Show the subscription price section on the home page",
