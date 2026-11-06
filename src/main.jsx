@@ -1271,20 +1271,15 @@ function App() {
             {activeTab === "directory" && <Directory data={data} t={t} navigate={setTab} />}
             {activeTab === "dashboard" && !data.approvalRequired && (
               <>
-                {!["carrier", "broker", "supplier"].includes(accountKind(user)) && (
-                  <StartHereCard
-                    kind={accountKind(user)}
-                    t={t}
-                    lang={lang}
-                    navigate={setTab}
-                    userId={user.id}
-                    modules={modules}
-                  />
-                )}
+                <StartHereCard
+                  kind={accountKind(user)}
+                  t={t}
+                  lang={lang}
+                  navigate={setTab}
+                  userId={user.id}
+                  modules={modules}
+                />
                 {admin && !user.demo && <NotesDueCard t={t} lang={lang} navigate={setTab} />}
-                {!admin && user.accountType !== "individual" && (
-                  <ReferralCard referral={data.referral} t={t} />
-                )}
                 <RoleDashboard
                   data={data}
                   t={t}
@@ -1294,16 +1289,6 @@ function App() {
                 />
                 {!admin && user.accountType !== "individual" && (
                   <ReferralCard referral={data.referral} t={t} />
-                )}
-                {["carrier", "broker", "supplier"].includes(accountKind(user)) && (
-                  <StartHereCard
-                    kind={accountKind(user)}
-                    t={t}
-                    lang={lang}
-                    navigate={setTab}
-                    userId={user.id}
-                    modules={modules}
-                  />
                 )}
               </>
             )}
