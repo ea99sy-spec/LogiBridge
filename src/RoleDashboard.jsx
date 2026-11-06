@@ -1,6 +1,7 @@
 import { HolidayCard } from "./Holidays";
 import { SubscriptionCard } from "./Subscription";
 import { MonthlyReportCard } from "./MonthlyReport";
+import ProviderPanels from "./ProviderPanels";
 import "./recurring.css";
 import React, { useState } from "react";
 import { accountKind, workspaceModules } from "../shared/workspaces";
@@ -165,6 +166,7 @@ export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }
           </article>
         ))}
       </div>
+      {infoAtBottom && <ProviderPanels kind={kind} data={data} t={t} navigate={navigate} money={money} />}
       <section className={`hero role-hero role-${kind}`}>
         <div>
           <span className="eyebrow">{t(`priority_${kind}`)}</span>

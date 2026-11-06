@@ -1115,3 +1115,26 @@ body {
 .nav-more > summary::-webkit-details-marker {
   display: none;
 }
+
+/* Provider overview: border status chips */
+.border-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+.border-chip {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  font-size: 14px;
+}
+.border-chip.open {
+  background: #dcfce7;
+}
+.border-chip.busy {
+  background: #fef3c7;
+}
+.border-chip.closed {
+  background: #fee2e2;
+}
