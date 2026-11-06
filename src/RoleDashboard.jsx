@@ -40,22 +40,27 @@ export default function RoleDashboard({ data, t, navigate, money, ShipmentCard }
       ["myDocuments", data.shipmentDocuments.length],
     ],
     carrier: [
-      ["assignedJobs", active.length],
-      ["availableJobs", data.shipments.filter((s) => s.status === "open").length],
-      ["submittedOffers", bids.length],
-      ["myVehicles", fleet.length],
+      ["openOffers", bids.length],
+      ["activeCargoes", active.length],
+      ["openJobs", data.shipments.filter((s) => s.status === "open").length],
+      ["subscriptionStatus", t("sub_" + (data.subscription?.status || "none"))],
     ],
     broker: [
-      ["assignedJobs", active.length],
-      ["availableJobs", data.shipments.filter((s) => s.status === "open").length],
-      ["submittedOffers", bids.length],
-      ["completedOperations", own.filter((s) => s.status === "delivered").length],
+      ["newClearanceRequests", data.shipments.filter((s) => s.status === "open").length],
+      ["clearanceInProgress", active.length],
+      ["openOffers", bids.length],
+      ["subscriptionStatus", t("sub_" + (data.subscription?.status || "none"))],
     ],
     supplier: [
-      ["myEquipment", listings.length],
       ["newEquipmentOrders", orders.filter((o) => o.status === "demo_reserved").length],
-      ["confirmedOrders", orders.filter((o) => o.status === "confirmed").length],
-      ["orderValue", money(orders.filter((o) => o.status !== "cancelled").reduce((n, o) => n + o.total, 0))],
+      ["rentedEquipment", orders.filter((o) => o.status === "confirmed").length],
+      ["totalSales", money(orders.filter((o) => o.status !== "cancelled").reduce((n, o) => n + o.total, 0))],
+      [
+        "verificationAndSubscription",
+        t(data.user.verified ? "verified" : "unverified") +
+          " · " +
+          t("sub_" + (data.subscription?.status || "none")),
+      ],
     ],
     admin: [
       ["pendingApplications", pending.length],
