@@ -1235,7 +1235,6 @@ function App() {
                   userId={user.id}
                   modules={modules}
                 />
-                {user.accountType !== "individual" && <ReferralCard referral={data.referral} t={t} />}
               </>
             )}
             {activeTab === "guide" && (
@@ -1274,6 +1273,9 @@ function App() {
                   money={money}
                   ShipmentCard={ShipmentCard}
                 />
+                {!admin && user.accountType !== "individual" && (
+                  <ReferralCard referral={data.referral} t={t} />
+                )}
               </>
             )}
             {activeTab === "jobs" && (carrier || user.role === "broker") && (

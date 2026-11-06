@@ -182,6 +182,7 @@ export default function Landing({ t, langSelect, user }) {
         <section id="accounts" className="landing-section">
           <h2>{t("accountsTitle")}</h2>
           <p className="section-lead">{t(health.demo ? "accountsLeadDemo" : "accountsLead")}</p>
+          {health.demo && <p className="muted small">{t("tryPlatformNote")}</p>}
           <div className="landing-account-cards">
             {types.map((type) => (
               <article key={type}>
@@ -199,7 +200,6 @@ export default function Landing({ t, langSelect, user }) {
               </article>
             ))}
           </div>
-          {health.demo && <p className="muted small">{t("tryPlatformNote")}</p>}
           {error && <p role="alert">{error}</p>}
         </section>
 

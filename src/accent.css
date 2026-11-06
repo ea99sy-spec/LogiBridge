@@ -1084,3 +1084,19 @@ svg.flag {
   padding: 8px 0;
   border-bottom: 1px solid #eef1f6;
 }
+
+/* Lighter Arabic text was hard to read on every page; lift the body weight and the About text. */
+body {
+  font-weight: 500;
+}
+.about-grid p {
+  font-size: 17px;
+  line-height: 1.9;
+}
+.about-values b {
+  font-size: 17px;
+}
+.about-values small {
+  font-size: 15px;
+  line-height: 1.7;
+}
