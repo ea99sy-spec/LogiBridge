@@ -1138,3 +1138,7 @@ body {
 .border-chip.closed {
   background: #fee2e2;
 }
+
+.currency-toggle { display: flex; gap: 6px; margin-top: 6px; }
+.currency-toggle button { padding: 4px 12px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer; }
+.currency-toggle button.active { background: #0b2545; color: #fff; border-color: #0b2545; }

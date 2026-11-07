@@ -106,8 +106,10 @@ export function quickEstimate(s, q, demo = false, now = Date.now()) {
   const byCity = list.filter((x) => q.city && (city(x.from) === city(q.city) || city(x.to) === city(q.city)));
   if (byCity.length >= MIN_DEALS) list = byCity;
   if (list.length < MIN_DEALS) return { deals: list.length, enough: false };
-  const sum = summarize(list, now);
-  return { enough: true, deals: sum.deals, low: sum.low, mid: sum.median, high: sum.high, basis: "route" };
+  // Price per tonne from real deals that have a weight; the shipment's chargeable weight is applied on top.
+  const rates = list.filter((x) => x.weight > 0).map((x) => x.price / (x.weight / 1000));
+  if (rates.length < MIN_DEALS) return { deals: rates.length, enough: false };
+  return { enough: true, deals: rates.length, ratePerTon: round2(median(rates)), basis: "route_tonne" };
 }
 
 // Partial (LTL) road freight: the charged weight is the largest of the actual weight,
@@ -156,7 +158,16 @@ export function priceIndexRoutes(app, { publicOnly } = {}) {
       q.length = req.query.length;
       q.width = req.query.width;
       q.height = req.query.height;
-      res.json({ ...quickEstimate(readState(), q, false), chargeable: chargeableWeight(q) });
+      const s = readState();
+      const est = quickEstimate(s, q, false);
+      const charge = chargeableWeight(q);
+      res.json({
+        enough: est.enough,
+        deals: est.deals,
+        chargeableKg: charge.kg,
+        priceUsd: est.enough ? Math.round((est.ratePerTon * charge.kg) / 1000) : null,
+        eurPerUsd: s.settings?.eurPerUsd || null,
+      });
     });
     return;
   }
