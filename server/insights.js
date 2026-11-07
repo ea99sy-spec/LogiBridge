@@ -5,11 +5,12 @@
 const DAY = 86400000;
 const round1 = (n) => Math.round(n * 10) / 10;
 
-export function onTimeOf(s, userId) {
+// On-time share for the shipments that match `match` (carrier or driver).
+export function onTimeFor(s, match) {
   let count = 0,
     onTime = 0;
   for (const sh of s.shipments || []) {
-    if (sh.carrierId !== userId || !sh.bidId || !["arrived", "delivered"].includes(sh.status)) continue;
+    if (!match(sh) || !sh.bidId || !["arrived", "delivered"].includes(sh.status)) continue;
     const bid = (s.bids || []).find((b) => b.id === sh.bidId);
     const arrived = sh.arrivedAt || sh.pod?.at || sh.completedAt;
     if (!bid || !arrived) continue;
@@ -21,6 +22,10 @@ export function onTimeOf(s, userId) {
     if (Date.parse(arrived) <= due.getTime()) onTime++;
   }
   return { count, pct: count ? Math.round((onTime / count) * 100) : null };
+}
+
+export function onTimeOf(s, userId) {
+  return onTimeFor(s, (sh) => sh.carrierId === userId);
 }
 
 export function paySpeedOf(s, userId) {

@@ -2611,6 +2611,8 @@ export const extraRows = {
     "Ücrete esas ağırlık = gerçek ağırlık ile hacim × 333 kg/m³ değerlerinden büyüğü. Paletler ve yükleme metresi için aşağıdaki hesaplayıcıyı kullanın.",
   ],
   driverAwaitingVerify: ["(بانتظار التحقق)", "(awaiting verification)", "(doğrulama bekliyor)"],
+  driverTrips: ["رحلات مكتملة", "Completed trips", "Tamamlanan sefer"],
+  driverOnTime: ["في الموعد", "On time", "Zamanında"],
   weightLimitError: [
     "الوزن لازم يكون بين 1 و 24,000 كغ.",
     "Weight must be between 1 and 24,000 kg.",
