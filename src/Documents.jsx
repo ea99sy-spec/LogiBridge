@@ -489,6 +489,82 @@ function FileView({ file, data, user, t, run, busy, lang, setError }) {
   );
 }
 
+// Every document of the account across all shipments, grouped by type. Downloads go through the
+// server, which watermarks copies that were not uploaded by this account.
+const ARCHIVE_KINDS = [
+  "invoice",
+  "packing",
+  "origin",
+  "transport",
+  "customs",
+  "insurance",
+  "delivery",
+  "warranty",
+  "other",
+];
+export function DocumentArchive({ data, t, lang }) {
+  const [kind, setKind] = useState("all");
+  const [query, setQuery] = useState("");
+  const shipments = useMemo(() => new Map((data.shipments || []).map((s) => [s.id, s])), [data.shipments]);
+  const rows = (data.shipmentDocuments || [])
+    .filter((d) => !String(d.kind || "").startsWith("photo_"))
+    .filter((d) => kind === "all" || d.kind === kind)
+    .map((d) => {
+      const sh = shipments.get(d.shipmentId);
+      return { d, title: sh?.title || "", route: sh ? `${sh.origin} → ${sh.destination}` : "" };
+    })
+    .filter(
+      (r) =>
+        !query || `${r.d.filename || ""} ${r.title} ${r.route}`.toLowerCase().includes(query.toLowerCase()),
+    )
+    .sort((a, b) => String(b.d.createdAt).localeCompare(String(a.d.createdAt)));
+  return (
+    <details className="doc-archive" open>
+      <summary>
+        {t("docArchiveTitle")} ({rows.length})
+      </summary>
+      <p className="muted small">{t("docArchiveDesc")}</p>
+      <div className="archive-filters">
+        <select value={kind} onChange={(e) => setKind(e.target.value)} aria-label={t("docArchiveKind")}>
+          <option value="all">{t("docArchiveAll")}</option>
+          {ARCHIVE_KINDS.map((k) => (
+            <option key={k} value={k}>
+              {kindLabel(t, k)}
+            </option>
+          ))}
+        </select>
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t("docArchiveSearch")}
+          aria-label={t("docArchiveSearch")}
+        />
+      </div>
+      {rows.length === 0 ? (
+        <p className="muted">{t("docArchiveEmpty")}</p>
+      ) : (
+        <ul className="archive-list">
+          {rows.slice(0, 200).map(({ d, title, route }) => (
+            <li key={d.id}>
+              <b>{kindLabel(t, d.kind)}</b> · <span dir="ltr">{d.filename || "—"}</span>
+              <small className="muted">
+                {" "}
+                {title}
+                {route ? ` · ${route}` : ""} ·{" "}
+                {new Date(d.createdAt).toLocaleDateString(lang, { dateStyle: "medium" })}
+              </small>{" "}
+              <a className="text-button" href={`/api/shipment-documents/${d.id}`}>
+                {t("download")}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </details>
+  );
+}
+
 export function DocumentCenter({ data, user, t, run, busy, navigate, lang }) {
   const files = useMemo(() => filesFor(data, user), [data, user]);
   const wanted = new URLSearchParams(window.location.search).get("id");
@@ -515,6 +591,7 @@ export function DocumentCenter({ data, user, t, run, busy, navigate, lang }) {
     <>
       <div className="print-blocked">{t("printBlocked")}</div>
       <div className="protected-docs" onContextMenu={block} onDragStart={block} onCopy={block}>
+        <DocumentArchive data={data} t={t} lang={lang} />
         <div className="section-heading">
           <div>
             <h1>{t("uploadDocuments")}</h1>

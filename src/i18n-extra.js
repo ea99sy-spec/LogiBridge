@@ -2630,6 +2630,20 @@ export const extraRows = {
   pkgMedium: ["كرتونة متوسطة (60×40×40 سم)", "Medium carton (60×40×40 cm)", "Orta koli (60×40×40 cm)"],
   pkgLarge: ["كرتونة كبيرة (80×60×60 سم)", "Large carton (80×60×60 cm)", "Büyük koli (80×60×60 cm)"],
   pkgPallet: ["باليت (120×80×120 سم)", "Pallet (120×80×120 cm)", "Palet (120×80×120 cm)"],
+  docArchiveTitle: ["أرشيف المستندات", "Document archive", "Belge arşivi"],
+  docArchiveDesc: [
+    "كل فواتيرك وشهاداتك وبياناتك الجمركية من كل الشحنات، مرتبة حسب النوع.",
+    "All your invoices, certificates and customs documents from every shipment, sorted by type.",
+    "Tüm sevkiyatlarınızdaki faturalar, belgeler ve gümrük evrakları, türe göre sıralı.",
+  ],
+  docArchiveAll: ["كل الأنواع", "All types", "Tüm türler"],
+  docArchiveKind: ["نوع المستند", "Document type", "Belge türü"],
+  docArchiveSearch: [
+    "ابحث باسم الملف أو الشحنة",
+    "Search by file or shipment",
+    "Dosya veya sevkiyata göre ara",
+  ],
+  docArchiveEmpty: ["ما في مستندات بعد.", "No documents yet.", "Henüz belge yok."],
   weightLimitError: [
     "الوزن لازم يكون بين 1 و 24,000 كغ.",
     "Weight must be between 1 and 24,000 kg.",
