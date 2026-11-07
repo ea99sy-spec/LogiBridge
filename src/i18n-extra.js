@@ -2623,6 +2623,13 @@ export const extraRows = {
   flag_ratings: ["التقييمات", "Ratings", "Değerlendirmeler"],
   flag_marketplace: ["سوق العروض", "Offer marketplace", "Teklif pazarı"],
   flag_contracts: ["العقود الإلكترونية", "Electronic contracts", "Elektronik sözleşmeler"],
+  pkgType: ["نوع الوحدة", "Package type", "Koli türü"],
+  pkgCount: ["العدد", "Quantity", "Adet"],
+  pkgEnvelope: ["ظرف أوراق (35×25×3 سم)", "Document envelope (35×25×3 cm)", "Evrak zarfı (35×25×3 cm)"],
+  pkgSmall: ["كرتونة صغيرة (40×30×30 سم)", "Small carton (40×30×30 cm)", "Küçük koli (40×30×30 cm)"],
+  pkgMedium: ["كرتونة متوسطة (60×40×40 سم)", "Medium carton (60×40×40 cm)", "Orta koli (60×40×40 cm)"],
+  pkgLarge: ["كرتونة كبيرة (80×60×60 سم)", "Large carton (80×60×60 cm)", "Büyük koli (80×60×60 cm)"],
+  pkgPallet: ["باليت (120×80×120 سم)", "Pallet (120×80×120 cm)", "Palet (120×80×120 cm)"],
   weightLimitError: [
     "الوزن لازم يكون بين 1 و 24,000 كغ.",
     "Weight must be between 1 and 24,000 kg.",

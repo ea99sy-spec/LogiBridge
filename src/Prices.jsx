@@ -95,6 +95,19 @@ export function PriceIndexPage({ t, lang }) {
 }
 
 // Home page: "How much will my shipment cost?" from real deals.
+// Standard package sizes in cm (length, width, height). The visitor only chooses the type and the count.
+const PACKAGES = {
+  envelope: [35, 25, 3],
+  small: [40, 30, 30],
+  medium: [60, 40, 40],
+  large: [80, 60, 60],
+  pallet: [120, 80, 120],
+};
+const dimsOf = (pkg) => {
+  const d = PACKAGES[pkg];
+  return d ? { length: d[0], width: d[1], height: d[2] } : {};
+};
+
 export function QuickPrice({ t }) {
   const lang = document.documentElement.lang || "ar";
   const countries = countryOptions(lang);
@@ -128,9 +141,7 @@ export function QuickPrice({ t }) {
             city: f.get("city") || "",
             weight: String(weight),
             pallets: f.get("pallets") || "",
-            length: f.get("length") || "",
-            width: f.get("width") || "",
-            height: f.get("height") || "",
+            ...dimsOf(f.get("pkg")),
           });
           try {
             setResult(await (await fetch("/api/public/price-estimate?" + q)).json());
@@ -168,27 +179,20 @@ export function QuickPrice({ t }) {
           <small>{t("weight")} (kg)</small>
           <input name="weight" type="number" min="1" max="24000" required placeholder="500" />
         </label>
-        <fieldset className="pallet-fields">
-          <legend>
-            <small>{t("palletSize")}</small>
-          </legend>
-          <label>
-            <small>{t("palletCount")}</small>
-            <input name="pallets" type="number" min="1" max="100" placeholder="1" />
-          </label>
-          <label>
-            <small>{t("lenLabel")}</small>
-            <input name="length" type="number" min="1" max="400" placeholder="120" />
-          </label>
-          <label>
-            <small>{t("widthLabel")}</small>
-            <input name="width" type="number" min="1" max="400" placeholder="80" />
-          </label>
-          <label>
-            <small>{t("heightLabel")}</small>
-            <input name="height" type="number" min="1" max="400" placeholder="120" />
-          </label>
-        </fieldset>
+        <label>
+          <small>{t("pkgType")}</small>
+          <select name="pkg" defaultValue="small">
+            <option value="envelope">{t("pkgEnvelope")}</option>
+            <option value="small">{t("pkgSmall")}</option>
+            <option value="medium">{t("pkgMedium")}</option>
+            <option value="large">{t("pkgLarge")}</option>
+            <option value="pallet">{t("pkgPallet")}</option>
+          </select>
+        </label>
+        <label>
+          <small>{t("pkgCount")}</small>
+          <input name="pallets" type="number" min="1" max="100" defaultValue="1" />
+        </label>
         <button className="button" disabled={busy}>
           {t("estimatePrice")}
         </button>
