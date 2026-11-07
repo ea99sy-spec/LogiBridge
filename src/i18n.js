@@ -272,18 +272,14 @@ const rows = {
   ],
   locationOnly: ["تحديث الموقع فقط", "Location update only", "Yalnızca konum güncelle"],
   saveUpdate: ["حفظ التحديث", "Save update", "Güncellemeyi kaydet"],
-  priceEstimate: [
-    "السعر التقديري للمسار والوزن",
-    "Estimated route and weight price",
-    "Rota ve ağırlık fiyat tahmini",
-  ],
+  priceEstimate: ["السعر التقديري للمسار", "Estimated route price", "Rota fiyat tahmini"],
   samples: ["عدد العروض المشابهة", "Comparable offers", "Benzer teklifler"],
   lowConfidence: ["ثقة منخفضة", "Low confidence", "Düşük güven"],
   moderateConfidence: ["ثقة متوسطة", "Moderate confidence", "Orta güven"],
   noPriceData: [
-    "أدخل المدن والوزن؛ يظهر التقدير عند توفر عروض مشابهة.",
-    "Enter cities and weight. An estimate appears when comparable offers exist.",
-    "Şehirleri ve ağırlığı girin. Benzer teklifler varsa tahmin gösterilir.",
+    "أدخل المدن؛ يظهر التقدير عند توفر صفقات حقيقية كافية على المسار.",
+    "Enter the cities. An estimate appears when enough real deals exist on the route.",
+    "Şehirleri girin. Güzergâhta yeterli gerçek anlaşma olduğunda tahmin görünür.",
   ],
   estimateNote: [
     "متوسط تاريخي موزون، وليس عرضًا ملزمًا أو نموذج ذكاء اصطناعي مدرّب.",
