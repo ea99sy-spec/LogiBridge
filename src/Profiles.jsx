@@ -618,6 +618,25 @@ export function AdminSiteSettings({ data, t, run, busy }) {
     <section className="panel form-stack">
       <h2>{t("siteSettings")}</h2>
       <CorridorCard t={t} />
+      {settings && (
+        <label className="cost-check">
+          <small>{t("eurRateLabel")}</small>
+          <input
+            type="number"
+            step="0.0001"
+            min="0.1"
+            max="5"
+            key={String(settings.eurPerUsd)}
+            defaultValue={settings.eurPerUsd ?? ""}
+            disabled={busy}
+            onBlur={(e) => {
+              const v = e.target.value;
+              if (String(settings.eurPerUsd ?? "") !== v) save({ eurPerUsd: v === "" ? null : Number(v) });
+            }}
+          />
+          <small className="muted">{t("eurRateDesc")}</small>
+        </label>
+      )}
       {data.flags && (
         <div className="feature-flags">
           <h3>{t("optFlagsTitle")}</h3>

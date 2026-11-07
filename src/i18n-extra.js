@@ -2644,6 +2644,18 @@ export const extraRows = {
     "Dosya veya sevkiyata göre ara",
   ],
   docArchiveEmpty: ["ما في مستندات بعد.", "No documents yet.", "Henüz belge yok."],
+  finalPriceTitle: ["السعر التقديري للشحنة", "Estimated shipment price", "Tahmini sevkiyat fiyatı"],
+  finalPriceNote: [
+    "مبني على متوسط أسعار الصفقات الحقيقية على هذا المسار، حسب الطن. السعر النهائي يحدده عرض الناقل.",
+    "Based on the average real deal price on this route, per tonne. The final price is set by the carrier's offer.",
+    "Bu güzergâhtaki gerçek anlaşmaların tonluk ortalama fiyatına dayanır. Nihai fiyatı taşıyıcının teklifi belirler.",
+  ],
+  eurRateLabel: ["سعر صرف اليورو (يورو لكل دولار)", "EUR per USD rate", "EUR/USD kuru (1 USD = ? EUR)"],
+  eurRateDesc: [
+    "يُستخدم لعرض السعر باليورو. اتركه فارغاً لإخفاء خيار اليورو.",
+    "Used to show prices in euros. Leave empty to hide the euro option.",
+    "Fiyatları euro olarak göstermek için kullanılır. Euro seçeneğini gizlemek için boş bırakın.",
+  ],
   weightLimitError: [
     "الوزن لازم يكون بين 1 و 24,000 كغ.",
     "Weight must be between 1 and 24,000 kg.",

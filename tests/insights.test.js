@@ -81,8 +81,9 @@ test("price index needs three deals and uses route prices, not weight", () => {
   assert.equal(route.perTon, undefined);
   const est = quickEstimate(s, { from: "TR", to: "SY", weight: 5000 });
   assert.equal(est.enough, true);
-  assert.equal(est.mid, 1100);
-  assert.equal(est.basis, "route");
+  // 1100 for 10 t = 110 per tonne; the rate is applied to the chargeable weight.
+  assert.equal(est.ratePerTon, 110);
+  assert.equal(est.basis, "route_tonne");
   // Demo deals never appear in the registered world.
   assert.equal(priceIndex({ ...s, users: users.map((u) => ({ ...u, demo: true })) }, false, now).length, 0);
 });

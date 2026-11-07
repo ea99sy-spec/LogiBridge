@@ -212,6 +212,7 @@ export function operationRoutes(app) {
       showHomeVerification: s.settings?.showHomeVerification !== false,
       showPricingSection: s.settings?.showPricingSection !== false,
       crossingState: s.settings?.crossingState || {},
+      eurPerUsd: s.settings?.eurPerUsd ?? null,
       company: s.settings?.company || {},
       prohibited: prohibitedRules(s.settings),
       pricing: pricingOf(s),
@@ -245,6 +246,16 @@ export function operationRoutes(app) {
       "showPricingSection",
     ])
       if (k in b && typeof b[k] !== "boolean") throw new Error("Invalid request");
+    // Euro rate for showing prices in EUR (EUR per 1 USD). Empty = no EUR option.
+    let eurPerUsd;
+    if ("eurPerUsd" in b) {
+      if (b.eurPerUsd === null || b.eurPerUsd === "") eurPerUsd = null;
+      else {
+        const v = Number(b.eurPerUsd);
+        if (!(v >= 0.1 && v <= 5)) throw new Error("Invalid request");
+        eurPerUsd = v;
+      }
+    }
     let notifyEmail;
     if ("notifyEmail" in b) {
       notifyEmail = String(b.notifyEmail || "")
@@ -328,6 +339,7 @@ export function operationRoutes(app) {
       if ("showPricingSection" in b) s.settings.showPricingSection = b.showPricingSection;
       if (crossingState) s.settings.crossingState = crossingState;
       if (notifyEmail !== undefined) s.settings.notifyEmail = notifyEmail;
+      if (eurPerUsd !== undefined) s.settings.eurPerUsd = eurPerUsd;
     });
     res.json({ ok: true });
   });

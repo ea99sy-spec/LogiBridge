@@ -119,7 +119,7 @@ export function QuickPrice({ t }) {
   const [result, setResult] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const c = result?.chargeable;
+  const [currency, setCurrency] = useState("USD");
   return (
     <section className="landing-section quick-price" id="quick-price">
       <h2>{t("quickPriceTitle")}</h2>
@@ -202,41 +202,37 @@ export function QuickPrice({ t }) {
           {error}
         </p>
       )}
-      {c && (
-        <div className="quick-price-result charge-box" role="status">
-          <small>{t("chargeTitle")}</small>
-          <strong dir="ltr">{c.kg.toLocaleString("en")} kg</strong>
-          <ul className="price-facts">
-            <li>
-              {t("chargeActual")}: <span dir="ltr">{c.actualKg.toLocaleString("en")} kg</span>
-            </li>
-            <li>
-              {t("chargeVolume")}:{" "}
-              <span dir="ltr">
-                {c.m3} m³ ≈ {c.volumeKg.toLocaleString("en")} kg
-              </span>
-            </li>
-            <li>
-              {t("chargeLdm")}:{" "}
-              <span dir="ltr">
-                {c.ldm} LDM ≈ {c.ldmKg.toLocaleString("en")} kg
-              </span>
-            </li>
-          </ul>
-          <small className="muted">{t("chargeNote")}</small>
-        </div>
-      )}
       {result &&
         (result.enough ? (
           <div className="quick-price-result" role="status">
-            <small>{t("estimateRange")}</small>
+            <small>
+              {t("chargeTitle")}: <span dir="ltr">{result.chargeableKg.toLocaleString("en")} kg</span>
+            </small>
+            <small>{t("finalPriceTitle")}</small>
             <strong dir="ltr">
-              {usd(result.low)} – {usd(result.high)}
+              {currency === "EUR" && result.eurPerUsd
+                ? "€ " + Math.round(result.priceUsd * result.eurPerUsd).toLocaleString("en")
+                : "$ " + result.priceUsd.toLocaleString("en")}
             </strong>
-            <span>
-              {t("estimateMiddle")}: <b>{usd(result.mid)}</b>
-            </span>
-            <small className="muted">{t("estimateBasisRoute").replace("{n}", result.deals)}</small>
+            {result.eurPerUsd && (
+              <div className="currency-toggle">
+                <button
+                  type="button"
+                  className={currency === "USD" ? "active" : ""}
+                  onClick={() => setCurrency("USD")}
+                >
+                  USD
+                </button>
+                <button
+                  type="button"
+                  className={currency === "EUR" ? "active" : ""}
+                  onClick={() => setCurrency("EUR")}
+                >
+                  EUR
+                </button>
+              </div>
+            )}
+            <small className="muted">{t("finalPriceNote")}</small>
             <a className="button" href="/register">
               {t("getRealOffers")} ↗
             </a>
