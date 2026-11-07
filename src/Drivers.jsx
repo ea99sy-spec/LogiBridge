@@ -210,8 +210,8 @@ export function ShipmentDriver({ s, data, user, t, run, busy }) {
         >
           <option value="">{t("chooseDriver")}</option>
           {data.drivers.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name} · {d.plate} {d.status === "verified" ? "✓" : ""}
+            <option key={d.id} value={d.id} disabled={d.status !== "verified"}>
+              {d.name} · {d.plate} {d.status === "verified" ? "✓" : t("driverAwaitingVerify")}
             </option>
           ))}
         </select>

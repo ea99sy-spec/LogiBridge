@@ -7,6 +7,7 @@ import { AccountsReport } from "./AccountsReport";
 import { ReputationChips } from "./Reputation";
 import { FeedbackPage, FeedbackAdmin } from "./Feedback";
 import { PriceIndexPage } from "./Prices";
+import ToolsPage from "./Tools";
 import { ReturnTrips } from "./ReturnTrips";
 import { ReferralCard } from "./Referral";
 import { DriverReview, ShipmentDriver } from "./Drivers";
@@ -991,6 +992,7 @@ function App() {
   );
   if (window.location.pathname === "/driver") return <DriverPortal t={t} />;
   if (window.location.pathname === "/border") return <BorderPage t={t} lang={lang} langSelect={langSelect} />;
+  if (window.location.pathname === "/tools") return <ToolsPage t={t} langSelect={langSelect} />;
   if (/^\/t\/[a-f0-9]{40}$/.test(window.location.pathname))
     return <PublicTracking t={t} lang={lang} langSelect={langSelect} />;
   if (window.location.pathname === "/sales-terms")

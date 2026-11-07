@@ -2586,6 +2586,31 @@ export const extraRows = {
     "Based on {n} real deals, scaled by weight.",
     "Ağırlığa göre {n} gerçek anlaşmadan hesaplandı.",
   ],
+  toolsTitle: ["أدوات مجانية", "Free tools", "Ücretsiz araçlar"],
+  toolsIntro: [
+    "احسب حجم شحنتك ووزنها المحسوب وسعرها التقريبي قبل ما تنشر طلبك، بدون تسجيل.",
+    "Work out your shipment's volume, chargeable weight and rough price before you post your request, no sign-up needed.",
+    "Talebinizi yayınlamadan önce sevkiyatınızın hacmini, ücrete esas ağırlığını ve yaklaşık fiyatını hesaplayın, kayıt gerekmez.",
+  ],
+  cbmTitle: [
+    "حاسبة الحجم (CBM) والوزن",
+    "Volume (CBM) and weight calculator",
+    "Hacim (CBM) ve ağırlık hesaplayıcı",
+  ],
+  cbmIntro: [
+    "أدخل أبعاد القطعة الواحدة بالسنتيمتر وعدد القطع.",
+    "Enter the size of one piece in cm and the number of pieces.",
+    "Tek bir parçanın ölçülerini cm olarak ve parça sayısını girin.",
+  ],
+  cbmPieces: ["عدد القطع", "Pieces", "Parça sayısı"],
+  cbmWeight: ["الوزن الفعلي (كغ)", "Actual weight (kg)", "Gerçek ağırlık (kg)"],
+  cbmVolume: ["الحجم", "Volume", "Hacim"],
+  cbmNote: [
+    "الوزن المحسوب = الأكبر بين الوزن الفعلي والحجم × 333 كغ/م³. للبالتات والمتر الطولي استخدم الحاسبة أدناه.",
+    "Chargeable weight = the larger of actual weight and volume × 333 kg/m³. For pallets and loading metres, use the calculator below.",
+    "Ücrete esas ağırlık = gerçek ağırlık ile hacim × 333 kg/m³ değerlerinden büyüğü. Paletler ve yükleme metresi için aşağıdaki hesaplayıcıyı kullanın.",
+  ],
+  driverAwaitingVerify: ["(بانتظار التحقق)", "(awaiting verification)", "(doğrulama bekliyor)"],
   weightLimitError: [
     "الوزن لازم يكون بين 1 و 24,000 كغ.",
     "Weight must be between 1 and 24,000 kg.",
@@ -2958,6 +2983,11 @@ export const extraRows = {
     "عيّن الناقل سائقًا لشحنتك",
     "The carrier assigned a driver to your shipment",
     "Taşıyıcı sevkiyatınıza sürücü atadı",
+  ],
+  "err_Driver must be verified before assignment": [
+    "لازم يكون السائق متحققاً قبل تعيينه على الشحنة.",
+    "The driver must be verified before being assigned to a shipment.",
+    "Sürücü, sevkiyata atanmadan önce doğrulanmış olmalı.",
   ],
   "err_Driver unavailable": ["السائق غير موجود.", "Driver unavailable.", "Sürücü bulunamadı."],
   "err_Too many drivers": ["عدد السائقين كبير جدًا.", "Too many drivers.", "Çok fazla sürücü."],
