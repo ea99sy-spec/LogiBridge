@@ -110,6 +110,35 @@ export function quickEstimate(s, q, demo = false, now = Date.now()) {
   return { enough: true, deals: sum.deals, low: sum.low, mid: sum.median, high: sum.high, basis: "route" };
 }
 
+// Partial (LTL) road freight: the charged weight is the largest of the actual weight,
+// volume (1 m³ = 333 kg) and loading metres (LDM = pallet footprint / 2.40 m trailer width).
+// KG_PER_LDM is an assumption; change it if the business uses another factor.
+export const VOLUME_KG_PER_M3 = 333;
+export const KG_PER_LDM = 1850;
+const TRAILER_WIDTH_M = 2.4;
+const cap = (v, max) => Math.min(Math.max(Number(v) || 0, 0), max);
+const round2 = (n) => Math.round(n * 100) / 100;
+export function chargeableWeight(q) {
+  const actualKg = cap(q.weight, 24000);
+  const pallets = Math.round(cap(q.pallets, 100));
+  const L = cap(q.length, 400);
+  const W = cap(q.width, 400);
+  const H = cap(q.height, 400);
+  const fits = pallets > 0 && L > 0 && W > 0;
+  const ldm = fits ? (pallets * (L / 100) * (W / 100)) / TRAILER_WIDTH_M : 0;
+  const m3 = fits && H > 0 ? (pallets * L * W * H) / 1e6 : 0;
+  const volumeKg = m3 * VOLUME_KG_PER_M3;
+  const ldmKg = ldm * KG_PER_LDM;
+  return {
+    kg: Math.round(Math.max(actualKg, volumeKg, ldmKg)),
+    actualKg: Math.round(actualKg),
+    m3: round2(m3),
+    volumeKg: Math.round(volumeKg),
+    ldm: round2(ldm),
+    ldmKg: Math.round(ldmKg),
+  };
+}
+
 export function priceIndexRoutes(app, { publicOnly } = {}) {
   if (publicOnly) {
     // Public: registered accounts' deals only.
@@ -122,7 +151,12 @@ export function priceIndexRoutes(app, { publicOnly } = {}) {
         to: String(req.query.to || "").slice(0, 2),
         city: String(req.query.city || "").slice(0, 80),
       };
-      res.json(quickEstimate(readState(), q, false));
+      q.weight = req.query.weight;
+      q.pallets = req.query.pallets;
+      q.length = req.query.length;
+      q.width = req.query.width;
+      q.height = req.query.height;
+      res.json({ ...quickEstimate(readState(), q, false), chargeable: chargeableWeight(q) });
     });
     return;
   }

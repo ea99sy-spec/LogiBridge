@@ -154,6 +154,7 @@ export function driverRoutes(app) {
       }
       const d = (s.drivers || []).find((x) => x.id === req.body.driverId && x.carrierId === req.user.id);
       if (!d) throw new Error("Driver unavailable");
+      if (d.status !== "verified") throw new Error("Driver must be verified before assignment");
       sh.driverId = d.id;
       notice(
         s,

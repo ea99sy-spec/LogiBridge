@@ -105,6 +105,8 @@ export function QuickPrice({ t }) {
   ];
   const [result, setResult] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const c = result?.chargeable;
   return (
     <section className="landing-section quick-price" id="quick-price">
       <h2>{t("quickPriceTitle")}</h2>
@@ -113,11 +115,22 @@ export function QuickPrice({ t }) {
         onSubmit={async (e) => {
           e.preventDefault();
           const f = new FormData(e.currentTarget);
+          const weight = Number(f.get("weight"));
+          if (!(weight >= 1 && weight <= 24000)) {
+            setError(t("weightLimitError"));
+            return;
+          }
+          setError("");
           setBusy(true);
           const q = new URLSearchParams({
             from: f.get("from"),
             to: f.get("to"),
             city: f.get("city") || "",
+            weight: String(weight),
+            pallets: f.get("pallets") || "",
+            length: f.get("length") || "",
+            width: f.get("width") || "",
+            height: f.get("height") || "",
           });
           try {
             setResult(await (await fetch("/api/public/price-estimate?" + q)).json());
@@ -151,10 +164,64 @@ export function QuickPrice({ t }) {
           <small>{t("cityOptional")}</small>
           <input name="city" maxLength={80} placeholder={t("cityExample")} />
         </label>
+        <label>
+          <small>{t("weight")} (kg)</small>
+          <input name="weight" type="number" min="1" max="24000" required placeholder="500" />
+        </label>
+        <fieldset className="pallet-fields">
+          <legend>
+            <small>{t("palletSize")}</small>
+          </legend>
+          <label>
+            <small>{t("palletCount")}</small>
+            <input name="pallets" type="number" min="1" max="100" placeholder="1" />
+          </label>
+          <label>
+            <small>{t("lenLabel")}</small>
+            <input name="length" type="number" min="1" max="400" placeholder="120" />
+          </label>
+          <label>
+            <small>{t("widthLabel")}</small>
+            <input name="width" type="number" min="1" max="400" placeholder="80" />
+          </label>
+          <label>
+            <small>{t("heightLabel")}</small>
+            <input name="height" type="number" min="1" max="400" placeholder="120" />
+          </label>
+        </fieldset>
         <button className="button" disabled={busy}>
           {t("estimatePrice")}
         </button>
       </form>
+      {error && (
+        <p className="error-text" role="alert">
+          {error}
+        </p>
+      )}
+      {c && (
+        <div className="quick-price-result charge-box" role="status">
+          <small>{t("chargeTitle")}</small>
+          <strong dir="ltr">{c.kg.toLocaleString("en")} kg</strong>
+          <ul className="price-facts">
+            <li>
+              {t("chargeActual")}: <span dir="ltr">{c.actualKg.toLocaleString("en")} kg</span>
+            </li>
+            <li>
+              {t("chargeVolume")}:{" "}
+              <span dir="ltr">
+                {c.m3} m³ ≈ {c.volumeKg.toLocaleString("en")} kg
+              </span>
+            </li>
+            <li>
+              {t("chargeLdm")}:{" "}
+              <span dir="ltr">
+                {c.ldm} LDM ≈ {c.ldmKg.toLocaleString("en")} kg
+              </span>
+            </li>
+          </ul>
+          <small className="muted">{t("chargeNote")}</small>
+        </div>
+      )}
       {result &&
         (result.enough ? (
           <div className="quick-price-result" role="status">

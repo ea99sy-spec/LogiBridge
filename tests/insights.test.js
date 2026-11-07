@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { onTimeOf, paySpeedOf } from "../server/insights.js";
-import { priceIndex, quickEstimate } from "../server/priceIndex.js";
+import { priceIndex, quickEstimate, chargeableWeight } from "../server/priceIndex.js";
 import { checkCommercial, totals } from "../shared/commercial.js";
 import { visibleTrips } from "../server/returnTrips.js";
 
@@ -85,6 +85,15 @@ test("price index needs three deals and uses route prices, not weight", () => {
   assert.equal(est.basis, "route");
   // Demo deals never appear in the registered world.
   assert.equal(priceIndex({ ...s, users: users.map((u) => ({ ...u, demo: true })) }, false, now).length, 0);
+});
+
+test("chargeable weight takes the largest of weight, volume and loading metres", () => {
+  // 2 pallets 120x80x100 cm: LDM 0.8 (x1850 = 1480 kg), volume 1.92 m3 (x333 = 639 kg)
+  const c = chargeableWeight({ weight: 500, pallets: 2, length: 120, width: 80, height: 100 });
+  assert.equal(c.kg, 1480);
+  assert.equal(c.ldm, 0.8);
+  assert.equal(chargeableWeight({ weight: 2000, pallets: 1, length: 120, width: 80, height: 100 }).kg, 2000);
+  assert.equal(chargeableWeight({ weight: 500 }).kg, 500);
 });
 
 test("commercial documents are checked against the shipment", () => {
