@@ -562,9 +562,27 @@ export function PublicTracking({ t, lang, langSelect }) {
     }
   }
   useEffect(() => {
+    let id = null;
+    const start = () => {
+      clearInterval(id);
+      id = setInterval(load, 30000);
+    };
+    const onVisibility = () => {
+      if (document.hidden) {
+        clearInterval(id);
+        id = null;
+      } else {
+        load();
+        start();
+      }
+    };
     load();
-    const id = setInterval(load, 120000);
-    return () => clearInterval(id);
+    if (!document.hidden) start();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
   return (
     <div className="legal-page">

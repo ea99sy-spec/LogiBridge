@@ -2613,6 +2613,16 @@ export const extraRows = {
   driverAwaitingVerify: ["(بانتظار التحقق)", "(awaiting verification)", "(doğrulama bekliyor)"],
   driverTrips: ["رحلات مكتملة", "Completed trips", "Tamamlanan sefer"],
   driverOnTime: ["في الموعد", "On time", "Zamanında"],
+  optFlagsTitle: ["الميزات الاختيارية", "Optional features", "İsteğe bağlı özellikler"],
+  optFlagsDesc: [
+    "فعّل أو أوقف الميزة لكل المنصة.",
+    "Turn each feature on or off for the whole platform.",
+    "Her özelliği tüm platform için açın veya kapatın.",
+  ],
+  flag_tracking: ["تتبع الشحنات", "Shipment tracking", "Sevkiyat takibi"],
+  flag_ratings: ["التقييمات", "Ratings", "Değerlendirmeler"],
+  flag_marketplace: ["سوق العروض", "Offer marketplace", "Teklif pazarı"],
+  flag_contracts: ["العقود الإلكترونية", "Electronic contracts", "Elektronik sözleşmeler"],
   weightLimitError: [
     "الوزن لازم يكون بين 1 و 24,000 كغ.",
     "Weight must be between 1 and 24,000 kg.",

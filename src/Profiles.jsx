@@ -618,6 +618,23 @@ export function AdminSiteSettings({ data, t, run, busy }) {
     <section className="panel form-stack">
       <h2>{t("siteSettings")}</h2>
       <CorridorCard t={t} />
+      {data.flags && (
+        <div className="feature-flags">
+          <h3>{t("optFlagsTitle")}</h3>
+          <p className="muted small">{t("optFlagsDesc")}</p>
+          {["tracking", "ratings", "marketplace", "contracts"].map((k) => (
+            <label key={k} className="cost-check">
+              <input
+                type="checkbox"
+                checked={!!data.flags[k]}
+                disabled={busy}
+                onChange={(e) => run("/flags", { [k]: e.target.checked }, "PATCH")}
+              />{" "}
+              {t("flag_" + k)}
+            </label>
+          ))}
+        </div>
+      )}
       <div className="form-stack">
         <b>{t("crossingLiveTitle")}</b>
         <small>{t("crossingLiveNote")}</small>
