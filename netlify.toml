@@ -58,6 +58,9 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=(self)"
+    Strict-Transport-Security = "max-age=31536000"
+    # Content Security Policy: only our own code, Google Fonts, OpenStreetMap tiles and the PayTR payment frame.
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.tile.openstreetmap.org; connect-src 'self'; frame-src https://www.openstreetmap.org https://www.paytr.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
 
 # The service worker must always be fresh so updates reach installed copies.
 [[headers]]

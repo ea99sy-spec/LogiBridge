@@ -110,10 +110,17 @@ export function likelyProviders(s, sh, limit = 6) {
 }
 
 const MAX_LOG = 200;
+// Remove secrets that may appear in browser or server errors before they are stored.
+const redact = (v) =>
+  String(v ?? "")
+    .replace(/(token|password|secret|key|code|signature)=[^&\s]+/gi, "$1=[redacted]")
+    .replace(/\b[a-f0-9]{40,}\b/gi, "[redacted]");
+// Keep only the route, never the query string or hash (they can carry tokens).
+const cleanPath = (v) => String(v ?? "").split(/[?#]/)[0];
 export function logError(s, { source, message, path, userId, stack }) {
   s.errorLog ||= [];
-  const msg = text(message, 300) || "Unknown error";
-  const where = text(path, 200);
+  const msg = text(redact(message), 300) || "Unknown error";
+  const where = text(cleanPath(path), 200);
   const now = new Date().toISOString();
   const same = s.errorLog.find((e) => e.source === source && e.message === msg && e.path === where);
   if (same) {
@@ -127,7 +134,7 @@ export function logError(s, { source, message, path, userId, stack }) {
     source,
     message: msg,
     path: where,
-    stack: text(stack, 1200),
+    stack: text(redact(stack), 1200),
     userId,
     count: 1,
     at: now,
