@@ -194,6 +194,15 @@ export function ShipmentDriver({ s, data, user, t, run, busy }) {
               · <span dir="ltr">{s.driverInfo.phone}</span>
             </>
           ) : null}{" "}
+          {s.driverInfo.record && (
+            <span className="driver-record">
+              {" "}
+              · {t("driverTrips")}: {s.driverInfo.record.trips}
+              {s.driverInfo.record.onTimeCount
+                ? ` · ${t("driverOnTime")}: ${s.driverInfo.record.onTimePct}% (${s.driverInfo.record.onTimeCount})`
+                : ""}
+            </span>
+          )}{" "}
           {s.driverInfo.verified ? (
             <span className="driver-status verified">✓ {t("verifiedDriver")}</span>
           ) : (

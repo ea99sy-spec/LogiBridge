@@ -1,6 +1,7 @@
 import { downloadable } from "./fileOutput.js";
 import { readState, mutate, id } from "./store.js";
 import { notice } from "./advanced.js";
+import { onTimeFor } from "./insights.js";
 import { validateDocument, encryptDocument, decryptDocument } from "./identity.js";
 
 // Driver and truck verification: the carrier registers each driver with the plate, licence and a
@@ -35,6 +36,21 @@ export function driversFor(s, user) {
 }
 
 // What the people on a shipment see about its driver (no documents, no licence number).
+// Trips finished with this driver and how many arrived by the agreed day. Cached per state snapshot.
+const recordCache = new WeakMap();
+function driverRecordOf(s, driverId) {
+  if (!recordCache.has(s)) recordCache.set(s, new Map());
+  const cache = recordCache.get(s);
+  if (!cache.has(driverId)) {
+    const trips = (s.shipments || []).filter(
+      (sh) => sh.driverId === driverId && ["arrived", "delivered"].includes(sh.status),
+    ).length;
+    const t = onTimeFor(s, (sh) => sh.driverId === driverId);
+    cache.set(driverId, { trips, onTimePct: t.pct, onTimeCount: t.count });
+  }
+  return cache.get(driverId);
+}
+
 export function driverInfo(s, sh, viewer) {
   const d = sh.driverId && (s.drivers || []).find((x) => x.id === sh.driverId);
   if (!d) return null;
@@ -44,6 +60,7 @@ export function driverInfo(s, sh, viewer) {
     plate: d.plate,
     truckType: d.truckType,
     verified: d.status === "verified",
+    record: driverRecordOf(s, d.id),
     ...(owner ? { phone: d.phone } : {}),
   };
 }
