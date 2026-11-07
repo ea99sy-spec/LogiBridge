@@ -1175,8 +1175,8 @@ export function errorText(lang, message) {
   if (!message) return rows.error[index];
   if (rows["err_" + message]) return rows["err_" + message][index];
   if (message === "Account approval required") return rows.approvalRestrictionNote?.[index] ?? message;
-  // Unknown messages are still more useful than a generic failure, in English.
-  return `${rows.error[index]} (${message})`;
+  console.warn("Unmapped error message:", message);
+  return rows.error[index];
 }
 export const documentKeys = ["invoice", "packing", "origin", "transport", "customs"];
 export const documentLabels = {
