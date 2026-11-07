@@ -47,7 +47,6 @@ export function dealSamples(s, demo) {
 
 function summarize(list, now) {
   const prices = list.map((x) => x.price);
-  const perTon = list.filter((x) => x.weight > 0).map((x) => x.price / (x.weight / 1000));
   const recent = list.filter((x) => now - Date.parse(x.at) <= 30 * DAY).map((x) => x.price);
   const before = list
     .filter((x) => now - Date.parse(x.at) > 30 * DAY && now - Date.parse(x.at) <= 60 * DAY)
@@ -59,7 +58,6 @@ function summarize(list, now) {
     high: r(pct(prices, 0.75)),
     min: r(Math.min(...prices)),
     max: r(Math.max(...prices)),
-    perTon: perTon.length ? r(median(perTon)) : null,
     days: r(median(list.map((x) => Number(x.days) || 0))),
     trend:
       recent.length >= 2 && before.length >= 2
@@ -94,7 +92,7 @@ export function priceIndex(s, demo, now = Date.now()) {
     .sort((a, b) => b.deals - a.deals);
 }
 
-// Quick estimate for a visitor: country pair (and city when there are enough deals there).
+// Quick estimate for a visitor: the market price of real deals on the route (country pair, and city when there are enough deals there). Weight is not used.
 export function quickEstimate(s, q, demo = false, now = Date.now()) {
   let list = dealSamples(s, demo).filter(
     (x) =>
@@ -108,17 +106,6 @@ export function quickEstimate(s, q, demo = false, now = Date.now()) {
   const byCity = list.filter((x) => q.city && (city(x.from) === city(q.city) || city(x.to) === city(q.city)));
   if (byCity.length >= MIN_DEALS) list = byCity;
   if (list.length < MIN_DEALS) return { deals: list.length, enough: false };
-  const tons = Number(q.weight) > 0 ? Number(q.weight) / 1000 : null;
-  const perTon = list.filter((x) => x.weight > 0).map((x) => x.price / (x.weight / 1000));
-  if (tons && perTon.length >= MIN_DEALS)
-    return {
-      enough: true,
-      deals: perTon.length,
-      low: r(pct(perTon, 0.25) * tons),
-      mid: r(median(perTon) * tons),
-      high: r(pct(perTon, 0.75) * tons),
-      basis: "weight",
-    };
   const sum = summarize(list, now);
   return { enough: true, deals: sum.deals, low: sum.low, mid: sum.median, high: sum.high, basis: "route" };
 }
@@ -134,7 +121,6 @@ export function priceIndexRoutes(app, { publicOnly } = {}) {
         from: String(req.query.from || "").slice(0, 2),
         to: String(req.query.to || "").slice(0, 2),
         city: String(req.query.city || "").slice(0, 80),
-        weight: Math.min(Math.max(Number(req.query.weight) || 0, 0), 100000),
       };
       res.json(quickEstimate(readState(), q, false));
     });

@@ -77,11 +77,6 @@ export function PriceIndexPage({ t, lang }) {
                       {usd(r.low)} – {usd(r.high)}
                     </span>
                   </li>
-                  {r.perTon !== null && (
-                    <li>
-                      {t("perTon")}: {usd(r.perTon)}
-                    </li>
-                  )}
                   <li>
                     {t("typicalDays")}: {r.days}
                   </li>
@@ -123,7 +118,6 @@ export function QuickPrice({ t }) {
             from: f.get("from"),
             to: f.get("to"),
             city: f.get("city") || "",
-            weight: f.get("weight") || "",
           });
           try {
             setResult(await (await fetch("/api/public/price-estimate?" + q)).json());
@@ -157,10 +151,6 @@ export function QuickPrice({ t }) {
           <small>{t("cityOptional")}</small>
           <input name="city" maxLength={80} placeholder={t("cityExample")} />
         </label>
-        <label>
-          <small>{t("weight")}</small>
-          <input name="weight" type="number" min="1" max="100000" placeholder="5000" />
-        </label>
         <button className="button" disabled={busy}>
           {t("estimatePrice")}
         </button>
@@ -175,12 +165,7 @@ export function QuickPrice({ t }) {
             <span>
               {t("estimateMiddle")}: <b>{usd(result.mid)}</b>
             </span>
-            <small className="muted">
-              {t(result.basis === "weight" ? "estimateBasisWeight" : "estimateBasisRoute").replace(
-                "{n}",
-                result.deals,
-              )}
-            </small>
+            <small className="muted">{t("estimateBasisRoute").replace("{n}", result.deals)}</small>
             <a className="button" href="/register">
               {t("getRealOffers")} ↗
             </a>

@@ -5,15 +5,22 @@ import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { estimatePrice, matchRoutes, reserveEquipment } from "../server/advanced.js";
-test("estimates require comparable routes and preserve insufficient data", () => {
+test("estimates use real route prices and need three deals", () => {
   const s = {
     users: [],
-    shipments: [{ id: "s", origin: "A", destination: "B", weight: 100 }],
-    bids: [{ shipmentId: "s", price: 50 }],
+    shipments: ["s1", "s2", "s3"].map((id) => ({ id, origin: "A", destination: "B" })),
+    bids: [
+      { shipmentId: "s1", price: 50 },
+      { shipmentId: "s2", price: 100 },
+      { shipmentId: "s3", price: 150 },
+    ],
   };
-  assert.equal(estimatePrice(s, { origin: "A", destination: "B", weight: 200 }).estimate, 100);
-  assert.equal(estimatePrice(s, { origin: "A", destination: "C", weight: 100 }).estimate, null);
-  assert.throws(() => estimatePrice(s, { weight: -1 }));
+  assert.equal(estimatePrice(s, { origin: "A", destination: "B" }).estimate, 100);
+  assert.equal(estimatePrice(s, { origin: "A", destination: "C" }).estimate, null);
+  assert.equal(
+    estimatePrice({ ...s, bids: s.bids.slice(0, 2) }, { origin: "A", destination: "B" }).estimate,
+    null,
+  );
 });
 test("rental dates cannot overlap and cancellation frees equipment", () => {
   const s = {

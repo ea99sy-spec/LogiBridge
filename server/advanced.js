@@ -3,8 +3,9 @@ import { randomBytes, createHash } from "node:crypto";
 import { readPosition, requirePosition } from "./position.js";
 import { recordPosition, savePhoto, saveProof } from "./tracking.js";
 import { readState, mutate, id, subscribeState } from "./store.js";
-import { transitionShipment, positive, syncOrder } from "./domain.js";
+import { transitionShipment, syncOrder } from "./domain.js";
 import { sameWorld, demoActive } from "./world.js";
+import { MIN_DEALS } from "./priceIndex.js";
 import { queueAdminEmail } from "./email.js";
 import { queueWhatsApp } from "./whatsapp.js";
 const hash = (v) => createHash("sha256").update(v).digest("hex");
@@ -99,7 +100,8 @@ export function matchRoutes(s, sh) {
       notice(s, u, "matching_opportunity", sh.id);
 }
 export function estimatePrice(s, b, user) {
-  const weight = positive(b.weight, "weight");
+  // Market estimate: the median of real accepted prices on the same route. Weight is not used.
+  // A number appears only with at least MIN_DEALS real deals, so no single company's price is exposed.
   const samples = s.bids.filter(
     (bid) =>
       (!user || sameWorld(s, user, bid.carrierId)) &&
@@ -109,24 +111,25 @@ export function estimatePrice(s, b, user) {
           city(sh.origin) === city(b.origin) &&
           city(sh.destination) === city(b.destination) &&
           (!b.originCountry || sh.originCountry === b.originCountry) &&
-          (!b.destinationCountry || sh.destinationCountry === b.destinationCountry) &&
-          sh.weight >= weight / 2 &&
-          sh.weight <= weight * 2,
+          (!b.destinationCountry || sh.destinationCountry === b.destinationCountry),
       ),
   );
-  const values = samples.map((bid) => {
-    const sh = s.shipments.find((x) => x.id === bid.shipmentId);
-    return (bid.price * weight) / sh.weight;
-  });
+  const prices = samples
+    .map((bid) => bid.price)
+    .filter((p) => p > 0)
+    .sort((x, y) => x - y);
+  const mid = prices.length
+    ? prices.length % 2
+      ? prices[(prices.length - 1) / 2]
+      : (prices[prices.length / 2 - 1] + prices[prices.length / 2]) / 2
+    : null;
   return {
     currency: "USD",
-    samples: values.length,
-    estimate: values.length
-      ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 100) / 100
-      : null,
-    method: "historical_route_weight",
-    confidence: values.length >= 5 ? "moderate" : "low",
-    simulated: samples.some((b) => s.users.find((u) => u.id === b.carrierId)?.demo),
+    samples: prices.length,
+    estimate: prices.length >= MIN_DEALS ? Math.round(mid) : null,
+    method: "market_route",
+    confidence: prices.length >= 5 ? "moderate" : "low",
+    simulated: samples.some((bid) => s.users.find((u) => u.id === bid.carrierId)?.demo),
   };
 }
 export function reserveEquipment(s, u, b) {

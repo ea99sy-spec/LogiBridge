@@ -48,7 +48,7 @@ test("on-time share and payment speed come from real dates", () => {
   assert.deepEqual(paySpeedOf(s, "m"), { count: 2, avgDays: 2 });
 });
 
-test("price index needs three deals and estimates by weight", () => {
+test("price index needs three deals and uses route prices, not weight", () => {
   const now = Date.parse("2026-10-17T12:00:00Z");
   const mk = (i, price, weight) => ({
     id: "s" + i,
@@ -78,10 +78,11 @@ test("price index needs three deals and estimates by weight", () => {
   const [route] = priceIndex(s, false, now);
   assert.equal(route.deals, 3);
   assert.equal(route.median, 1100);
-  assert.equal(route.perTon, 110);
+  assert.equal(route.perTon, undefined);
   const est = quickEstimate(s, { from: "TR", to: "SY", weight: 5000 });
   assert.equal(est.enough, true);
-  assert.equal(est.mid, 550);
+  assert.equal(est.mid, 1100);
+  assert.equal(est.basis, "route");
   // Demo deals never appear in the registered world.
   assert.equal(priceIndex({ ...s, users: users.map((u) => ({ ...u, demo: true })) }, false, now).length, 0);
 });
