@@ -13,7 +13,7 @@
   border-bottom: 3px solid #facc15;
 }
 .g-tiles b {
-  font-size: 26px;
+  font-size: calc(26px * var(--fs));
   color: #102a56;
   font-variant-numeric: tabular-nums;
 }
@@ -72,7 +72,7 @@
 .g-col small {
   position: absolute;
   bottom: -18px;
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
   color: #6b7f9e;
   white-space: nowrap;
 }
@@ -82,7 +82,7 @@
   white-space: nowrap;
   background: #102a56;
   color: #fff;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   padding: 3px 8px;
   border-radius: 6px;
   z-index: 2;
@@ -92,7 +92,7 @@
 }
 .g-table {
   width: 100%;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   border-collapse: collapse;
 }
 .g-table th,
@@ -118,7 +118,7 @@
   grid-template-columns: minmax(0, 1.3fr) 1fr auto;
   gap: 8px;
   align-items: center;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .g-list li span {
   overflow: hidden;

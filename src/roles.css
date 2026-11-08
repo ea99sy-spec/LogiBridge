@@ -3,14 +3,14 @@
   background: #edf4ff;
   border: 1px solid #d9e7fc;
   border-radius: 20px;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   color: #6585b3;
 }
 .role-hero {
   min-height: 205px;
 }
 .role-hero-icon {
-  font-size: 105px;
+  font-size: calc(105px * var(--fs));
   color: #9bc1f8;
   opacity: 0.6;
   line-height: 1;
@@ -34,18 +34,18 @@
   display: grid;
   place-items: center;
   border-radius: 12px;
-  font-size: 30px;
+  font-size: calc(30px * var(--fs));
   flex-shrink: 0;
 }
 .role-next-step > div {
   flex: 1;
 }
 .role-next-step p {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   color: #829bbd;
 }
 .role-next-step h3 {
-  font-size: 14px;
+  font-size: calc(14px * var(--fs));
   margin-bottom: 6px;
 }
 .role-tabs {
@@ -59,7 +59,7 @@
   background: white;
   color: #7390b8;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .role-tabs button.active {
   background: #10294b;
@@ -73,7 +73,7 @@
   margin: 15px 0;
 }
 .supplier-catalog strong {
-  font-size: 23px;
+  font-size: calc(23px * var(--fs));
 }
 .supplier-order {
   display: flex;
@@ -87,11 +87,11 @@
 }
 .supplier-order p,
 .supplier-order small {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   color: #8ba2c2;
 }
 .supplier-order strong {
-  font-size: 20px;
+  font-size: calc(20px * var(--fs));
 }
 .supplier-order .actions {
   flex-basis: 100%;
@@ -102,7 +102,7 @@
 }
 @media (max-width: 800px) {
   .role-hero-icon {
-    font-size: 75px;
+    font-size: calc(75px * var(--fs));
     margin-inline: 12px;
   }
   .role-next-step {
@@ -118,7 +118,7 @@
     display: none;
   }
   .role-tabs button {
-    font-size: 11px;
+    font-size: calc(11px * var(--fs));
     padding: 10px 13px;
   }
   .supplier-order {

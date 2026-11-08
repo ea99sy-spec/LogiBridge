@@ -1,13 +1,13 @@
 @import "tailwindcss";
 @theme {
-  --font-sans: "Tajawal", "Segoe UI", Tahoma, Arial, sans-serif;
+  --font-sans: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 .plan-banner {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #6e809a;
   margin-bottom: 15px;
 }
@@ -17,16 +17,16 @@
 .escrow-line small {
   flex-basis: 100%;
   color: #74859f;
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
 }
 :root {
-  font-family: "Tajawal", "Segoe UI", Tahoma, Arial, sans-serif;
+  font-family: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
   letter-spacing: 0;
   color: #262f3d;
   background: #f5f7f6;
   font-synthesis: none;
   line-height: 1.6;
-  font-size: 14px;
+  font-size: calc(14px * var(--fs));
 }
 * {
   box-sizing: border-box;
@@ -83,16 +83,16 @@ p {
   margin: 0;
 }
 h1 {
-  font-size: 29px;
+  font-size: calc(29px * var(--fs));
   font-weight: 650;
   line-height: 1.4;
 }
 h2 {
-  font-size: 21px;
+  font-size: calc(21px * var(--fs));
   font-weight: 650;
 }
 h3 {
-  font-size: 17px;
+  font-size: calc(17px * var(--fs));
   font-weight: 650;
   margin-bottom: 12px;
 }
@@ -103,7 +103,7 @@ p {
   margin: 8px 0;
 }
 small {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 a {
   color: #374c6c;
@@ -113,10 +113,10 @@ a {
   color: #697b97;
 }
 .small {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .eyebrow {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   letter-spacing: 1.7px;
   font-weight: 600;
   color: #70819b;
@@ -125,7 +125,7 @@ a {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 25px;
+  font-size: calc(25px * var(--fs));
   font-weight: 700;
   letter-spacing: -0.7px;
   direction: ltr;
@@ -139,7 +139,7 @@ a {
   border-radius: 10px;
   display: grid;
   place-items: center;
-  font-size: 27px;
+  font-size: calc(27px * var(--fs));
   line-height: 1;
 }
 .app-shell {
@@ -161,11 +161,11 @@ a {
 .sidebar-tagline {
   text-align: center;
   color: #8695ab;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   margin: 8px 0 28px;
 }
 .nav-label {
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
   letter-spacing: 2px;
   color: #70819b;
   margin: 0 12px 10px;
@@ -187,7 +187,7 @@ a {
   text-align: start;
   padding: 10px 13px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   white-space: nowrap;
 }
 .sidebar nav button:hover {
@@ -203,7 +203,7 @@ a {
   box-shadow: inset -3px 0 #80a2d4;
 }
 .nav-icon {
-  font-size: 20px;
+  font-size: calc(20px * var(--fs));
   width: 22px;
   text-align: center;
   line-height: 1;
@@ -214,12 +214,12 @@ a {
   color: #c6daf9;
   padding: 0 6px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
 }
 .sidebar-bottom {
   margin-top: auto;
   padding-top: 20px;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #8b99af;
 }
 .connection-dot {
@@ -248,23 +248,23 @@ a {
   place-items: center;
   flex-shrink: 0;
   font-weight: 700;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .account b {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   color: #e1e5ea;
 }
 .account small {
   display: block;
   color: #7989a2;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
 }
 .switch {
   border: 0;
   background: transparent;
   color: #bcc4d1;
   margin: 10px 0 0;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
 }
 main {
   flex: 1;
@@ -282,7 +282,7 @@ main {
 }
 .breadcrumb {
   color: #7e8ea6;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .breadcrumb span {
   margin: 0 12px;
@@ -298,14 +298,14 @@ main {
   gap: 18px;
 }
 .language {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   padding: 7px 10px;
   background: transparent;
   border-color: #dfe3e9;
   max-width: 140px;
 }
 .verification {
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #6f819b;
 }
 .verification.yes,
@@ -316,7 +316,7 @@ main {
   padding: 8px 36px;
   background: #dfe7f2;
   color: #47628b;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   display: flex;
   gap: 9px;
 }
@@ -338,12 +338,12 @@ main {
 }
 .page-intro p,
 .section-heading p {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   color: #74859e;
 }
 .wave {
   color: #6585b4;
-  font-size: 22px;
+  font-size: calc(22px * var(--fs));
 }
 .button {
   background: #10294b;
@@ -351,7 +351,7 @@ main {
   border: 1px solid #10294b;
   border-radius: 7px;
   padding: 10px 17px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   font-weight: 600;
   white-space: normal;
 }
@@ -374,13 +374,13 @@ main {
 }
 .small-button {
   padding: 6px 10px;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
 }
 .text-button {
   border: 0;
   background: transparent;
   color: #495b75;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 .stats {
   display: grid;
@@ -399,10 +399,10 @@ main {
 }
 .stat small {
   color: #70819b;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 .stat strong {
-  font-size: 30px;
+  font-size: calc(30px * var(--fs));
   font-weight: 650;
   margin: 9px 0 2px;
   line-height: 1.3;
@@ -417,10 +417,10 @@ main {
   height: 30px;
   border-radius: 8px;
   text-align: center;
-  font-size: 20px;
+  font-size: calc(20px * var(--fs));
 }
 .stat-foot {
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
   color: #8f9db2;
 }
 .hero {
@@ -438,15 +438,15 @@ main {
 .hero .eyebrow {
   color: #a1acbd;
   letter-spacing: 2px;
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
 }
 .hero h2 {
-  font-size: 28px;
+  font-size: calc(28px * var(--fs));
   line-height: 1.4;
   margin: 9px 0;
 }
 .hero p {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   color: #a1adbe;
   max-width: 460px;
   margin-bottom: 20px;
@@ -471,7 +471,7 @@ main {
 }
 .shipment-card h3 {
   margin: 13px 0 20px;
-  font-size: 16px;
+  font-size: calc(16px * var(--fs));
 }
 .card-top {
   display: flex;
@@ -480,14 +480,14 @@ main {
   gap: 8px;
 }
 .tag {
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
   color: #667893;
   background: #eceff3;
   border-radius: 4px;
   padding: 3px 7px;
 }
 .badge {
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
   color: #5f6f88;
   background: #e6ebf3;
   border-radius: 5px;
@@ -515,7 +515,7 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  font-size: 14px;
+  font-size: calc(14px * var(--fs));
   font-weight: 600;
   direction: ltr;
 }
@@ -523,18 +523,18 @@ main {
   display: block;
   color: #8896ac;
   font-weight: 400;
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
   margin-bottom: 2px;
 }
 .route-line {
   color: #9eaabb;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   white-space: nowrap;
 }
 .cargo-details {
   display: flex;
   gap: 12px;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #71839d;
   margin-top: 20px;
   padding-top: 12px;
@@ -559,7 +559,7 @@ main {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #74859f;
 }
 .journey span {
@@ -578,7 +578,7 @@ main {
 }
 .network p {
   color: #8291a8;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 .network-icon {
   width: 62px;
@@ -587,7 +587,7 @@ main {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 34px;
+  font-size: calc(34px * var(--fs));
   color: #64758f;
   flex-shrink: 0;
 }
@@ -597,11 +597,11 @@ footer {
   padding: 18px 0;
   display: flex;
   justify-content: space-between;
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
   color: #8594aa;
 }
 .section-heading h1 {
-  font-size: 25px;
+  font-size: calc(25px * var(--fs));
 }
 .filters {
   display: flex;
@@ -624,7 +624,7 @@ footer {
 .counter {
   background: #e9ecf1;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   padding: 2px 5px;
 }
 .offer {
@@ -642,26 +642,26 @@ footer {
   min-width: 100px;
 }
 .offer b {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 .offer small {
   display: block;
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
   color: #72839d;
 }
 .offer strong {
-  font-size: 13px;
+  font-size: calc(13px * var(--fs));
 }
 .field {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   min-width: 0;
 }
 .field > span {
   color: #64758f;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 .bid-form {
   display: grid;
@@ -692,7 +692,7 @@ footer {
   padding: 12px 0;
   margin-top: 15px;
   border-top: 1px solid #e4e8ee;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   display: flex;
   justify-content: space-between;
   gap: 8px;
@@ -710,11 +710,11 @@ footer {
   margin: 20px 0 8px;
 }
 .capacity strong {
-  font-size: 24px;
+  font-size: calc(24px * var(--fs));
   font-weight: 600;
 }
 .capacity span {
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #7687a0;
 }
 progress {
@@ -746,7 +746,7 @@ progress::-webkit-progress-value {
   border: 1px solid #e1e5ea;
   border-radius: 7px;
   margin: 10px 0;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .list-row small {
   display: block;
@@ -756,17 +756,17 @@ progress::-webkit-progress-value {
   padding: 32px 15px;
   text-align: center;
   color: #8897ad;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .empty > span {
-  font-size: 40px;
+  font-size: calc(40px * var(--fs));
   color: #bac3d1;
 }
 .notice {
   padding: 15px 18px;
   background: #e0e7f1;
   color: #4f678c;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   border-radius: 9px;
   margin-bottom: 20px;
 }
@@ -786,7 +786,7 @@ progress::-webkit-progress-value {
   accent-color: #3d506d;
 }
 .estimate {
-  font-size: 28px;
+  font-size: calc(28px * var(--fs));
   display: block;
   margin-top: 20px;
 }
@@ -815,14 +815,14 @@ progress::-webkit-progress-value {
   width: 100%;
   padding: 12px 8px;
   border-radius: 7px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .contacts button.selected {
   background: #e4e9f0;
 }
 .contacts small {
   display: block;
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
   color: #7888a1;
 }
 .chat-main {
@@ -858,16 +858,16 @@ progress::-webkit-progress-value {
   border-radius: 10px 0 10px 10px;
 }
 .message p {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .message small {
   display: block;
   color: #6e809a;
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
 }
 .message time {
   display: block;
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
   color: #8695ab;
   text-align: end;
   margin-top: 8px;
@@ -884,7 +884,7 @@ progress::-webkit-progress-value {
   width: 130px;
 }
 .large-seal {
-  font-size: 80px;
+  font-size: calc(80px * var(--fs));
   color: #b9c2cf;
   display: block;
   text-align: center;
@@ -898,7 +898,7 @@ progress::-webkit-progress-value {
   height: 130px;
   display: grid;
   place-items: center;
-  font-size: 66px;
+  font-size: calc(66px * var(--fs));
   color: #677995;
   margin-bottom: 20px;
 }
@@ -907,7 +907,7 @@ progress::-webkit-progress-value {
 }
 .product strong {
   display: block;
-  font-size: 22px;
+  font-size: calc(22px * var(--fs));
   margin-bottom: 20px;
 }
 .toggle-row {
@@ -962,10 +962,10 @@ progress::-webkit-progress-value {
 .review-row small {
   display: block;
   color: #7e8ea5;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 .review-row a {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 .rating-row {
   padding: 15px 0;
@@ -974,7 +974,7 @@ progress::-webkit-progress-value {
 .stars {
   color: #557db9;
   display: block;
-  font-size: 23px;
+  font-size: calc(23px * var(--fs));
   direction: ltr;
   text-align: start;
 }
@@ -999,7 +999,7 @@ progress::-webkit-progress-value {
   padding: 13px 22px;
   color: #384861;
   box-shadow: 0 10px 40px #102a5620;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .toast.bad {
   background: #f9e8e1;
@@ -1030,7 +1030,7 @@ progress::-webkit-progress-value {
   border: 0;
   background: #e9edf3;
   border-radius: 6px;
-  font-size: 24px;
+  font-size: calc(24px * var(--fs));
   line-height: 1;
   padding: 5px 10px;
   color: #53637c;
@@ -1062,12 +1062,12 @@ progress::-webkit-progress-value {
   margin: auto;
 }
 .login-hero h1 {
-  font-size: 46px;
+  font-size: calc(46px * var(--fs));
   margin: 25px 0 20px;
 }
 .login-hero p {
   color: #acb6c6;
-  font-size: 16px;
+  font-size: calc(16px * var(--fs));
   max-width: 420px;
 }
 .login-hero .route-art {
@@ -1078,7 +1078,7 @@ progress::-webkit-progress-value {
 .mini-stats {
   display: flex;
   gap: 18px;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   color: #a7b3c5;
   direction: ltr;
 }
@@ -1100,11 +1100,11 @@ progress::-webkit-progress-value {
   inset-inline-end: 40px;
 }
 .login-form h2 {
-  font-size: 30px;
+  font-size: calc(30px * var(--fs));
   margin: 10px 0;
 }
 .login-form .muted {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   margin-bottom: 30px;
 }
 .account-button {
@@ -1124,20 +1124,20 @@ progress::-webkit-progress-value {
   box-shadow: 0 5px 15px #12356809;
 }
 .account-button b {
-  font-size: 14px;
+  font-size: calc(14px * var(--fs));
 }
 .account-button small {
   display: block;
   color: #7989a2;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 .account-button > span:last-child {
   margin-inline-start: auto;
-  font-size: 19px;
+  font-size: calc(19px * var(--fs));
   color: #6a7c97;
 }
 .demo-note {
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #657da1;
   margin-top: 25px;
 }
@@ -1194,13 +1194,13 @@ progress::-webkit-progress-value {
     grid-template-columns: 1fr;
   }
   .login-hero h1 {
-    font-size: 37px;
+    font-size: calc(37px * var(--fs));
   }
   .login-form {
     padding-inline: 35px;
   }
   .route-line {
-    font-size: 9px;
+    font-size: calc(max(9px, 11px) * var(--fs));
   }
 }
 @media (max-width: 800px) {
@@ -1214,7 +1214,7 @@ progress::-webkit-progress-value {
     padding: 15px;
   }
   .sidebar .brand {
-    font-size: 23px;
+    font-size: calc(23px * var(--fs));
   }
   .sidebar-tagline,
   .nav-label,
@@ -1229,7 +1229,7 @@ progress::-webkit-progress-value {
   }
   .sidebar nav button {
     padding: 8px 10px;
-    font-size: 11px;
+    font-size: calc(11px * var(--fs));
   }
   .nav-count {
     display: none;
@@ -1261,10 +1261,10 @@ progress::-webkit-progress-value {
     min-width: 140px;
   }
   .hero h2 {
-    font-size: 23px;
+    font-size: calc(23px * var(--fs));
   }
   .hero p {
-    font-size: 11px;
+    font-size: calc(11px * var(--fs));
   }
   .shipment-list {
     grid-template-columns: 1fr;
@@ -1280,12 +1280,12 @@ progress::-webkit-progress-value {
   }
   .contacts button {
     gap: 6px;
-    font-size: 10px;
+    font-size: calc(max(10px, 11px) * var(--fs));
   }
   .contacts .avatar {
     width: 28px;
     height: 28px;
-    font-size: 9px;
+    font-size: calc(max(9px, 11px) * var(--fs));
   }
   .login {
     grid-template-columns: 1fr;
@@ -1298,7 +1298,7 @@ progress::-webkit-progress-value {
     margin-top: 35px;
   }
   .login-hero h1 {
-    font-size: 32px;
+    font-size: calc(32px * var(--fs));
   }
   .login-hero .route-art {
     display: none;
@@ -1314,7 +1314,7 @@ progress::-webkit-progress-value {
     align-self: flex-end;
   }
   .page-intro h1 {
-    font-size: 24px;
+    font-size: calc(24px * var(--fs));
   }
   footer {
     margin-inline: 18px;
@@ -1336,19 +1336,19 @@ progress::-webkit-progress-value {
     gap: 10px;
   }
   .stat strong {
-    font-size: 27px;
+    font-size: calc(27px * var(--fs));
   }
   .stat small {
-    font-size: 10px;
+    font-size: calc(max(10px, 11px) * var(--fs));
     max-width: 95px;
   }
   .stat-foot {
-    font-size: 11px;
+    font-size: calc(11px * var(--fs));
   }
   .stat-icon {
     width: 24px;
     height: 24px;
-    font-size: 17px;
+    font-size: calc(17px * var(--fs));
   }
   .chat {
     grid-template-columns: 1fr;
@@ -1379,7 +1379,7 @@ progress::-webkit-progress-value {
     gap: 14px;
   }
   .breadcrumb {
-    font-size: 10px;
+    font-size: calc(max(10px, 11px) * var(--fs));
   }
   .breadcrumb span {
     margin-inline: 6px;
@@ -1401,7 +1401,7 @@ progress::-webkit-progress-value {
     width: 100%;
   }
   .cargo-details {
-    font-size: 11px;
+    font-size: calc(11px * var(--fs));
   }
   .inline-form {
     flex-direction: column;
@@ -1412,6 +1412,6 @@ progress::-webkit-progress-value {
     text-align: end;
   }
   .login-form h2 {
-    font-size: 26px;
+    font-size: calc(26px * var(--fs));
   }
 }

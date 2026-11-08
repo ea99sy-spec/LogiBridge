@@ -23,7 +23,7 @@
   background: #edf4ff;
   color: #10294b;
   border-radius: 9px;
-  font-size: 22px;
+  font-size: calc(22px * var(--fs));
   flex-shrink: 0;
 }
 .operation-shortcuts button:nth-child(2) > span {
@@ -31,7 +31,7 @@
   color: #a8841a;
 }
 .operation-shortcuts b {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   font-weight: 650;
   color: #526f9a;
 }
@@ -77,16 +77,16 @@
   min-width: 0;
 }
 .saved-document b {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   overflow-wrap: anywhere;
 }
 .saved-document small {
   display: block;
   color: #90a4c1;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
 }
 .saved-document .button {
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   padding: 7px 10px;
   text-decoration: none;
 }
@@ -116,19 +116,19 @@
   background: #edf4ff;
 }
 .tracking-picker b {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   color: #4c6e9d;
 }
 .tracking-picker small {
   color: #8ca2c2;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
 }
 .tracking-picker .badge {
   align-self: start;
   margin-top: 5px;
 }
 .tracking-id {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   overflow-wrap: anywhere;
   color: #8ba3c4;
 }
@@ -143,7 +143,7 @@
   align-items: center;
   flex-direction: column;
   gap: 10px;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #93a6c2;
   flex: 1;
   text-align: center;
@@ -200,16 +200,16 @@
   background: #dce7f7;
 }
 .tracking-history b {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .tracking-history p {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   color: #6d88af;
   margin: 3px 0;
 }
 .tracking-history small {
   color: #9aafca;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
 }
 .tracking-layout > section > .shipment-card {
   margin-top: 20px;
@@ -222,11 +222,11 @@
   border-collapse: collapse;
   text-align: start;
   min-width: 700px;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 .admin-directory th {
   color: #809abb;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   padding: 13px 10px;
   background: #f3f7fd;
   white-space: nowrap;
@@ -240,11 +240,11 @@
 .admin-directory td small {
   display: block;
   color: #95a9c5;
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
   margin-top: 3px;
 }
 .admin-directory td b {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 .admin-directory {
   margin-top: 24px;
@@ -274,7 +274,7 @@
     gap: 5px;
   }
   .shipment-progress > div {
-    font-size: 9px;
+    font-size: calc(max(9px, 11px) * var(--fs));
   }
   .shipment-progress span {
     width: 28px;
@@ -293,12 +293,12 @@
     gap: 8px;
   }
   .operation-shortcuts b {
-    font-size: 10px;
+    font-size: calc(max(10px, 11px) * var(--fs));
   }
   .operation-shortcuts button > span {
     height: 29px;
     width: 29px;
-    font-size: 18px;
+    font-size: calc(18px * var(--fs));
   }
   .operation-shortcuts i {
     display: none;
@@ -313,7 +313,7 @@
     gap: 4px;
   }
   .shipment-progress > div {
-    font-size: 11px;
+    font-size: calc(11px * var(--fs));
   }
   .saved-document {
     flex-wrap: wrap;
@@ -330,7 +330,7 @@
 }
 .landing-direct-actions a {
   text-decoration: none;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #5b79a4;
   border: 1px solid #d7e3f5;
   border-radius: 7px;
@@ -343,7 +343,7 @@
   overflow-wrap: anywhere;
 }
 .public-profile h2 {
-  font-size: 20px;
+  font-size: calc(20px * var(--fs));
 }
 .pending-account {
   max-width: 900px;
@@ -355,7 +355,7 @@
 .access-contact {
   text-align: center;
   color: #6d88af;
-  font-size: 13px;
+  font-size: calc(13px * var(--fs));
   padding: 12px;
 }
 .access-contact a {
@@ -420,7 +420,7 @@ td .small-button + .small-button {
 }
 .account-details dt {
   color: #667085;
-  font-size: 13px;
+  font-size: calc(13px * var(--fs));
 }
 .account-details dd {
   margin: 0;
@@ -430,7 +430,7 @@ td .small-button + .small-button {
   background: #f2f4f7;
   padding: 12px 16px;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: calc(15px * var(--fs));
   line-height: 1.9;
 }
 .qr {
@@ -462,7 +462,7 @@ td .small-button + .small-button {
   border-inline-start: 3px solid #f5c542;
   background: #fffbeb;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: calc(13px * var(--fs));
 }
 .email-verify {
   display: flex;
@@ -512,7 +512,7 @@ td .small-button + .small-button {
   margin: 6px 0;
 }
 .company-hero .verified {
-  font-size: 14px;
+  font-size: calc(14px * var(--fs));
   color: #2f9e6f;
 }
 .company-actions {
@@ -561,7 +561,7 @@ td .small-button + .small-button {
   border-radius: 50%;
   background: #e6ebf3;
   color: #33415c;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .stage-step span {
   font-weight: 600;
@@ -599,7 +599,7 @@ td .small-button + .small-button {
   border-radius: 999px;
   background: #eef3fb;
   color: #315f9a;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   font-weight: 600;
 }
 .crossing-choices {
@@ -748,7 +748,7 @@ a.whatsapp {
   border-radius: 999px;
   background: #eef3fb;
   color: #315f9a;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .fact.warn {
   background: #fff4e0;
@@ -784,7 +784,7 @@ a.whatsapp {
   background: #f4f7fc;
 }
 .photo-strip small {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   color: #6b778c;
 }
 .photo-upload,
@@ -805,11 +805,11 @@ a.whatsapp {
   touch-action: none;
 }
 .field-label {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   color: #6b778c;
 }
 .delivery-code b {
-  font-size: 18px;
+  font-size: calc(18px * var(--fs));
   letter-spacing: 3px;
 }
 .share-link {

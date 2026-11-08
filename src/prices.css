@@ -28,11 +28,11 @@
   gap: 8px;
 }
 .price-main strong {
-  font-size: 28px;
+  font-size: calc(28px * var(--fs));
   color: #102a56;
 }
 .price-trend {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 999px;
@@ -50,7 +50,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   color: #6b7f9e;
 }
 .price-range i {
@@ -62,7 +62,7 @@
 .price-facts {
   margin: 0;
   padding-inline-start: 18px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   color: #173a6c;
   display: grid;
   gap: 2px;
@@ -98,7 +98,7 @@
   justify-items: start;
 }
 .quick-price-result strong {
-  font-size: 30px;
+  font-size: calc(30px * var(--fs));
   color: #102a56;
 }
 .quick-price-result.empty {
