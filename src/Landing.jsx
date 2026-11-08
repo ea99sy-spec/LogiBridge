@@ -245,7 +245,9 @@ export default function Landing({ t, langSelect, user }) {
               <div className="compare-row" key={k}>
                 <span className="compare-topic">{t("compareTopic" + k)}</span>
                 <span className="compare-usual">{t("compareUsual" + k)}</span>
-                <span className="compare-ours">✓ {t("compareOurs" + k)}</span>
+                <span className="compare-ours">
+                  <i aria-hidden="true">✓</i> {t("compareOurs" + k)}
+                </span>
               </div>
             ))}
           </div>

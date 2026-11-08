@@ -1013,3 +1013,50 @@
     display: none;
   }
 }
+
+/* ---- Layout polish: tighter sections, icon and title on one line, aligned step text ---- */
+.landing-section {
+  padding: 28px 42px 40px;
+}
+.landing-section > h2 {
+  margin-top: 0;
+}
+.compare-ours {
+  color: #0b1f3a;
+}
+.compare-ours i {
+  font-style: normal;
+  color: #15803d;
+  font-weight: 700;
+}
+.about-grid article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 14px;
+  row-gap: 10px;
+}
+.about-grid article .access-symbol {
+  margin: 0;
+}
+.about-grid h3 {
+  margin: 0;
+}
+.about-grid article p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+.about-steps li {
+  grid-template-columns: 28px 1fr;
+  column-gap: 10px;
+  align-items: center;
+  row-gap: 6px;
+}
+.about-steps li small {
+  grid-column: 2;
+}
+@media (max-width: 700px) {
+  .landing-section {
+    padding: 24px 20px 32px;
+  }
+}
