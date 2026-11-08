@@ -48,6 +48,7 @@ import { publicStats } from "./stats.js";
 import { noteRoutes } from "./notes.js";
 import { reputationMap } from "./insights.js";
 import { priceIndexRoutes } from "./priceIndex.js";
+import { rateCardRoutes, runRateCardWatch } from "./rateCards.js";
 import { returnTripRoutes, visibleTrips } from "./returnTrips.js";
 import { commercialRoutes } from "./commercial.js";
 import { driverRoutes, driversFor, driverInfo } from "./drivers.js";
@@ -720,6 +721,7 @@ export async function createApp() {
   noteRoutes(app);
   accountsReportRoutes(app);
   priceIndexRoutes(app);
+  rateCardRoutes(app);
   returnTripRoutes(app);
   commercialRoutes(app);
   driverRoutes(app);
@@ -1351,6 +1353,7 @@ export async function createApp() {
         runTrackingWatch()
           .then(() => runRecurringWatch())
           .then(() => runMonthlyWatch())
+          .then(() => runRateCardWatch())
           .catch((e) => console.error("Tracking:", e.message)),
       300000,
     );

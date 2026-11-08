@@ -108,3 +108,25 @@
 .quick-price-result .button {
   margin-top: 6px;
 }
+
+.rate-cards .rate-card-form,
+.rate-card-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: end;
+  margin-block: 8px;
+}
+.rate-card-row > div {
+  flex: 1 1 220px;
+  display: grid;
+  gap: 2px;
+}
+.rate-card-row form {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.rate-card-row input {
+  width: 110px;
+}

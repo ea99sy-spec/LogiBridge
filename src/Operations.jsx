@@ -801,7 +801,7 @@ export function AdminPanel({ data, t, run, busy, navigate, accountsOnly = false 
         <>
           <UnansweredRequests t={t} lang={document.documentElement.lang} />
           <ErrorLog t={t} lang={document.documentElement.lang} demo={data.user.demo} />
-          <AdminSiteSettings data={data} t={t} run={run} busy={busy} />
+          <AdminSiteSettings data={data} t={t} run={run} busy={busy} lang={document.documentElement.lang} />
           <AdminEmailSettings data={data} t={t} run={run} busy={busy} />
           <AdminPayments data={data} t={t} run={run} busy={busy} />
           <BankTransfers data={data} t={t} run={run} busy={busy} />

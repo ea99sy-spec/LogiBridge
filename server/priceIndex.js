@@ -92,8 +92,37 @@ export function priceIndex(s, demo, now = Date.now()) {
     .sort((a, b) => b.deals - a.deals);
 }
 
-// Quick estimate for a visitor: the market price of real deals on the route (country pair, and city when there are enough deals there). Weight is not used.
-export function quickEstimate(s, q, demo = false, now = Date.now()) {
+// Visitor estimate, in order of trust:
+// 1. live carrier rate cards (one rate per carrier, at least MIN_DEALS carriers);
+// 2. real accepted deals on the route (at least MIN_DEALS deals);
+// 3. the administrator's reference rate for the country pair, always labelled as an estimate.
+// Carrier names are never shown. Weight is applied later by the chargeable-weight rule.
+function cardEstimate(s, q, demo, now) {
+  const demoOf = new Map((s.users || []).map((u) => [u.id, !!u.demo]));
+  const live = (s.rateCards || []).filter(
+    (c) =>
+      Date.parse(c.validUntil) > now &&
+      demoOf.get(c.carrierId) === !!demo &&
+      (!q.from || c.originCountry === q.from) &&
+      (!q.to || c.destinationCountry === q.to),
+  );
+  if (!live.length) return null;
+  // A carrier with several cards on the route counts once, at the median of its own rates.
+  const perCarrier = (list) => {
+    const by = new Map();
+    for (const c of list) by.set(c.carrierId, [...(by.get(c.carrierId) || []), c.pricePerTonUsd]);
+    return [...by.values()].map((v) => median(v));
+  };
+  const byCity = q.city
+    ? live.filter((c) => city(c.from) === city(q.city) || city(c.to) === city(q.city))
+    : [];
+  let rates = perCarrier(byCity);
+  if (rates.length < MIN_DEALS) rates = perCarrier(live);
+  if (rates.length < MIN_DEALS) return null;
+  return { enough: true, deals: rates.length, ratePerTon: round2(median(rates)), basis: "carrier_cards" };
+}
+
+function dealEstimate(s, q, demo) {
   let list = dealSamples(s, demo).filter(
     (x) =>
       (!q.from || x.originCountry === q.from) &&
@@ -110,6 +139,22 @@ export function quickEstimate(s, q, demo = false, now = Date.now()) {
   const rates = list.filter((x) => x.weight > 0).map((x) => x.price / (x.weight / 1000));
   if (rates.length < MIN_DEALS) return { deals: rates.length, enough: false };
   return { enough: true, deals: rates.length, ratePerTon: round2(median(rates)), basis: "route_tonne" };
+}
+
+function referenceEstimate(s, q) {
+  if (!q.from || !q.to) return null;
+  const r = (s.settings?.referenceRates || []).find(
+    (x) => x.originCountry === q.from && x.destinationCountry === q.to,
+  );
+  return r ? { enough: true, deals: 0, ratePerTon: round2(r.pricePerTonUsd), basis: "reference" } : null;
+}
+
+export function quickEstimate(s, q, demo = false, now = Date.now()) {
+  const fromCards = cardEstimate(s, q, demo, now);
+  if (fromCards) return fromCards;
+  const fromDeals = dealEstimate(s, q, demo);
+  if (fromDeals.enough) return fromDeals;
+  return referenceEstimate(s, q) || fromDeals;
 }
 
 // Partial (LTL) road freight: the charged weight is the largest of the actual weight,
@@ -167,6 +212,7 @@ export function priceIndexRoutes(app, { publicOnly } = {}) {
         chargeableKg: charge.kg,
         priceUsd: est.enough ? Math.round((est.ratePerTon * charge.kg) / 1000) : null,
         eurPerUsd: s.settings?.eurPerUsd || null,
+        basis: est.basis || null,
       });
     });
     return;

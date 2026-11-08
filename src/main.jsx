@@ -1734,7 +1734,7 @@ function App() {
             {activeTab === "feedback" && (
               <FeedbackPage data={data} user={user} t={t} lang={lang} run={run} busy={busy} />
             )}
-            {activeTab === "prices" && <PriceIndexPage t={t} lang={lang} />}
+            {activeTab === "prices" && <PriceIndexPage t={t} lang={lang} user={user} run={run} busy={busy} />}
             {activeTab === "growth" && <GrowthPage t={t} lang={lang} />}
             {activeTab === "team" && <TeamPage t={t} lang={lang} run={run} busy={busy} />}
             {activeTab === "support" && <SupportPage t={t} lang={lang} navigate={setTab} />}

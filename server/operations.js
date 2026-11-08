@@ -14,6 +14,7 @@ import { requiresApproval } from "../shared/access.js";
 import { TERMS_VERSION } from "../shared/legal.js";
 import { ownerMissing } from "./documents.js";
 import { prohibitedRules } from "../shared/prohibited.js";
+import { validCountry } from "../shared/countries.js";
 import { addCrossingStat } from "../shared/crossingTimes.js";
 import { subscriptionOf, addMonths, pricingOf } from "../shared/subscription.js";
 const text = (value, max = 300) => {
@@ -213,6 +214,7 @@ export function operationRoutes(app) {
       showPricingSection: s.settings?.showPricingSection !== false,
       crossingState: s.settings?.crossingState || {},
       eurPerUsd: s.settings?.eurPerUsd ?? null,
+      referenceRates: s.settings?.referenceRates || [],
       company: s.settings?.company || {},
       prohibited: prohibitedRules(s.settings),
       pricing: pricingOf(s),
@@ -255,6 +257,22 @@ export function operationRoutes(app) {
         if (!(v >= 0.1 && v <= 5)) throw new Error("Invalid request");
         eurPerUsd = v;
       }
+    }
+    // Administrator estimates shown to visitors when no carrier or deal data exists yet (always labelled).
+    let referenceRates;
+    if ("referenceRates" in b) {
+      if (!Array.isArray(b.referenceRates) || b.referenceRates.length > 40)
+        throw new Error("Invalid request");
+      referenceRates = b.referenceRates.map((r) => {
+        const p = Number(r.pricePerTonUsd);
+        if (!validCountry(r.originCountry) || !validCountry(r.destinationCountry) || !(p >= 10 && p <= 10000))
+          throw new Error("Invalid request");
+        return {
+          originCountry: r.originCountry,
+          destinationCountry: r.destinationCountry,
+          pricePerTonUsd: Math.round(p * 100) / 100,
+        };
+      });
     }
     let notifyEmail;
     if ("notifyEmail" in b) {
@@ -340,6 +358,7 @@ export function operationRoutes(app) {
       if (crossingState) s.settings.crossingState = crossingState;
       if (notifyEmail !== undefined) s.settings.notifyEmail = notifyEmail;
       if (eurPerUsd !== undefined) s.settings.eurPerUsd = eurPerUsd;
+      if (referenceRates !== undefined) s.settings.referenceRates = referenceRates;
     });
     res.json({ ok: true });
   });
