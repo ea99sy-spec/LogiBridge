@@ -50,7 +50,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 .doc-count {
   padding: 2px 8px;
@@ -193,10 +193,10 @@
   padding: 6px 8px;
   border-radius: 10px;
   background: #f6f8fc;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .doc-icon {
-  font-size: 9px;
+  font-size: calc(max(9px, 11px) * var(--fs));
   font-weight: 700;
   padding: 3px 5px;
   border-radius: 5px;
@@ -290,7 +290,7 @@
   border-radius: 999px;
   padding: 4px 12px;
   font: inherit;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   cursor: pointer;
   justify-self: start;
   margin: 4px 0;
@@ -353,7 +353,7 @@
   border-radius: 999px;
   border: 1px solid #d5dde9;
   background: #fff;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   cursor: pointer;
   user-select: none;
 }
@@ -432,7 +432,7 @@
 }
 .cd-items {
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   min-width: 760px;
   width: 100%;
 }
@@ -451,7 +451,7 @@
   width: 100%;
   min-width: 60px;
   padding: 5px 6px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .cd-items td:nth-child(2) input {
   min-width: 160px;
@@ -471,14 +471,14 @@
   background: #fff5f5;
   padding: 4px 8px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .cd-warn {
   color: #7a5c00;
   background: #fffbea;
   padding: 4px 8px;
   border-radius: 8px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .cd-ok {
   color: #166534;
@@ -493,5 +493,5 @@
   .protected-docs{display:none!important}
   .print-blocked{display:block!important;padding:40px;text-align:center;font-size:18px}
 }
-.doc-protect-note{font-size:.85rem;color:#64748b;margin:4px 0 14px}
+.doc-protect-note{font-size:calc(0.85rem * var(--fs));color:#64748b;margin:4px 0 14px}
 .doc-views{display:block;color:#10294b}

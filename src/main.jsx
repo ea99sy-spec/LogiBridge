@@ -41,6 +41,7 @@ import "./roles.css";
 import "./advanced.css";
 import "./accent.css";
 import "./theme.css";
+import "./type-scale.css";
 import ShipmentRoute from "./ShipmentRoute";
 import { crossingKeys } from "../shared/crossings";
 import {

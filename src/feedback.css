@@ -26,11 +26,11 @@
   text-align: center;
 }
 .fb-type span {
-  font-size: 22px;
+  font-size: calc(22px * var(--fs));
 }
 .fb-type small {
   color: #6b7f9e;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 .fb-type.on {
   border-color: #facc15;
@@ -106,7 +106,7 @@
   align-items: center;
 }
 .fb-badge {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   font-weight: 700;
   padding: 2px 10px;
   border-radius: 999px;
@@ -123,7 +123,7 @@
 }
 .fb-status,
 .fb-status-select {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   padding: 2px 10px;
   border-radius: 999px;
   background: #eef3fb;
@@ -199,7 +199,7 @@
   border-bottom-color: #ef4444;
 }
 .fb-summary b {
-  font-size: 24px;
+  font-size: calc(24px * var(--fs));
   color: #102a56;
 }
 .fb-summary small {

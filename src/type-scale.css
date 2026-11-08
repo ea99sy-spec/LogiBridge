@@ -1,0 +1,9 @@
+/* Global type scale. Every font size on the site is multiplied by --fs, so one number controls
+   how large the text reads. Sizes below 11px are lifted to 11px first. */
+:root {
+  --fs: 1.25;
+  --font-sans: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+}
+body {
+  font-family: var(--font-sans);
+}

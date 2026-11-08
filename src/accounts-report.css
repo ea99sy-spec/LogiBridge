@@ -24,7 +24,7 @@
 }
 .report-totals b {
   display: block;
-  font-size: 22px;
+  font-size: calc(22px * var(--fs));
   color: #102a56;
 }
 .report-totals small {
@@ -52,7 +52,7 @@
 .report-table {
   border-collapse: separate;
   border-spacing: 0;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   min-width: 100%;
 }
 .report-table th,

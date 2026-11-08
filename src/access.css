@@ -86,7 +86,7 @@ a:focus-visible {
 .access-header .brand {
   color: #102a56;
   text-decoration: none;
-  font-size: 26px;
+  font-size: calc(26px * var(--fs));
 }
 .access-header .brand-icon {
   height: 38px;
@@ -111,7 +111,7 @@ a:focus-visible {
   background: #edf4ff;
   border-radius: 25px;
   padding: 8px 14px;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   letter-spacing: 2px;
   display: inline-flex;
   align-items: center;
@@ -125,7 +125,7 @@ a:focus-visible {
   border-radius: 50%;
 }
 .access-story h1 {
-  font-size: 48px;
+  font-size: calc(48px * var(--fs));
   line-height: 1.4;
   letter-spacing: -1.1px;
   max-width: 590px;
@@ -134,7 +134,7 @@ a:focus-visible {
 }
 .access-story > p {
   max-width: 470px;
-  font-size: 15px;
+  font-size: calc(15px * var(--fs));
   line-height: 1.9;
   color: #6d82a1;
 }
@@ -167,7 +167,7 @@ a:focus-visible {
   border-radius: 22px;
   background: #10294b;
   color: white;
-  font-size: 21px;
+  font-size: calc(21px * var(--fs));
   font-weight: 700;
   box-shadow: 0 9px 26px #10294b2b;
   transform: rotate(-7deg);
@@ -178,7 +178,7 @@ a:focus-visible {
   transform: rotate(7deg);
 }
 .bridge-city b {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   letter-spacing: 1px;
   color: #6f83a3;
 }
@@ -202,7 +202,7 @@ a:focus-visible {
   height: 47px;
   display: grid;
   place-items: center;
-  font-size: 28px;
+  font-size: calc(28px * var(--fs));
   background: white;
   border: 1px solid #cfddf2;
   border-radius: 12px;
@@ -251,10 +251,10 @@ a:focus-visible {
   flex-wrap: wrap;
   gap: 10px 22px;
   color: #536f9a;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 .access-story > .access-footnote {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   line-height: 1.8;
   margin-top: 23px;
   color: #91a1b8;
@@ -277,12 +277,12 @@ a:focus-visible {
   background: linear-gradient(90deg, #10294b 0 72%, #facc15 72%);
 }
 .access-card h2 {
-  font-size: 25px;
+  font-size: calc(25px * var(--fs));
   color: #122f5c;
   margin: 8px 0 10px;
 }
 .access-card > .muted {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   margin-bottom: 25px;
   line-height: 1.8;
 }
@@ -312,12 +312,12 @@ a:focus-visible {
   transform: translateY(-2px);
 }
 .access-option b {
-  font-size: 13px;
+  font-size: calc(13px * var(--fs));
 }
 .access-option small {
   display: block;
   color: #8498b4;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   margin-top: 3px;
 }
 .access-symbol {
@@ -326,7 +326,7 @@ a:focus-visible {
   background: #edf4ff;
   color: #10294b;
   border-radius: 12px;
-  font-size: 25px;
+  font-size: calc(25px * var(--fs));
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -337,11 +337,11 @@ a:focus-visible {
 }
 .option-arrow {
   margin-inline-start: auto;
-  font-size: 21px;
+  font-size: calc(21px * var(--fs));
   color: #8fa9cc;
 }
 .access-back {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   color: #7690b4;
   text-decoration: none;
   display: block;
@@ -355,7 +355,7 @@ a:focus-visible {
   border-radius: 16px;
   background: #edf4ff;
   color: #10294b;
-  font-size: 31px;
+  font-size: calc(31px * var(--fs));
   margin-bottom: 17px;
 }
 .account-individual .access-form-icon,
@@ -367,7 +367,7 @@ a:focus-visible {
   padding: 12px 14px;
 }
 .access-card .field small {
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #91a2b9;
 }
 .access-submit {
@@ -377,7 +377,7 @@ a:focus-visible {
 }
 .access-register-link {
   text-align: center;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   color: #8195b2;
   margin-top: 22px;
 }
@@ -397,18 +397,18 @@ a:focus-visible {
   background: #fffbed;
   border: 1px dashed #efdc88;
   border-radius: 9px;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #a28a38;
 }
 .demo-access button {
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #8b701c;
 }
 .access-footer {
   max-width: 1280px;
   width: calc(100% - 92px);
   margin: 0 auto;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   padding: 20px 0;
   color: #97a9c2;
 }
@@ -416,7 +416,7 @@ a:focus-visible {
   display: flex;
   align-items: flex-start;
   gap: 11px;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   line-height: 1.8;
   color: #7e92af;
 }
@@ -433,7 +433,7 @@ a:focus-visible {
   background: #fff2ee;
   padding: 10px;
   border-radius: 7px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .verification-steps {
   display: flex;
@@ -447,7 +447,7 @@ a:focus-visible {
   align-items: center;
   gap: 12px;
   flex: 1;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   color: #8ca0bd;
 }
 .verification-steps span {
@@ -480,7 +480,7 @@ a:focus-visible {
   gap: 8px;
 }
 .upload-icon {
-  font-size: 33px;
+  font-size: calc(33px * var(--fs));
   color: #10294b;
   background: #e7f0ff;
   width: 56px;
@@ -490,16 +490,16 @@ a:focus-visible {
   border-radius: 15px;
 }
 .document-drop b {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   color: #5676a3;
 }
 .document-drop small {
   color: #9baecc;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
 }
 .document-drop input {
   width: 100%;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   border: 0;
   background: transparent;
   margin-top: 8px;
@@ -510,7 +510,7 @@ a:focus-visible {
   border-radius: 24px;
   background: #fff7d6;
   color: #9e7d19;
-  font-size: 51px;
+  font-size: calc(51px * var(--fs));
   display: grid;
   place-items: center;
   margin: 0 auto 20px;
@@ -520,12 +520,12 @@ a:focus-visible {
   padding: 28px;
 }
 .verification-status > p {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   line-height: 1.9;
   color: #8498b6;
 }
 .verification-requirement {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   text-align: start;
   color: #5676a3;
   border-top: 1px solid #e6eef9;
@@ -533,7 +533,7 @@ a:focus-visible {
   margin-top: 12px;
 }
 .verification-status .notice {
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   margin: 20px 0 0;
   background: #fff9df;
   color: #9d832d;
@@ -550,15 +550,15 @@ a:focus-visible {
   flex: 1;
 }
 .verification-application b {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .verification-application small {
   display: block;
   color: #8fa3c1;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
 }
 .verification-application p {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   flex-basis: 100%;
   overflow-wrap: anywhere;
   color: #7991b4;
@@ -579,14 +579,14 @@ a:focus-visible {
   margin: 10px 0 3px;
 }
 .review-heading small {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   color: #8ea4c4;
 }
 .document-download {
   display: inline-block;
   text-decoration: none;
   padding: 7px 13px;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
 }
 .registry-links {
   display: flex;
@@ -595,11 +595,11 @@ a:focus-visible {
   margin-top: 16px;
 }
 .registry-links a {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   color: #10294b;
 }
 .registry-links small {
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #8da3c3;
 }
 .review-form {
@@ -611,7 +611,7 @@ a:focus-visible {
   border-radius: 12px;
 }
 .review-audit {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   color: #839abb;
   padding-top: 15px;
 }
@@ -625,7 +625,7 @@ a:focus-visible {
     padding-inline: 35px;
   }
   .access-story h1 {
-    font-size: 39px;
+    font-size: calc(39px * var(--fs));
   }
   .access-card {
     padding: 29px;
@@ -637,7 +637,7 @@ a:focus-visible {
     width: 330px;
   }
   .access-story > p {
-    font-size: 13px;
+    font-size: calc(13px * var(--fs));
   }
 }
 @media (max-width: 800px) {
@@ -651,7 +651,7 @@ a:focus-visible {
     padding: 22px 24px;
   }
   .access-story h1 {
-    font-size: 33px;
+    font-size: calc(33px * var(--fs));
     max-width: none;
     margin: 17px 0 12px;
   }
@@ -671,14 +671,14 @@ a:focus-visible {
   .bridge-city > span {
     width: 56px;
     height: 56px;
-    font-size: 17px;
+    font-size: calc(17px * var(--fs));
     border-radius: 17px;
   }
   .access-footnote {
     display: none;
   }
   .access-benefits {
-    font-size: 10px;
+    font-size: calc(max(10px, 11px) * var(--fs));
   }
   .access-card {
     border-radius: 17px;
@@ -691,7 +691,7 @@ a:focus-visible {
   }
   .verification-steps > div {
     gap: 7px;
-    font-size: 10px;
+    font-size: calc(max(10px, 11px) * var(--fs));
   }
 }
 @media (max-width: 480px) {
@@ -702,16 +702,16 @@ a:focus-visible {
     padding-inline: 18px;
   }
   .access-header .brand {
-    font-size: 22px;
+    font-size: calc(22px * var(--fs));
   }
   .access-card {
     padding: 25px 20px;
   }
   .access-story h1 {
-    font-size: 29px;
+    font-size: calc(29px * var(--fs));
   }
   .access-card h2 {
-    font-size: 21px;
+    font-size: calc(21px * var(--fs));
   }
   .bridge-track {
     width: 130px;
@@ -726,7 +726,7 @@ a:focus-visible {
     border-radius: 10px;
   }
   .access-option small {
-    font-size: 9px;
+    font-size: calc(max(9px, 11px) * var(--fs));
   }
   .demo-access {
     flex-wrap: wrap;
@@ -770,7 +770,7 @@ a:focus-visible {
   margin-top: 0;
 }
 .legal-content h2 {
-  font-size: 18px;
+  font-size: calc(18px * var(--fs));
   margin: 26px 0 6px;
 }
 .legal-content p {
@@ -818,7 +818,7 @@ a:focus-visible {
 }
 .company-line {
   flex-basis: 100%;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   color: #869bb9;
   overflow-wrap: anywhere;
 }

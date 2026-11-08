@@ -143,7 +143,7 @@
   margin: 0;
 }
 .subscription-days b {
-  font-size: 26px;
+  font-size: calc(26px * var(--fs));
   color: #102a56;
 }
 .badge.sub-trial {
@@ -170,7 +170,7 @@
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  font-size: 13px;
+  font-size: calc(13px * var(--fs));
 }
 .bonus-progress .bar {
   height: 10px;
@@ -189,7 +189,7 @@
   padding: 10px 16px;
   background: var(--brand-yellow-soft);
   color: #6b5000;
-  font-size: 13px;
+  font-size: calc(13px * var(--fs));
   border-bottom: 1px solid #f1df9b;
 }
 .subscription-banner.expired {
@@ -225,21 +225,21 @@
   text-align: center;
 }
 .price-item span {
-  font-size: 13px;
+  font-size: calc(13px * var(--fs));
   opacity: 0.85;
 }
 .price-item b {
-  font-size: 22px;
+  font-size: calc(22px * var(--fs));
   color: var(--brand-yellow);
 }
 .price-item small {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   color: #dbe5f5;
   font-weight: 400;
 }
 .price-note {
   margin: 12px 0 0;
-  font-size: 13px;
+  font-size: calc(13px * var(--fs));
   opacity: 0.85;
 }
 .pricing-settings {
@@ -327,7 +327,7 @@ main textarea {
   background: var(--brand-yellow);
   color: #102a56;
   font-weight: 700;
-  font-size: 17px;
+  font-size: calc(17px * var(--fs));
 }
 .guide-tips ul {
   margin: 8px 0;
@@ -371,7 +371,7 @@ main textarea {
   color: #102a56;
 }
 .holiday-country {
-  font-size: 13px;
+  font-size: calc(13px * var(--fs));
   color: #6b778c;
 }
 .countdown {
@@ -393,11 +393,11 @@ main textarea {
   color: #fff;
 }
 .countdown-digits b {
-  font-size: 22px;
+  font-size: calc(22px * var(--fs));
   color: var(--brand-yellow);
 }
 .countdown-digits small {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   opacity: 0.85;
 }
 .countdown.active .countdown-digits span {
@@ -423,7 +423,7 @@ main textarea {
   grid-column: 2 / -1;
 }
 .holiday-date {
-  font-size: 13px;
+  font-size: calc(13px * var(--fs));
   color: #3f5679;
 }
 .holiday-card {
@@ -454,7 +454,7 @@ main textarea {
   display: inline-block;
   padding: 2px 10px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   font-weight: 700;
 }
 .country-chip.c-TR {
@@ -511,7 +511,7 @@ svg.flag {
   width: auto;
 }
 .auto-close-line {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   margin: 6px 0;
   padding: 6px 10px;
   border-radius: 10px;
@@ -523,13 +523,13 @@ svg.flag {
   color: #166534;
 }
 .prohibited-note {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   background: #fff5f5;
   border: 1px solid #fecaca;
   color: #9b1c1c;
 }
 .rejected-line {
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .reject-shipment {
   justify-self: start;
@@ -542,7 +542,7 @@ svg.flag {
   margin-top: 4px;
 }
 .rep-chip {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   padding: 2px 8px;
   border-radius: 999px;
   background: #eef3fb;
@@ -563,7 +563,7 @@ svg.flag {
   margin-top: 3px;
 }
 .offer-badge {
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
   font-weight: 700;
   padding: 1px 8px;
   border-radius: 999px;
@@ -587,7 +587,7 @@ svg.flag {
 }
 .offer-compare table {
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   min-width: 100%;
 }
 .offer-compare th,
@@ -659,11 +659,11 @@ svg.flag {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  font-size: 13px;
+  font-size: calc(13px * var(--fs));
   color: #6b7f9e;
 }
 .referral-stats b {
-  font-size: 20px;
+  font-size: calc(20px * var(--fs));
   color: #102a56;
   margin-inline-end: 4px;
 }
@@ -693,7 +693,7 @@ svg.flag {
 .time-grid {
   border-collapse: separate;
   border-spacing: 3px;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
 }
 .time-grid th {
   font-weight: 600;
@@ -772,7 +772,7 @@ svg.flag {
   align-items: center;
 }
 .driver-status {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 999px;
@@ -792,7 +792,7 @@ svg.flag {
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   margin: 4px 0;
 }
 .shipment-driver select {
@@ -801,7 +801,7 @@ svg.flag {
 .guarantee-chip {
   display: inline-block;
   margin-top: 3px;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   font-weight: 700;
   padding: 1px 8px;
   border-radius: 999px;
@@ -809,7 +809,7 @@ svg.flag {
   color: #5b21b6;
 }
 .trust-badge {
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
   font-weight: 700;
   padding: 2px 9px;
   border-radius: 999px;
@@ -864,18 +864,18 @@ svg.flag {
   flex-wrap: wrap;
   gap: 10px 16px;
   align-items: center;
-  font-size: 13px;
+  font-size: calc(13px * var(--fs));
 }
 .cost-suggested b {
   color: #166534;
-  font-size: 16px;
+  font-size: calc(16px * var(--fs));
 }
 .shared-truck {
   display: flex;
   flex-wrap: wrap;
   gap: 6px 12px;
   align-items: center;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   padding: 8px 10px;
   border-radius: 10px;
   background: #eef4ff;
@@ -934,7 +934,7 @@ svg.flag {
   display: flex;
   gap: 8px;
   align-items: flex-start;
-  font-size: 0.88rem;
+  font-size: calc(0.88rem * var(--fs));
   margin: 6px 0;
 }
 
@@ -949,7 +949,7 @@ svg.flag {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 11px;
+  font-size: calc(11px * var(--fs));
 }
 
 /* Start-here card: each step is a link to its page */
@@ -981,7 +981,7 @@ svg.flag {
   }
   .breadcrumb {
     min-width: 0;
-    font-size: 14px;
+    font-size: calc(14px * var(--fs));
   }
   .content {
     padding: 16px;
@@ -989,22 +989,22 @@ svg.flag {
   .content p,
   .panel p,
   .panel li {
-    font-size: 15px;
+    font-size: calc(15px * var(--fs));
     line-height: 1.7;
   }
   .content h1,
   .section-heading h1 {
-    font-size: 26px;
+    font-size: calc(26px * var(--fs));
     line-height: 1.3;
   }
   .content h2,
   .section-heading h2 {
-    font-size: 21px;
+    font-size: calc(21px * var(--fs));
     line-height: 1.35;
   }
   .content h3,
   .panel h3 {
-    font-size: 18px;
+    font-size: calc(18px * var(--fs));
     line-height: 1.4;
   }
   .content small,
@@ -1013,30 +1013,30 @@ svg.flag {
   .panel small,
   .stat small,
   .start-here small {
-    font-size: 13px;
+    font-size: calc(13px * var(--fs));
     line-height: 1.6;
   }
   .content .badge,
   .panel .badge {
-    font-size: 12px;
+    font-size: calc(12px * var(--fs));
   }
   .route-line {
-    font-size: 12px;
+    font-size: calc(12px * var(--fs));
   }
   .start-here-link {
-    font-size: 15px;
+    font-size: calc(15px * var(--fs));
     min-height: 36px;
   }
   .landing-hero h1 {
-    font-size: 36px;
+    font-size: calc(36px * var(--fs));
     line-height: 1.3;
   }
   .landing-hero .hero-value {
-    font-size: 17px;
+    font-size: calc(17px * var(--fs));
     line-height: 1.8;
   }
   .live-strip {
-    font-size: 13px;
+    font-size: calc(13px * var(--fs));
   }
   .sidebar nav button,
   .text-button,
@@ -1048,7 +1048,7 @@ svg.flag {
   .legal-footer-links a,
   footer,
   footer a {
-    font-size: 13px;
+    font-size: calc(13px * var(--fs));
   }
 }
 
@@ -1072,7 +1072,7 @@ svg.flag {
   color: #546278;
 }
 .board-stat strong {
-  font-size: 22px;
+  font-size: calc(22px * var(--fs));
   color: #0b2350;
 }
 .board-list {
@@ -1090,14 +1090,14 @@ body {
   font-weight: 500;
 }
 .about-grid p {
-  font-size: 17px;
+  font-size: calc(17px * var(--fs));
   line-height: 1.9;
 }
 .about-values b {
-  font-size: 17px;
+  font-size: calc(17px * var(--fs));
 }
 .about-values small {
-  font-size: 15px;
+  font-size: calc(15px * var(--fs));
   line-height: 1.7;
 }
 
@@ -1127,7 +1127,7 @@ body {
   padding: 6px 10px;
   border-radius: 999px;
   background: #f1f5f9;
-  font-size: 14px;
+  font-size: calc(14px * var(--fs));
 }
 .border-chip.open {
   background: #dcfce7;

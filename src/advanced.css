@@ -44,7 +44,7 @@
 }
 .calendar-grid small {
   display: block;
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
 }
 .calendar-grid .available {
   background: #e3f3ed;
@@ -72,7 +72,7 @@
   padding: 12px;
 }
 .fx-date {
-  font-size: 10px;
+  font-size: calc(max(10px, 11px) * var(--fs));
 }
 .currency-select {
   max-width: 100px;

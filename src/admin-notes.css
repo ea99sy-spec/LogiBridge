@@ -92,7 +92,7 @@
   border-radius: 999px;
   padding: 6px 12px;
   font: inherit;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   cursor: pointer;
   color: #173a6c;
 }
@@ -159,7 +159,7 @@
   flex-wrap: wrap;
   gap: 6px 10px;
   align-items: center;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
 }
 .note-account {
   border: 0;
@@ -168,7 +168,7 @@
   border-radius: 999px;
   padding: 3px 10px;
   font: inherit;
-  font-size: 12px;
+  font-size: calc(12px * var(--fs));
   cursor: pointer;
 }
 .note-due {
