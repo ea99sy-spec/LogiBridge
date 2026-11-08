@@ -1,4 +1,17 @@
 import test from "node:test";
+import { PDFDocument, StandardFonts } from "pdf-lib";
+// A small PDF with visible text, so uploads pass the readable-content check.
+async function textPdfBase64() {
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage([300, 200]);
+  page.drawText("Registration certificate", {
+    x: 20,
+    y: 150,
+    size: 14,
+    font: await pdf.embedFont(StandardFonts.Helvetica),
+  });
+  return Buffer.from(await pdf.save()).toString("base64");
+}
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -495,7 +508,7 @@ test("company profile pages are for approved members and show contact details", 
   await call("sup", "/auth/register", company);
   // Documents need a complete profile with a contact email first.
   const doc = await call("sup", "/kyb", {
-    content: "JVBERi0xLjQK",
+    content: await textPdfBase64(),
     mime: "application/pdf",
     filename: "r.pdf",
   });

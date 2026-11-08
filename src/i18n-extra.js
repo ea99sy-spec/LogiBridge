@@ -2844,6 +2844,11 @@ export const extraRows = {
     "A server error occurred. Try again shortly.",
     "Sunucu hatası oluştu. Biraz sonra tekrar deneyin.",
   ],
+  "err_PDF has no readable content": [
+    "ملف الـ PDF فاضي أو ما فيه محتوى واضح. ارفع الملف الأصلي (مثلاً ممسوح ضوئياً أو مصدّر من البرنامج).",
+    "This PDF is empty or has no readable content. Upload the original file (for example a scan or an export from the source program).",
+    "Bu PDF boş veya okunabilir içerik yok. Orijinal dosyayı yükleyin (örneğin tarama veya kaynak programdan dışa aktarılmış).",
+  ],
   weightLimitError: [
     "الوزن لازم يكون بين 1 و 24,000 كغ.",
     "Weight must be between 1 and 24,000 kg.",

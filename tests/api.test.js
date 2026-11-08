@@ -1,4 +1,18 @@
 import test from "node:test";
+import { PDFDocument, StandardFonts } from "pdf-lib";
+// A small PDF with visible text, so uploads pass the readable-content check.
+async function textPdfBase64() {
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage([300, 200]);
+  page.drawText("Registration certificate", {
+    x: 20,
+    y: 150,
+    size: 14,
+    font: await pdf.embedFont(StandardFonts.Helvetica),
+  });
+  return Buffer.from(await pdf.save()).toString("base64");
+}
+
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -258,7 +272,7 @@ test("HTTP workflows, permissions, validation, feature flags and persistence", a
     registration: "123",
     filename: "registration.pdf",
     mime: "application/pdf",
-    content: Buffer.from("%PDF-1.4\nDemo file header").toString("base64"),
+    content: await textPdfBase64(),
   };
   const shippingDoc = { ...document, shipmentId: shipment.id, kind: "invoice" };
   assert.equal((await call("supplier", "/shipment-documents", shippingDoc)).status, 400);
