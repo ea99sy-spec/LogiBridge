@@ -17,7 +17,7 @@ function useHealth() {
     pricing: null,
     whatsapp: "",
     homeVerification: true,
-    homePricing: true,
+    pricingSection: true,
   });
   useEffect(() => {
     fetch("/api/health")
@@ -275,7 +275,7 @@ export default function Landing({ t, langSelect, user }) {
         )}
 
         {/* 7. Cost and questions */}
-        {health.homePricing !== false && (
+        {health.pricingSection !== false && (
           <section id="pricing" className="landing-section">
             <div className="pricing-card">
               <h2>{t("pricingTitle")}</h2>
