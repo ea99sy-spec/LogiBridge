@@ -67,6 +67,7 @@ import { inviterFor, rewardReferral, referralState } from "./referrals.js";
 import { checkGoods, prohibitedRules } from "../shared/prohibited.js";
 import { feedbackRoutes } from "./feedback.js";
 import { documentRoutes, documentVisible, requestVisible } from "./documents.js";
+import { pdfHasContent } from "./pdfContent.js";
 import { accountsReportRoutes } from "./accountsReport.js";
 import { TERMS_VERSION, termsOutdated } from "../shared/legal.js";
 import { trackingRoutes, publicTrackingRoutes, newDeliveryCode, runTrackingWatch } from "./tracking.js";
@@ -1011,6 +1012,8 @@ export async function createApp() {
     role(req.user, "merchant", "carrier", "supplier");
     const b = req.body;
     validateDocument(b);
+    if (b.mime === "application/pdf" && !(await pdfHasContent(Buffer.from(b.content, "base64"))))
+      throw new Error("PDF has no readable content");
     const person = req.user.accountType === "individual";
     // Companies complete their profile first, so the administrator reviews it with the documents.
     if (!person && !req.user.demo && (!req.user.profile?.about || !req.user.profile?.contactEmail))
