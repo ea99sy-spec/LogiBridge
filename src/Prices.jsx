@@ -8,7 +8,164 @@ import "./prices.css";
 const usd = (n) => "$" + Number(n).toLocaleString("en");
 const stageKey = (s) => (s === "full" ? "fullShipment" : "leg_" + s);
 
-export function PriceIndexPage({ t, lang }) {
+// Carrier's own route rates (USD per tonne). Valid for 90 days; any save renews them.
+function RateCardsPanel({ t, lang, run, busy }) {
+  const [cards, setCards] = useState(null);
+  const options = countryOptions(lang);
+  const name = (code) => options.find((o) => o.code === code)?.label || code;
+  const fmtDate = (d) =>
+    new Date(d).toLocaleDateString(lang, { day: "numeric", month: "short", year: "numeric" });
+  const load = () =>
+    fetch("/api/rate-cards")
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setCards)
+      .catch(() => setCards([]));
+  useEffect(() => {
+    load();
+  }, []);
+  // run() returns null when the server refused the change; the error is already shown.
+  const save = async (body, method, path, success) => {
+    const r = await run(path, body, method, { success });
+    if (r !== null) load();
+    return r;
+  };
+  return (
+    <section className="panel rate-cards">
+      <h2>{t("rcTitle")}</h2>
+      <p className="muted">{t("rcIntro")}</p>
+      <form
+        className="rate-card-form"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const form = e.currentTarget;
+          const f = new FormData(form);
+          const r = await save(
+            {
+              originCountry: f.get("originCountry"),
+              destinationCountry: f.get("destinationCountry"),
+              from: f.get("from"),
+              to: f.get("to"),
+              pricePerTonUsd: f.get("pricePerTonUsd"),
+            },
+            "POST",
+            "/rate-cards",
+            "rcSaved",
+          );
+          if (r !== null) form.reset();
+        }}
+      >
+        <label>
+          <small>{t("rcOrigin")}</small>
+          <select name="originCountry" defaultValue="TR">
+            {options.map((o) => (
+              <option key={o.code} value={o.code}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <small>{t("rcDest")}</small>
+          <select name="destinationCountry" defaultValue="SY">
+            {options.map((o) => (
+              <option key={o.code} value={o.code}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <small>{t("rcFromCity")}</small>
+          <input name="from" maxLength={80} />
+        </label>
+        <label>
+          <small>{t("rcToCity")}</small>
+          <input name="to" maxLength={80} />
+        </label>
+        <label>
+          <small>{t("rcPrice")}</small>
+          <input name="pricePerTonUsd" type="number" min="10" max="10000" step="0.01" required dir="ltr" />
+        </label>
+        <button className="button" disabled={busy}>
+          {t("rcAdd")}
+        </button>
+      </form>
+      {cards === null ? (
+        <p className="muted">{t("loading")}</p>
+      ) : cards.length ? (
+        cards.map((c) => (
+          <div className="rate-card-row" key={c.id}>
+            <div>
+              <strong>
+                {name(c.originCountry)} → {name(c.destinationCountry)}
+              </strong>
+              {(c.from || c.to) && (
+                <small>
+                  {" "}
+                  ({c.from || "—"} → {c.to || "—"})
+                </small>
+              )}
+              <small className={c.active ? "muted" : "error-text"}>
+                {" "}
+                · {c.active ? t("rcActive") : t("rcExpired")} · {t("rcValidUntil")}: {fmtDate(c.validUntil)}
+              </small>
+            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const f = new FormData(e.currentTarget);
+                save(
+                  { pricePerTonUsd: f.get("pricePerTonUsd") },
+                  "PATCH",
+                  `/rate-cards/${c.id}`,
+                  "rcUpdated",
+                );
+              }}
+            >
+              <input
+                name="pricePerTonUsd"
+                type="number"
+                min="10"
+                max="10000"
+                step="0.01"
+                defaultValue={c.pricePerTonUsd}
+                required
+                dir="ltr"
+                aria-label={t("rcPrice")}
+              />
+              <button className="button" disabled={busy}>
+                {t("rcSave")}
+              </button>
+            </form>
+            <button
+              type="button"
+              className="button ghost"
+              disabled={busy}
+              onClick={() => save({}, "PATCH", `/rate-cards/${c.id}`, "rcRenewed")}
+            >
+              {t("rcRenew")}
+            </button>
+            <button
+              type="button"
+              className="button ghost"
+              disabled={busy}
+              onClick={() => {
+                if (window.confirm(t("rcDeleteConfirm")))
+                  save({}, "DELETE", `/rate-cards/${c.id}`, "rcDeleted");
+              }}
+            >
+              {t("rcDelete")}
+            </button>
+          </div>
+        ))
+      ) : (
+        <p className="muted">{t("rcEmpty")}</p>
+      )}
+    </section>
+  );
+}
+
+export function PriceIndexPage({ t, lang, user, run, busy }) {
   const [data, setData] = useState(null);
   const [query, setQuery] = useState("");
   useEffect(() => {
@@ -28,6 +185,7 @@ export function PriceIndexPage({ t, lang }) {
           <p>{t("pricesIntro").replace("{n}", data?.min || 3)}</p>
         </div>
       </div>
+      {user?.role === "carrier" && <RateCardsPanel t={t} lang={lang} run={run} busy={busy} />}
       {data === null ? (
         <p className="muted">{t("loading")}</p>
       ) : !data.routes.length ? (
@@ -233,6 +391,7 @@ export function QuickPrice({ t }) {
               </div>
             )}
             <small className="muted">{t("finalPriceNote")}</small>
+            {result.basis === "reference" && <small className="muted">{t("estimateReference")}</small>}
             <a className="button" href="/register">
               {t("getRealOffers")} ↗
             </a>

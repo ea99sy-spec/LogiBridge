@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { waLink } from "../shared/wa";
 import { crossingKeys } from "../shared/crossings";
 import CorridorCard from "./CorridorCard";
-import { countryName } from "../shared/countries";
+import { countryName, countryOptions } from "../shared/countries";
 export function PendingAccount({ data, t, navigate }) {
   const status = data.user.verificationStatus;
   return (
@@ -600,7 +600,79 @@ export function AccountSecurity({ data, t, run, busy }) {
   );
 }
 // Owner switches: demo sign-in buttons and the activity emails about the site.
-export function AdminSiteSettings({ data, t, run, busy }) {
+// Administrator estimates for visitors before carrier rates exist. Always shown as estimates.
+function ReferenceRatesEditor({ t, lang, value, busy, onSave }) {
+  const [rows, setRows] = useState(value || []);
+  useEffect(() => setRows(value || []), [value]);
+  const options = countryOptions(lang);
+  const update = (i, key, v) => setRows(rows.map((r, j) => (j === i ? { ...r, [key]: v } : r)));
+  return (
+    <div className="form-stack reference-rates">
+      <h3>{t("adminRefTitle")}</h3>
+      <p className="muted small">{t("adminRefIntro")}</p>
+      {rows.map((r, i) => (
+        <div className="rate-card-row" key={i}>
+          <select value={r.originCountry} onChange={(e) => update(i, "originCountry", e.target.value)}>
+            {options.map((o) => (
+              <option key={o.code} value={o.code}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+          <select
+            value={r.destinationCountry}
+            onChange={(e) => update(i, "destinationCountry", e.target.value)}
+          >
+            {options.map((o) => (
+              <option key={o.code} value={o.code}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+          <input
+            type="number"
+            min="10"
+            max="10000"
+            step="0.01"
+            dir="ltr"
+            value={r.pricePerTonUsd}
+            onChange={(e) => update(i, "pricePerTonUsd", e.target.value)}
+            aria-label={t("rcPrice")}
+          />
+          <button
+            type="button"
+            className="button ghost"
+            onClick={() => setRows(rows.filter((_, j) => j !== i))}
+          >
+            ✕
+          </button>
+        </div>
+      ))}
+      <div className="row-actions">
+        <button
+          type="button"
+          className="button ghost"
+          disabled={busy}
+          onClick={() =>
+            setRows([...rows, { originCountry: "TR", destinationCountry: "SY", pricePerTonUsd: "" }])
+          }
+        >
+          {t("adminRefAdd")}
+        </button>
+        <button
+          type="button"
+          className="button"
+          disabled={busy}
+          onClick={() => onSave(rows.map((r) => ({ ...r, pricePerTonUsd: Number(r.pricePerTonUsd) })))}
+        >
+          {t("adminRefSave")}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function AdminSiteSettings({ data, t, run, busy, lang }) {
   const [settings, setSettings] = useState(null);
   useEffect(() => {
     if (data.user.demo) return;
@@ -636,6 +708,15 @@ export function AdminSiteSettings({ data, t, run, busy }) {
           />
           <small className="muted">{t("eurRateDesc")}</small>
         </label>
+      )}
+      {settings && (
+        <ReferenceRatesEditor
+          t={t}
+          lang={lang}
+          value={settings.referenceRates}
+          busy={busy}
+          onSave={(rows) => save({ referenceRates: rows })}
+        />
       )}
       {data.flags && (
         <div className="feature-flags">
